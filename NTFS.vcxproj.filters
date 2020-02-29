@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Commands">
+      <UniqueIdentifier>{d9b7d278-8acb-4315-bf21-76cea46bdd14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Commands">
+      <UniqueIdentifier>{f9cffb64-428d-4757-8cc2-91f982c6006d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{21005216-a213-4461-bd3a-444228a60642}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{b4b2947e-c599-48d1-a12f-b610e818447d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\NTFS">
+      <UniqueIdentifier>{d712c964-e149-4f6a-a37b-0ff1c98a2cf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NTFS">
+      <UniqueIdentifier>{939daecb-d675-444f-8123-2f2a88db1a30}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sources\disk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\volume.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Commands\commands.h">
+      <Filter>Header Files\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\buffer.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\constant_names.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\table.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\utils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\reader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\generator.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\bitlocker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\vbr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\mbr_gpt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\NTFS\ntfs.h">
+      <Filter>Header Files\NTFS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\NTFS\ntfs_explorer.h">
+      <Filter>Header Files\NTFS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\NTFS\ntfs_index_entry.h">
+      <Filter>Header Files\NTFS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\NTFS\ntfs_mft.h">
+      <Filter>Header Files\NTFS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\NTFS\ntfs_mft_record.h">
+      <Filter>Header Files\NTFS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\NTFS\ntfs_reader.h">
+      <Filter>Header Files\NTFS</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sources\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\disk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\volume.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\options.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_gpt.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_help.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_info.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_mbr.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_fve.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\table.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\constant_names.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\utils.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_vbr.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_bitlocker.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_mft.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_usn.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_shell.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_logfile.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\reader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_undelete.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_bitdecrypt.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\NTFS\ntfs_explorer.cpp">
+      <Filter>Source Files\NTFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\NTFS\ntfs_index_entry.cpp">
+      <Filter>Source Files\NTFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\NTFS\ntfs_mft.cpp">
+      <Filter>Source Files\NTFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\NTFS\ntfs_mft_record.cpp">
+      <Filter>Source Files\NTFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\NTFS\ntfs_reader.cpp">
+      <Filter>Source Files\NTFS</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
