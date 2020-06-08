@@ -30,5 +30,7 @@ public:
 
 	std::shared_ptr<MFT> mft() { return _MFT; }
 
+	std::shared_ptr<NTFSReader> reader() { return _reader; }
+
 	std::vector<std::wstring> list(std::wstring directory);
 };

@@ -98,20 +98,20 @@ bool check_datatuns_still_valid(ULONG64 datasize, ULONG64 clustersize, const std
 
 int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts) {
 
-	if (vol->filesystem() != "NTFS")
+	if (vol->filesystem() != "NTFS" && vol->filesystem() != "Bitlocker")
 	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
+		std::cerr << "[!] NTFS/Bitlocker volume required" << std::endl;
 		return 1;
 	}
 
 	utils::ui::title("Undelete from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
-	DWORD cluster_size = ((PBOOT_SECTOR_NTFS)vol->bootsector())->bytePerSector * ((PBOOT_SECTOR_NTFS)vol->bootsector())->sectorPerCluster;
-	DWORD record_size = ((PBOOT_SECTOR_NTFS)vol->bootsector())->clusterPerRecord >= 0 ? ((PBOOT_SECTOR_NTFS)vol->bootsector())->clusterPerRecord * cluster_size : 1 << -((PBOOT_SECTOR_NTFS)vol->bootsector())->clusterPerRecord;
-
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));
+
+	DWORD cluster_size = ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->bytePerSector * ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->sectorPerCluster;
+	DWORD record_size = ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord >= 0 ? ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord * cluster_size : 1 << -((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord;
 
 	std::cout << "[+] Reading $MFT record" << std::endl;
 

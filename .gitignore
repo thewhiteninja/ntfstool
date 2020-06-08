@@ -38,3 +38,4 @@
 .cppcheck
 .user
 /.vs
+/NTFS.vcxproj.user
