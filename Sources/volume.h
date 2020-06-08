@@ -12,7 +12,7 @@
 
 #include "Utils/buffer.h"
 
-typedef struct
+typedef struct _bitlocker_info
 {
 	bool bitlocked = false;
 	struct
