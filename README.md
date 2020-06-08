@@ -59,6 +59,11 @@ the help command displays some examples for each command.
 - No image file support. You can use tools like [OSFMount][3] to mount your disk image.
 - No documentation :no_mouth:.
 
+## Third-parties
+
+- cppcoro (vcpkg): A library of C++ coroutine abstractions for the coroutines TS.
+  
+
 [3]: https://www.osforensics.com/tools/mount-disk-images.html
 
 ## Output examples

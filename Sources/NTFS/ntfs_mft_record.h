@@ -16,7 +16,7 @@
 
 #include "ntfs_reader.h"
 
-#include "Utils/generator.h"
+#include <cppcoro/generator.hpp>
 
 
 class MFTRecord

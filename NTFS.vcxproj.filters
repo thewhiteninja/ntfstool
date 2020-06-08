@@ -60,9 +60,6 @@
     <ClInclude Include="Sources\reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Utils\generator.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\bitlocker.h">
       <Filter>Header Files</Filter>
     </ClInclude>

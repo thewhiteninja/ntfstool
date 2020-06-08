@@ -33,7 +33,6 @@
     <ClInclude Include="Sources\reader.h" />
     <ClInclude Include="Sources\Utils\buffer.h" />
     <ClInclude Include="Sources\Utils\constant_names.h" />
-    <ClInclude Include="Sources\Utils\generator.h" />
     <ClInclude Include="Sources\Utils\table.h" />
     <ClInclude Include="Sources\Utils\utils.h" />
     <ClInclude Include="Sources\vbr.h" />
