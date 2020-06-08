@@ -34,7 +34,7 @@ public:
 
 	PMFT_RECORD_HEADER header() { return _record.data(); }
 
-	PMFT_RECORD_ATTRIBUTE_HEADER attribute_header(DWORD type, std::string name = "");
+	PMFT_RECORD_ATTRIBUTE_HEADER attribute_header(DWORD type, std::string name = "", int index = 0);
 
 	ULONG64 datasize(std::string stream_name = "");
 

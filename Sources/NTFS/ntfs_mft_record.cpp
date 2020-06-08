@@ -296,7 +296,7 @@ std::vector<MFT_DATARUN> MFTRecord::read_dataruns(PMFT_RECORD_ATTRIBUTE_HEADER p
 	return result;
 }
 
-PMFT_RECORD_ATTRIBUTE_HEADER MFTRecord::attribute_header(DWORD type, std::string name)
+PMFT_RECORD_ATTRIBUTE_HEADER MFTRecord::attribute_header(DWORD type, std::string name, int index)
 {
 	PMFT_RECORD_ATTRIBUTE_HEADER pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, _record.data(), _record.data()->attributeOffset);
 	while (pAttribute->TypeCode != $END)
@@ -305,13 +305,15 @@ PMFT_RECORD_ATTRIBUTE_HEADER MFTRecord::attribute_header(DWORD type, std::string
 		{
 			if (pAttribute->NameLength == 0)
 			{
-				if (name == "") return pAttribute;
+				if ((name == "") && (index == 0)) return pAttribute;
+				else index--;
 			}
 			else
 			{
 				std::wstring attr_name = std::wstring(POINTER_ADD(PWCHAR, pAttribute, pAttribute->NameOffset));
 				attr_name.resize(pAttribute->NameLength);
-				if (utils::strings::wide_to_utf8(attr_name) == name) return pAttribute;
+				if ((utils::strings::wide_to_utf8(attr_name) == name) && (index == 0)) return pAttribute;
+				else index--;
 			}
 		}
 		pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, pAttribute, pAttribute->RecordLength);
@@ -418,7 +420,7 @@ bool MFTRecord::copy_data_to_file(std::wstring filename, std::string stream_name
 					wprintf(L"Invalid written file size");
 					ret = false;
 				}
-			}			
+			}
 		}
 		else if (pAttributeList != NULL)
 		{
