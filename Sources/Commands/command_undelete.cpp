@@ -152,13 +152,16 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 				SYSTEMTIME st = { 0 };
 
 				PMFT_RECORD_ATTRIBUTE_HEADER pattr = f->attribute_header($FILE_NAME, "");
-				PMFT_RECORD_ATTRIBUTE_HEADER pattr_long = f->attribute_header($FILE_NAME, "", 1);
-
-				if (pattr_long != nullptr)
+				if (pattr != nullptr)
 				{
-					if (pattr_long->RecordLength > pattr->RecordLength)
+					auto pattr_filename = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_FILENAME, pattr, pattr->Form.Resident.ValueOffset);
+					if (pattr_filename->NameType == 2)
 					{
-						pattr = pattr_long;
+						PMFT_RECORD_ATTRIBUTE_HEADER pattr_long = f->attribute_header($FILE_NAME, "", 1);
+						if (pattr_long != nullptr)
+						{
+							pattr = pattr_long;
+						}
 					}
 				}
 
