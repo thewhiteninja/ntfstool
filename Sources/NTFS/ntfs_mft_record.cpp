@@ -497,7 +497,7 @@ bool MFTRecord::copy_data_to_file(std::wstring filename, std::string stream_name
 		}
 		else if (pAttributeList != NULL)
 		{
-			if (pAttributeList->FormCode == NON_RESIDENT_FORM)
+			if (pAttributeList->FormCode == RESIDENT_FORM)
 			{
 				PMFT_RECORD_ATTRIBUTE content = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, pAttributeList, pAttributeList->Form.Resident.ValueOffset);
 				DWORD p = 0;
@@ -604,7 +604,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(DWORD blocks
 	}
 	else if (pAttributeList != NULL)
 	{
-		if (pAttributeList->FormCode == NON_RESIDENT_FORM)
+		if (pAttributeList->FormCode == RESIDENT_FORM)
 		{
 			PMFT_RECORD_ATTRIBUTE content = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, pAttributeList, pAttributeList->Form.Resident.ValueOffset);
 			DWORD p = 0;
@@ -649,7 +649,7 @@ std::shared_ptr<Buffer<PBYTE>> MFTRecord::data(std::string stream_name)
 	}
 	else if (pAttributeList != NULL)
 	{
-		if (pAttributeList->FormCode == NON_RESIDENT_FORM)
+		if (pAttributeList->FormCode == RESIDENT_FORM)
 		{
 			PMFT_RECORD_ATTRIBUTE content = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, pAttributeList, pAttributeList->Form.Resident.ValueOffset);
 			DWORD p = 0;
