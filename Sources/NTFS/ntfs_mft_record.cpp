@@ -52,7 +52,80 @@ ULONG64 MFTRecord::datasize(std::string stream_name)
 		{
 			if (pAttributeList->FormCode == NON_RESIDENT_FORM)
 			{
-				wprintf(L"Non-resident $Attribute_List is not supported");
+				DWORD filesize = 0;
+				if (ULongLongToDWord(pAttributeList->Form.Nonresident.FileSize, &filesize) != S_OK)
+				{
+					filesize = static_cast<DWORD>(pAttributeList->Form.Nonresident.FileSize);
+				}
+				auto nr_data = std::make_shared<Buffer<PMFT_RECORD_ATTRIBUTE_HEADER>>(filesize);
+
+				Buffer<PBYTE> cluster(_reader->sizes.cluster_size);
+				ULONGLONG readSize = 0;
+
+				bool err = false;
+				std::vector<MFT_DATARUN> runList = read_dataruns(pAttributeList);
+				for (const MFT_DATARUN& run : runList)
+				{
+					if (err) break;
+
+					if (run.offset == 0)
+					{
+						RtlZeroMemory(cluster.data(), _reader->sizes.cluster_size);
+						for (ULONGLONG i = 0; i < run.length; i++)
+						{
+							size_t size = 0;
+							if (ULongLongToSizeT(min(filesize - readSize, _reader->sizes.cluster_size), &size) == S_OK)
+							{
+								memcpy(POINTER_ADD(PBYTE, nr_data->data(), DWORD(readSize)), cluster.data(), size);
+								readSize += size;
+							}
+						}
+					}
+					else
+					{
+						_reader->seek(run.offset * _reader->sizes.cluster_size);
+						for (ULONGLONG i = 0; i < run.length; i++)
+						{
+							if (!_reader->read(cluster.data(), _reader->sizes.cluster_size))
+							{
+								wprintf(L"ReadFile failed");
+								err = TRUE;
+								break;
+							}
+
+							size_t size = 0;
+							if (ULongLongToSizeT(min(filesize - readSize, _reader->sizes.cluster_size), &size) == S_OK)
+							{
+								memcpy(POINTER_ADD(PBYTE, nr_data->data(), DWORD(readSize)), cluster.data(), size);
+								readSize += size;
+							}
+						}
+					}
+				}
+				if (readSize != filesize)
+				{
+					wprintf(L"Invalid read size");
+				}
+				else
+				{
+					DWORD offset = 0;
+					while (offset + sizeof(MFT_RECORD_ATTRIBUTE_HEADER) <= filesize)
+					{
+						PMFT_RECORD_ATTRIBUTE pAttr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, nr_data->address(), offset);
+						if (pAttr->typeID == $DATA)
+						{
+							std::wstring attr_name = std::wstring(POINTER_ADD(PWCHAR, pAttr, pAttr->nameOffset));
+							attr_name.resize(pAttr->nameLength);
+							if (((pAttr->nameLength == 0) && (stream_name == "")) || ((pAttr->nameLength > 0) && (stream_name == utils::strings::wide_to_utf8(attr_name))))
+							{
+								std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttr->recordNumber & 0xffffffffffff);
+								return extRecordHeader->datasize();
+							}
+						}
+
+						offset += pAttr->recordLength;
+					}
+				}
 			}
 			else
 			{
