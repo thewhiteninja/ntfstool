@@ -261,7 +261,7 @@ std::vector<std::string> print_attribute_index_allocation(std::vector<std::share
 
 int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWORD inode)
 {
-	if (vol->filesystem() != "NTFS")
+	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
 		std::cerr << "[!] NTFS volume required" << std::endl;
 		return 1;
