@@ -209,6 +209,7 @@ std::vector<std::string> print_attribute_filename(PMFT_RECORD_ATTRIBUTE_FILENAME
 		ret.push_back("------");
 		std::wstring name = std::wstring(pAttribute->Name);
 		name.resize(pAttribute->NameLength);
+		ret.push_back("NameType                : " + constants::disk::mft::file_record_filename_name_type(pAttribute->NameType));
 		ret.push_back("Name                    : " + utils::strings::wide_to_utf8(name));
 	}
 	return ret;

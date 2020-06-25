@@ -29,6 +29,8 @@ namespace constants {
 			std::string file_record_index_root_attribute_flag(ULONG32 f);
 
 			std::string file_record_reparse_point_type(ULONG32 t);
+
+			std::string file_record_filename_name_type(UCHAR t);
 		}
 
 		namespace usn

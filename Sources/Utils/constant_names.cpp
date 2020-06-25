@@ -6,6 +6,25 @@
 
 #include <map>
 
+
+std::string constants::disk::mft::file_record_filename_name_type(UCHAR t)
+{
+	switch (t)
+	{
+	case 0:
+		return TEXT("POSIX");
+	case 1:
+		return TEXT("WIN32");
+	case 2:
+		return TEXT("DOS");
+	case 3:
+		return TEXT("DOS & WIN32");
+	default:
+		return TEXT("UNKNOWN");
+	}
+}
+
+
 std::string constants::disk::partition_type(DWORD t)
 {
 	switch (t)
