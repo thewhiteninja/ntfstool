@@ -46,7 +46,7 @@ std::string remove_trailing_path_delimiter(const std::string& s)
 
 int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 {
-	if (vol->filesystem() != "NTFS")
+	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
 		std::cerr << "[!] NTFS volume required" << std::endl;
 		return 1;
