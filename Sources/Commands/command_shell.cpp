@@ -44,6 +44,25 @@ std::string remove_trailing_path_delimiter(const std::string& s)
 	return ret;
 }
 
+const std::map<std::string, std::string> help_strings = {
+	{"cat", "Print file content (limited to 1Mb file)"},
+	{"cd", "Change directory"},
+	{"exit", "See \"quit\" command."},
+	{"ls","List directory content"},
+	{"pwd","Print working directory"},
+	{"quit","Quit program"},
+	{"help","This command"} };
+
+void help(std::string cmd)
+{
+	std::cout << "= Commands" << std::endl;
+
+	for (auto command : help_strings)
+	{
+		std::cout << "    " << command.first << "\t\t: " << command.second << std::endl;
+	}
+}
+
 int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 {
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
@@ -92,6 +111,11 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 						std::cout << cmds.second << ": Directory not found" << std::endl;
 					}
 				}
+				continue;
+			}
+			if (cmds.first == "help")
+			{
+				help(cmds.first);
 				continue;
 			}
 			if (cmds.first == "ls")
@@ -232,7 +256,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 				else std::cout << remove_trailing_path_delimiter(current_dir) << std::endl;
 				continue;
 			}
-			std::cout << "unknown command : " << cmds.first << std::endl;
+			std::cout << "Unknown command : " << cmds.first << ". Type \"help\" for command list." << std::endl;
 		}
 	}
 	return 0;
