@@ -182,7 +182,27 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 		}
 		else
 		{
-			wprintf(L"Attribute $INDEX_ROOT not found");
+			PMFT_RECORD_ATTRIBUTE_HEADER pAttributeList = attribute_header($ATTRIBUTE_LIST);
+			if (pAttributeList != NULL)
+			{
+				std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE>> attribute_list_data = attribute_data<PMFT_RECORD_ATTRIBUTE>(pAttributeList);
+				if (attribute_list_data != nullptr)
+				{
+					DWORD offset = 0;
+					while (offset + sizeof(MFT_RECORD_ATTRIBUTE_HEADER) <= attribute_list_data->size())
+					{
+						PMFT_RECORD_ATTRIBUTE pAttr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, attribute_list_data->data(), offset);
+						if (pAttr->typeID == $INDEX_ROOT)
+						{
+							std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttr->recordNumber & 0xffffffffffff);
+							return extRecordHeader->index();
+						}
+
+						offset += pAttr->recordLength;
+					}
+					wprintf(L"Attribute $INDEX_ROOT not found");
+				}
+			}
 		}
 	}
 	return ret;
