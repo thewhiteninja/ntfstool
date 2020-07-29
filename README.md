@@ -690,6 +690,10 @@ the help command displays some examples for each command.
           | ADS  |   $Info                   |        32 |                     |
         3 |      | $Volume                   |         0 | 2020-02-26 16:35:29 | Hi Sy
         5 | DIR  | .                         |           | 2020-02-26 16:35:29 | Hi Sy
+    85010 |      | 7z1900-x64.exe            |   1447178 | 2020-07-29 17:19:49 | Ar
+          | ADS  |   Zone.Identifier         |       123 |                     |
+    85010 |      | 7Z1900~1.EXE              |   1447178 | 2020-07-29 17:19:49 | Ar
+          | ADS  |   Zone.Identifier         |       123 |                     |        
        42 |      | hello.txt                 |         5 | 2020-02-26 21:27:33 | Ar
        39 |      | kitten1.jpg               |     23486 | 2020-02-26 16:37:23 | Ar
           | ADS  |   Zone.Identifier         |       154 |                     |
@@ -703,7 +707,14 @@ the help command displays some examples for each command.
     \
     disk4:volume1:> cat hello.txt
     Hey !
+    disk4:volume1:> cat 7z1900-x64.exe:Zone.Identifier
+    [ZoneTransfer]
+    ZoneId=3
+    ReferrerUrl=https://www.7-zip.org/download.html
+    HostUrl=https://www.7-zip.org/a/7z1900-x64.exe
+
     disk4:volume1:> exit
+    
 </td></tr>
 </table>
 
