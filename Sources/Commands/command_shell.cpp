@@ -147,7 +147,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 						{
 							std::vector<std::string> types;
 							types.push_back("");
-							for (int i = 0; i < ads_names.size(); i++)
+							for (unsigned int i = 0; i < ads_names.size(); i++)
 							{
 								types.push_back("ADS");
 							}
@@ -218,6 +218,13 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 				if (cmds.second != "")
 				{
 					std::string filetocat = cmds.second;
+					size_t ads_sep = filetocat.find(':');
+					std::string stream_name = "";
+					if (ads_sep != std::string::npos)
+					{
+						stream_name = filetocat.substr(ads_sep + 1);
+						filetocat = filetocat.substr(0, ads_sep);
+					}
 
 					bool found = false;
 					std::vector<std::shared_ptr<IndexEntry>> index = current_dir_record->index();
@@ -228,11 +235,12 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 							std::shared_ptr<MFTRecord> filetocat_record = explorer->mft()->record_from_number(entry->record_number());
 							if (!(filetocat_record->header()->flag & MFT_RECORD_IS_DIRECTORY))
 							{
+
 								found = true;
-								if (filetocat_record->datasize() <= 1 * 1024 * 1024)
+								if (filetocat_record->datasize(stream_name) <= 1 * 1024 * 1024)
 								{
-									std::string content = std::string((PCHAR)filetocat_record->data()->data());
-									content.resize(filetocat_record->data()->size());
+									auto databuf = filetocat_record->data(stream_name);
+									std::string content = std::string((PCHAR)databuf->data(), databuf->size());
 									std::cout << content << std::endl;
 								}
 								else
