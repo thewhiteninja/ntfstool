@@ -140,7 +140,6 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 
 	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_number(LOG_FILE_NUMBER);
 
-	PMFT_RECORD_HEADER record_header = record->header();
 	ULONG64 total_size = record->datasize();
 
 	std::cout << "[+] $LogFile size : " << utils::format::size(total_size) << std::endl;

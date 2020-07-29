@@ -1,7 +1,7 @@
 
 #include "reader.h"
 
-Reader::Reader(std::wstring& volume_name)
+Reader::Reader(std::wstring volume_name)
 {
 	std::wstring valid_name = volume_name;
 	if (valid_name.back() == '\\') valid_name.pop_back();

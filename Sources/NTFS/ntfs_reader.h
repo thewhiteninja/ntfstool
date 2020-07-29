@@ -16,7 +16,7 @@ private:
 
 
 public:
-	explicit NTFSReader(std::wstring& volume_name);
+	explicit NTFSReader(std::wstring volume_name);
 	~NTFSReader();
 
 	struct {
@@ -27,5 +27,5 @@ public:
 		ULONG32 block_size = 0;
 	} sizes;
 
-	PBOOT_SECTOR_NTFS boot_record() { return (PBOOT_SECTOR_NTFS)& _boot_record; }
+	PBOOT_SECTOR_NTFS boot_record() { return (PBOOT_SECTOR_NTFS)&_boot_record; }
 };

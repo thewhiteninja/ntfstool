@@ -260,6 +260,35 @@ std::vector<std::string> print_attribute_index_allocation(std::vector<std::share
 	return ret;
 }
 
+std::vector<std::string> print_attribute_list(PMFT_RECORD_ATTRIBUTE pAttribute, DWORD length)
+{
+	std::vector<std::string> ret;
+	DWORD offset = 0;
+	PMFT_RECORD_ATTRIBUTE pAttributeCurr = pAttribute;
+	while (offset < length)
+	{
+		pAttributeCurr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, pAttribute, offset);
+
+		ret.push_back(constants::disk::mft::file_record_attribute_type(pAttributeCurr->typeID));
+		if (pAttributeCurr->nameLength > 0)
+		{
+			std::wstring name = std::wstring(POINTER_ADD(PWCHAR, pAttributeCurr, pAttributeCurr->nameOffset), pAttributeCurr->nameLength);
+			ret.push_back("Name      : " + utils::strings::wide_to_utf8(name));
+		}
+
+		ret.push_back("Record Num: " + utils::format::hex((ULONG64)pAttributeCurr->recordNumber));
+
+		offset += pAttributeCurr->recordLength;
+
+		if (offset < length)
+		{
+			ret.push_back("------");
+		}
+	}
+
+	return ret;
+}
+
 int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWORD inode)
 {
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
@@ -434,6 +463,27 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 
 			};
 			fr_attributes->add_item_multiline(print_attribute_bitmap(pattr, len));
+			break;
+		}
+		case $ATTRIBUTE_LIST:
+		{
+			PMFT_RECORD_ATTRIBUTE pattr = nullptr;
+			std::shared_ptr<Buffer<PBYTE>> attr_buf = nullptr;
+
+			DWORD len = 0;
+			if (pAttribute->FormCode == RESIDENT_FORM)
+			{
+				pattr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, pAttribute, pAttribute->Form.Resident.ValueOffset);
+				len = pAttribute->Form.Resident.ValueLength;
+			}
+			else
+			{
+				len = pAttribute->Form.Nonresident.ValidDataLength & 0xffffffff;
+				attr_buf = record->attribute_data<PBYTE>(pAttribute);
+				pattr = (PMFT_RECORD_ATTRIBUTE)attr_buf->data();
+
+			};
+			fr_attributes->add_item_multiline(print_attribute_list(pattr, len));
 			break;
 		}
 		default:

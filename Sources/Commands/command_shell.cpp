@@ -120,7 +120,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 			}
 			if (cmds.first == "ls")
 			{
-				std::vector<std::shared_ptr<IndexEntry>>& index = current_dir_record->index();
+				std::vector<std::shared_ptr<IndexEntry>> index = current_dir_record->index();
 				if (index.size() > 0)
 				{
 					std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
@@ -147,7 +147,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 						{
 							std::vector<std::string> types;
 							types.push_back("");
-							for (auto& ads : ads_names)
+							for (int i = 0; i < ads_names.size(); i++)
 							{
 								types.push_back("ADS");
 							}

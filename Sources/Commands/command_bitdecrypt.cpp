@@ -18,6 +18,7 @@
 
 #include <openssl/aes.h>
 #include <openssl/evp.h>
+#include <NTFS\ntfs_reader.h>
 
 #pragma comment(lib, "gdi32")
 #pragma comment(lib, "crypt32")
@@ -236,7 +237,7 @@ int decrypt_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 		Buffer<PBYTE> decSectorBuff(sector_size);
 		EVP_CIPHER_CTX* pctx = EVP_CIPHER_CTX_new();
 
-		auto& prof_start = std::chrono::high_resolution_clock::now();
+		auto prof_start = std::chrono::high_resolution_clock::now();
 
 		reader->seek(vol->offset() + fve_bh.backup_sector_offset);
 

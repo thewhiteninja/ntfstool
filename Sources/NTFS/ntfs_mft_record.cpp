@@ -299,17 +299,17 @@ PMFT_RECORD_ATTRIBUTE_HEADER MFTRecord::attribute_header(DWORD type, std::string
 	{
 		if (pAttribute->TypeCode == type)
 		{
-			if (pAttribute->NameLength == 0)
+			std::string attr_name = utils::strings::wide_to_utf8(std::wstring(POINTER_ADD(PWCHAR, pAttribute, pAttribute->NameOffset), pAttribute->NameLength));
+			if (attr_name == name)
 			{
-				if ((name == "") && (index == 0)) return pAttribute;
-				else index--;
-			}
-			else
-			{
-				std::wstring attr_name = std::wstring(POINTER_ADD(PWCHAR, pAttribute, pAttribute->NameOffset));
-				attr_name.resize(pAttribute->NameLength);
-				if ((utils::strings::wide_to_utf8(attr_name) == name) && (index == 0)) return pAttribute;
-				else index--;
+				if (index == 0)
+				{
+					return pAttribute;
+				}
+				else
+				{
+					index--;
+				}
 			}
 		}
 		pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, pAttribute, pAttribute->RecordLength);
