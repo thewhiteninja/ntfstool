@@ -691,9 +691,7 @@ the help command displays some examples for each command.
         3 |      | $Volume                   |         0 | 2020-02-26 16:35:29 | Hi Sy
         5 | DIR  | .                         |           | 2020-02-26 16:35:29 | Hi Sy
     85010 |      | 7z1900-x64.exe            |   1447178 | 2020-07-29 17:19:49 | Ar
-          | ADS  |   Zone.Identifier         |       123 |                     |
-    85010 |      | 7Z1900~1.EXE              |   1447178 | 2020-07-29 17:19:49 | Ar
-          | ADS  |   Zone.Identifier         |       123 |                     |        
+          | ADS  |   Zone.Identifier         |       123 |                     | 
        42 |      | hello.txt                 |         5 | 2020-02-26 21:27:33 | Ar
        39 |      | kitten1.jpg               |     23486 | 2020-02-26 16:37:23 | Ar
           | ADS  |   Zone.Identifier         |       154 |                     |
