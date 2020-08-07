@@ -67,6 +67,10 @@
     <ClCompile Include="Sources\Utils\utils.cpp" />
     <ClCompile Include="Sources\volume.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="LICENSE" />
+    <None Include="README.md" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{ED7F20A1-18AD-40D1-9CAE-5D613616F2F7}</ProjectGuid>

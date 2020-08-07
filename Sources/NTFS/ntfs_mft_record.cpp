@@ -94,7 +94,7 @@ std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> parse_index_block(std::shar
 	}
 
 	PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK pIndexSubBlockData = pIndexMainBlockData;
-	int blockIndex = 0;
+	uint32_t blockIndex = 0;
 	while (blockIndex < (pIndexBlock->size() / blocksize))
 	{
 		if (RtlCompareMemory(&pIndexSubBlockData->Magic, "INDX", 4) == 4)
