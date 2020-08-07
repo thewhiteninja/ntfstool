@@ -87,20 +87,23 @@ std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> parse_index_block(std::shar
 {
 	std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> mapVCNToIndexBlock;
 
-	PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK pIndexBlockData = pIndexBlock->data();
-	if (pIndexBlockData != NULL)
+	PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK pIndexMainBlockData = pIndexBlock->data();
+	if (pIndexMainBlockData == nullptr)
 	{
-		if (RtlCompareMemory(&pIndexBlockData->Magic, "INDX", 4) != 4)
+		return mapVCNToIndexBlock;
+	}
+
+	PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK pIndexSubBlockData = pIndexMainBlockData;
+	int blockIndex = 0;
+	while (blockIndex < (pIndexBlock->size() / blocksize))
+	{
+		if (RtlCompareMemory(&pIndexSubBlockData->Magic, "INDX", 4) == 4)
 		{
-			wprintf(L"Invalid MFT record magic (FILE)");
-		}
-		else
-		{
-			PWORD usnaddr = POINTER_ADD(PWORD, pIndexBlockData, pIndexBlockData->OffsetOfUS);
+			PWORD usnaddr = POINTER_ADD(PWORD, pIndexSubBlockData, pIndexSubBlockData->OffsetOfUS);
 			PWORD usarray = usnaddr + 1;
 			DWORD sectors = blocksize / sectorsize;
 
-			PWORD sector = (PWORD)pIndexBlockData;
+			PWORD sector = (PWORD)pIndexSubBlockData;
 			for (DWORD i = 0; i < sectors; i++)
 			{
 				sector += ((sectorsize >> 1) - 1);
@@ -108,18 +111,13 @@ std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> parse_index_block(std::shar
 				sector++;
 			}
 
-			DWORD64 allocSize = pIndexBlock->size();
-
-			DWORD64 curSize = 0;
-			while (curSize < allocSize)
-			{
-				mapVCNToIndexBlock[pIndexBlockData->VCN] = pIndexBlockData;
-				curSize += (DWORD64)pIndexBlockData->AllocEntrySize + 0x18;
-
-				pIndexBlockData = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK, pIndexBlockData, pIndexBlockData->AllocEntrySize + 0x18);
-			}
+			mapVCNToIndexBlock[pIndexSubBlockData->VCN] = pIndexSubBlockData;
 		}
+
+		pIndexSubBlockData = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK, pIndexSubBlockData, blocksize);
+		blockIndex++;
 	}
+
 	return mapVCNToIndexBlock;
 }
 
