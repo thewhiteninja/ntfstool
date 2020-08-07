@@ -13,6 +13,8 @@ IndexEntry::IndexEntry(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY e)
 	_name = std::wstring(e->FileName.Name);
 	_name.resize(e->FileName.NameLength);
 
+	_name_type = e->FileName.NameType;
+
 	_vcn = *POINTER_ADD(PLONGLONG, e, e->Length - 8);
 
 	_flags = e->Flags;

@@ -31,6 +31,9 @@
     <Filter Include="Source Files\NTFS">
       <UniqueIdentifier>{939daecb-d675-444f-8123-2f2a88db1a30}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Other files">
+      <UniqueIdentifier>{3c7a6abd-2fcc-40af-a9d5-97bf10420d63}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\disk.h">
@@ -170,5 +173,13 @@
     <ClCompile Include="Sources\Commands\command_extract.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md">
+      <Filter>Other files</Filter>
+    </None>
+    <None Include="LICENSE">
+      <Filter>Other files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -121,6 +121,15 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 			if (cmds.first == "ls")
 			{
 				std::vector<std::shared_ptr<IndexEntry>> index = current_dir_record->index();
+				std::set<DWORD64> win32_named_entries;
+				for (auto i : index)
+				{
+					if (i->name_type() != 2)
+					{
+						win32_named_entries.insert(i->record_number());
+					}
+				}
+
 				if (index.size() > 0)
 				{
 					std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
@@ -135,6 +144,9 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 					tab->add_header_line("Attributes");
 					for (auto& entry : index)
 					{
+						// Skip if there is an entry with non DOS name type
+						if ((entry->name_type() == 2) && (win32_named_entries.find(entry->record_number()) != win32_named_entries.end())) continue;
+
 						std::shared_ptr<MFTRecord> entry_rec = explorer->mft()->record_from_number(entry->record_number());
 						std::vector<std::string> ads_names = entry_rec->alternate_data_names();
 
