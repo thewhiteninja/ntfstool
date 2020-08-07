@@ -28,9 +28,11 @@ public:
 
 	std::wstring volume_name() const { return _volume_name; }
 
-	std::shared_ptr<MFT> mft() { return _MFT; }
-
 	std::shared_ptr<NTFSReader> reader() { return _reader; }
 
-	std::vector<std::wstring> list(std::wstring directory);
+	HANDLE handle() { return _reader->handle(); }
+
+	std::shared_ptr<MFT> mft() { return _MFT; }
+
+	std::vector<std::wstring> list(std::string directory);
 };

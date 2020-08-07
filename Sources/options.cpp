@@ -44,6 +44,7 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 
 	for (int i = 2; i < argc; i++)
 	{
+		if (is_option(argv[i], "path")) { read_option_string(argv[i], ret->path); continue; }
 		if (is_option(argv[i], "output")) { read_option_string(argv[i], ret->out); continue; }
 		if (is_option(argv[i], "from")) { read_option_string(argv[i], ret->from); continue; }
 		if (is_option(argv[i], "disk")) { read_option_ulong(argv[i], &ret->disk); continue; }

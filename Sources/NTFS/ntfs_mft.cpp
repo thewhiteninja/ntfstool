@@ -16,6 +16,13 @@ MFT::MFT(std::shared_ptr<NTFSReader> reader)
 	if (_reader->read(rec.data(), _reader->sizes.record_size))
 	{
 		_record = std::make_shared<MFTRecord>(rec.data(), this, _reader);
+
+		PMFT_RECORD_ATTRIBUTE_HEADER pAttributeData = _record->attribute_header($DATA);
+		if (pAttributeData != nullptr)
+		{
+			_dataruns = MFTRecord::read_dataruns(pAttributeData);
+		}
+
 	}
 	else
 	{
@@ -27,17 +34,25 @@ MFT::~MFT()
 {
 }
 
-std::shared_ptr<MFTRecord> MFT::record_from_path(std::filesystem::path path, ULONG64 directory_record_number)
+std::shared_ptr<MFTRecord> MFT::record_from_path(std::string path, ULONG64 directory_record_number)
 {
 	std::vector<std::wstring> parts;
 
-	if (path.root_path() != L"\\")
+	std::filesystem::path p(path);
+
+	if (p.root_directory() != "\\")
 	{
-		std::cout << "Only absolute paths are supported" << std::endl;
+		std::cout << "[-] Only absolute paths are supported" << std::endl;
 		return nullptr;
 	}
 
-	for (const auto& part : path)
+	if (p.has_root_name())
+	{
+		path = path.substr(2);
+		p = std::filesystem::path(path);
+	}
+
+	for (const auto& part : p)
 	{
 		parts.push_back(part.generic_wstring());
 	}
@@ -52,7 +67,7 @@ std::shared_ptr<MFTRecord> MFT::record_from_path(std::filesystem::path path, ULO
 		std::vector<std::shared_ptr<IndexEntry>> index = current_dir->index();
 		for (std::shared_ptr<IndexEntry>& entry : index)
 		{
-			if (entry->name() == parts[i])
+			if (utils::strings::lower(entry->name()) == utils::strings::lower(parts[i]))
 			{
 				next_dir = record_from_number(entry->record_number());
 				found = true;
@@ -85,9 +100,7 @@ std::shared_ptr<MFTRecord> MFT::record_from_number(ULONG64 record_number)
 		LONGLONG vcn = 0LL;
 		LONGLONG offset = -1LL;
 
-		PMFT_RECORD_ATTRIBUTE_HEADER pAttributeData = _record->attribute_header($DATA);
-		std::vector<MFT_DATARUN> data_runs = MFTRecord::read_dataruns(pAttributeData);
-		for (const MFT_DATARUN& run : data_runs)
+		for (const MFT_DATARUN& run : _dataruns)
 		{
 			if (cluster < vcn + run.length)
 			{
@@ -126,6 +139,8 @@ std::shared_ptr<MFTRecord> MFT::record_from_number(ULONG64 record_number)
 	}
 
 	std::shared_ptr<MFTRecord> ret = std::make_shared<MFTRecord>(pHeader, this, _reader);
+
+	buffer = nullptr;
 
 	return ret;
 }

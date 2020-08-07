@@ -20,6 +20,7 @@ void usage(char* binname)
 	std::cerr << "    gpt        : display guid partition table" << std::endl;
 	std::cerr << "    vbr        : display volume boot record" << std::endl;
 	std::cerr << "    mft        : display master file table" << std::endl;
+	std::cerr << "    extract    : extract a file" << std::endl;
 	std::cerr << "    bitlocker  : display bitlocker status and test password, recovery or bek file" << std::endl;
 	std::cerr << "    bitdecrypt : decrypt volume to an image file" << std::endl;
 	std::cerr << "    fve        : display fve metadata" << std::endl;
@@ -235,6 +236,22 @@ void print_help_usn(char* name)
 	std::cerr << std::endl;
 }
 
+void print_help_extract(char* name)
+{
+	std::cerr << "Extract commmand" << std::endl;
+	std::cerr << "-------------" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    " << name << " extract [disk id] [volume id] [path] [output]" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Description:" << std::endl;
+	std::cerr << "    Extract a file specified by a path to output." << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Extract SAM file" << std::endl;
+	std::cerr << "    " << name << " extract disk=0 volume=1 path=\"c:\\windows\\system32\\config\\sam\" output=\"d:\\sam_backup\"" << std::endl;
+	std::cerr << std::endl;
+}
+
+
 void print_help_undelete(char* name)
 {
 	std::cerr << "Undelete commmand" << std::endl;
@@ -287,6 +304,7 @@ namespace commands {
 				if (opts->subcommand == "gpt") { print_help_gpt(name); return; }
 				if (opts->subcommand == "vbr") { print_help_vbr(name); return; }
 				if (opts->subcommand == "mft") { print_help_mft(name); return; }
+				if (opts->subcommand == "extract") { print_help_extract(name); return; }
 				if (opts->subcommand == "bitlocker") { print_help_bitlocker(name); return; }
 				if (opts->subcommand == "bitdecrypt") { print_help_bitdecrypt(name); return; }
 				if (opts->subcommand == "fve") { print_help_fve(name); return; }

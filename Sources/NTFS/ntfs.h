@@ -293,6 +293,7 @@ typedef struct
 	ULONGLONG	AlterTime;
 	ULONGLONG	MFTTime;
 	ULONGLONG	ReadTime;
+	union {
 	struct {
 		DWORD readonly : 1;
 		DWORD hidden : 1;
@@ -309,6 +310,8 @@ typedef struct
 		DWORD not_indexed : 1;
 		DWORD encrypted : 1;
 	} Permission;
+		DWORD dword_part;
+	} u;
 	DWORD		MaxVersionNo;
 	DWORD		VersionNo;
 	DWORD		ClassId;

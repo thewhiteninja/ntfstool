@@ -16,19 +16,26 @@ MFTRecord::MFTRecord(PMFT_RECORD_HEADER pRH, MFT* mft, std::shared_ptr<NTFSReade
 
 	if (pRH != NULL)
 	{
-		_record.resize(_reader->sizes.record_size);
-		memcpy(_record.data(), pRH, _reader->sizes.record_size);
+		_record = std::make_shared<Buffer<PMFT_RECORD_HEADER>>(_reader->sizes.record_size);
+		memcpy(_record->data(), pRH, _reader->sizes.record_size);
 
-		if (RtlCompareMemory(_record.data()->signature, "FILE", 4) != 4)
+		if (RtlCompareMemory(_record->data()->signature, "FILE", 4) != 4)
 		{
 			wprintf(L"Invalid MFT record magic (FILE)");
 		}
 	}
 }
 
+MFTRecord::~MFTRecord()
+{
+	_record = nullptr;
+}
+
+
+
 ULONG64 MFTRecord::datasize(std::string stream_name)
 {
-	if (_record.data()->flag & FILE_RECORD_FLAG_DIR)
+	if (_record->data()->flag & FILE_RECORD_FLAG_DIR)
 	{
 		return 0;
 	}
@@ -126,9 +133,12 @@ std::vector<std::shared_ptr<IndexEntry>> parse_entries(PMFT_RECORD_ATTRIBUTE_IND
 		if (pIndexEntry->Flags & MFT_ATTRIBUTE_INDEX_ENTRY_FLAG_SUBNODE)
 		{
 			PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK block = vcnToBlock[e->vcn()];
-			PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY nextEntries = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, block, block->EntryOffset + 0x18);
-			std::vector<std::shared_ptr<IndexEntry>> subentries = parse_entries(nextEntries, vcnToBlock);
-			ret.insert(ret.end(), subentries.begin(), subentries.end());
+			if ((block != nullptr) && (block->Magic == 0x58444e49))
+			{
+				PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY nextEntries = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, block, block->EntryOffset + 0x18);
+				std::vector<std::shared_ptr<IndexEntry>> subentries = parse_entries(nextEntries, vcnToBlock);
+				ret.insert(ret.end(), subentries.begin(), subentries.end());
+			}
 		}
 
 		if (pIndexEntry->Flags & MFT_ATTRIBUTE_INDEX_ENTRY_FLAG_LAST)
@@ -147,7 +157,7 @@ std::vector<std::shared_ptr<IndexEntry>> parse_entries(PMFT_RECORD_ATTRIBUTE_IND
 std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 {
 	std::vector<std::shared_ptr<IndexEntry>> ret;
-	if (_record.data()->flag & MFT_RECORD_IS_DIRECTORY)
+	if (_record->data()->flag & MFT_RECORD_IS_DIRECTORY)
 	{
 		PMFT_RECORD_ATTRIBUTE_HEADER pAttr = attribute_header($INDEX_ROOT, MFT_ATTRIBUTE_NAME_INDEX);
 		if (pAttr != nullptr)
@@ -220,7 +230,12 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 	}
 	else
 	{
-		ret = std::make_shared<Buffer<T>>(attr->Form.Nonresident.FileSize);
+		DWORD filesize = 0;
+		if (ULongLongToDWord(attr->Form.Nonresident.FileSize, &filesize) != S_OK)
+		{
+			filesize = static_cast<DWORD>(attr->Form.Nonresident.FileSize);
+		}
+		ret = std::make_shared<Buffer<T>>(filesize);
 
 		Buffer<PBYTE> cluster(_reader->sizes.cluster_size);
 		ULONGLONG readSize = 0;
@@ -237,7 +252,7 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 				for (ULONGLONG i = 0; i < run.length; i++)
 				{
 					size_t size = 0;
-					if (ULongLongToSizeT(min(attr->Form.Nonresident.FileSize - readSize, _reader->sizes.cluster_size), &size) == S_OK)
+					if (ULongLongToSizeT(min(filesize - readSize, _reader->sizes.cluster_size), &size) == S_OK)
 					{
 						memcpy(POINTER_ADD(PBYTE, ret->data(), DWORD(readSize)), cluster.data(), size);
 						readSize += size;
@@ -257,7 +272,7 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 					}
 
 					size_t size = 0;
-					if (ULongLongToSizeT(min(attr->Form.Nonresident.FileSize - readSize, _reader->sizes.cluster_size), &size) == S_OK)
+					if (ULongLongToSizeT(min(filesize - readSize, _reader->sizes.cluster_size), &size) == S_OK)
 					{
 						memcpy(POINTER_ADD(PBYTE, ret->data(), DWORD(readSize)), cluster.data(), size);
 						readSize += size;
@@ -265,7 +280,7 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 				}
 			}
 		}
-		if (readSize != attr->Form.Nonresident.FileSize)
+		if (readSize != filesize)
 		{
 			wprintf(L"Invalid read size");
 		}
@@ -300,6 +315,7 @@ std::vector<MFT_DATARUN> MFTRecord::read_dataruns(PMFT_RECORD_ATTRIBUTE_HEADER p
 			{
 				offsetDiff |= (LONGLONG)(runList++[0]) << (i * 8);
 			}
+
 			if (offsetDiff >= (1LL << ((offset_len * 8) - 1)))
 				offsetDiff -= 1LL << (offset_len * 8);
 
@@ -314,7 +330,7 @@ std::vector<MFT_DATARUN> MFTRecord::read_dataruns(PMFT_RECORD_ATTRIBUTE_HEADER p
 
 PMFT_RECORD_ATTRIBUTE_HEADER MFTRecord::attribute_header(DWORD type, std::string name, int index)
 {
-	PMFT_RECORD_ATTRIBUTE_HEADER pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, _record.data(), _record.data()->attributeOffset);
+	PMFT_RECORD_ATTRIBUTE_HEADER pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, _record->data(), _record->data()->attributeOffset);
 	while ((pAttribute->TypeCode != $END) && (pAttribute->RecordLength > 0))
 	{
 		if (pAttribute->TypeCode == type)
@@ -460,7 +476,7 @@ bool MFTRecord::copy_data_to_file(std::wstring filename, std::string stream_name
 			}
 			else
 			{
-				wprintf(L"Non-resident $Attribute_List is not supported");
+				wprintf(L"Non-resident $Attribute_List is not supported (2)");
 			}
 		}
 		else
@@ -570,7 +586,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(DWORD blocks
 		}
 		else
 		{
-			wprintf(L"Non-resident $Attribute_List is not supported");
+			wprintf(L"Non-resident $Attribute_List is not supported (3)");
 		}
 	}
 	else
@@ -610,7 +626,7 @@ std::shared_ptr<Buffer<PBYTE>> MFTRecord::data(std::string stream_name)
 			}
 			else
 			{
-				wprintf(L"Non-resident $Attribute_List is not supported");
+				wprintf(L"Non-resident $Attribute_List is not supported (4)");
 			}
 		}
 	}
@@ -624,7 +640,7 @@ std::vector<std::string> MFTRecord::alternate_data_names()
 {
 	std::vector<std::string> ret;
 
-	PMFT_RECORD_ATTRIBUTE_HEADER pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, _record.data(), _record.data()->attributeOffset);
+	PMFT_RECORD_ATTRIBUTE_HEADER pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, _record->data(), _record->data()->attributeOffset);
 	while (pAttribute->TypeCode != $END)
 	{
 		if (pAttribute->TypeCode == $DATA)

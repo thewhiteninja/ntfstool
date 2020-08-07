@@ -19,7 +19,7 @@
 
 int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output) {
 
-	if (vol->filesystem() != "NTFS")
+	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
 		std::cerr << "[!] NTFS volume required" << std::endl;
 		return 1;

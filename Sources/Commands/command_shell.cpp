@@ -95,7 +95,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 				{
 					std::string next_path = cmds.second;
 					std::filesystem::path path(next_path);
-					if (path.root_path() != "\\")
+					if (path.root_directory() != "\\")
 					{
 						next_path = current_dir + next_path;
 					}
@@ -183,19 +183,19 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 							tab->add_item_line(utils::times::display_systemtime(st));
 
 							std::vector<std::string> perms;
-							if (stdinfo->Permission.archive) perms.push_back("Ar");
-							if (stdinfo->Permission.compressed) perms.push_back("Co");
-							if (stdinfo->Permission.device) perms.push_back("De");
-							if (stdinfo->Permission.encrypted) perms.push_back("En");
-							if (stdinfo->Permission.hidden) perms.push_back("Hi");
-							if (stdinfo->Permission.normal) perms.push_back("No");
-							if (stdinfo->Permission.not_indexed) perms.push_back("Ni");
-							if (stdinfo->Permission.offline) perms.push_back("Of");
-							if (stdinfo->Permission.readonly) perms.push_back("Ro");
-							if (stdinfo->Permission.reparse) perms.push_back("Re");
-							if (stdinfo->Permission.sparse) perms.push_back("Sp");
-							if (stdinfo->Permission.system) perms.push_back("Sy");
-							if (stdinfo->Permission.temp) perms.push_back("Tm");
+							if (stdinfo->u.Permission.archive) perms.push_back("Ar");
+							if (stdinfo->u.Permission.compressed) perms.push_back("Co");
+							if (stdinfo->u.Permission.device) perms.push_back("De");
+							if (stdinfo->u.Permission.encrypted) perms.push_back("En");
+							if (stdinfo->u.Permission.hidden) perms.push_back("Hi");
+							if (stdinfo->u.Permission.normal) perms.push_back("No");
+							if (stdinfo->u.Permission.not_indexed) perms.push_back("Ni");
+							if (stdinfo->u.Permission.offline) perms.push_back("Of");
+							if (stdinfo->u.Permission.readonly) perms.push_back("Ro");
+							if (stdinfo->u.Permission.reparse) perms.push_back("Re");
+							if (stdinfo->u.Permission.sparse) perms.push_back("Sp");
+							if (stdinfo->u.Permission.system) perms.push_back("Sy");
+							if (stdinfo->u.Permission.temp) perms.push_back("Tm");
 
 							tab->add_item_line(utils::strings::join(perms, " "));
 						}

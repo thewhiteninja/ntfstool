@@ -31,6 +31,10 @@ namespace commands {
 		int print_usn_journal(std::shared_ptr<Options> opts);
 	}
 
+	namespace extract {
+		int extract_file(std::shared_ptr<Options> opts);
+	}
+
 	namespace shell {
 		int go(std::shared_ptr<Options> opts);
 	}

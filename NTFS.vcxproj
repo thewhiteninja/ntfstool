@@ -41,6 +41,7 @@
   <ItemGroup>
     <ClCompile Include="Sources\Commands\command_bitdecrypt.cpp" />
     <ClCompile Include="Sources\Commands\command_bitlocker.cpp" />
+    <ClCompile Include="Sources\Commands\command_extract.cpp" />
     <ClCompile Include="Sources\Commands\command_logfile.cpp" />
     <ClCompile Include="Sources\Commands\command_shell.cpp" />
     <ClCompile Include="Sources\Commands\command_fve.cpp" />

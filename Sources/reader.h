@@ -14,8 +14,9 @@ protected:
 
 public:
 	explicit Reader(std::wstring volume_name);
-	Reader(Reader& r);
 	~Reader();
+
+	HANDLE handle() const { return _handle_disk; }
 
 	bool seek(ULONG64 position);
 

@@ -18,21 +18,24 @@
 
 #include <cppcoro/generator.hpp>
 
+#include <memory>
+#include <functional>
 
 class MFTRecord
 {
 private:
 	std::shared_ptr<NTFSReader> _reader;
 
-	Buffer<PMFT_RECORD_HEADER> _record;
+	std::shared_ptr<Buffer<PMFT_RECORD_HEADER>> _record = nullptr;
 
 	MFT* _mft = nullptr;
 
 public:
 
 	MFTRecord(PMFT_RECORD_HEADER pRH, MFT* mft, std::shared_ptr<NTFSReader> reader);
+	~MFTRecord();
 
-	PMFT_RECORD_HEADER header() { return _record.data(); }
+	PMFT_RECORD_HEADER header() { return _record->data(); }
 
 	PMFT_RECORD_ATTRIBUTE_HEADER attribute_header(DWORD type, std::string name = "", int index = 0);
 

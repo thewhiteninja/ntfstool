@@ -31,6 +31,8 @@ namespace utils
 	{
 		std::string lower(std::string& s);
 
+		std::wstring lower(std::wstring& s);
+
 		void ltrim(std::string& s);
 
 		void rtrim(std::string& s);

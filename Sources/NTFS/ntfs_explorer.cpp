@@ -13,7 +13,7 @@ NTFSExplorer::~NTFSExplorer()
 {
 }
 
-std::vector<std::wstring> NTFSExplorer::list(std::wstring directory)
+std::vector<std::wstring> NTFSExplorer::list(std::string directory)
 {
 	wprintf(L"Listing directory");
 

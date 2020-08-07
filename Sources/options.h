@@ -12,6 +12,7 @@ public:
 	std::string command;
 	std::string subcommand;
 	std::string from;
+	std::string path;
 	std::string out;
 	std::string format = "raw";
 

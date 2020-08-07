@@ -262,7 +262,7 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 
 int extract_deleted_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if (vol->filesystem() != "NTFS")
+	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
 		std::cerr << "[!] NTFS volume required" << std::endl;
 		return 1;
