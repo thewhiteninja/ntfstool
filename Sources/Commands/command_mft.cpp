@@ -215,6 +215,13 @@ std::vector<std::string> print_attribute_filename(PMFT_RECORD_ATTRIBUTE_FILENAME
 	return ret;
 }
 
+std::vector<std::string> print_attribute_logged_utility()
+{
+	std::vector<std::string> ret;
+	ret.push_back("Binary data");
+	return ret;
+}
+
 std::vector<std::string> print_attribute_bitmap(PMFT_RECORD_ATTRIBUTE_BITMAP pAttribute, DWORD length)
 {
 	std::vector<std::string> ret;
@@ -442,6 +449,11 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 		case $DATA:
 		{
 			fr_attributes->add_item_multiline(print_attribute_data(record, pAttribute));
+			break;
+		}
+		case $LOGGED_UTILITY_STREAM:
+		{
+			fr_attributes->add_item_multiline(print_attribute_logged_utility());
 			break;
 		}
 		case $BITMAP:
