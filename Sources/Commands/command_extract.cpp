@@ -39,26 +39,20 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 
 	if (record == nullptr)
 	{
-		std::cout << "[!] Invalid path" << std::endl;
+		std::cout << "[!] Invalid or non-existent path" << std::endl;
 		return 2;
 	}
-
-	auto pattr = record->attribute_header($FILE_NAME);
-	if (pattr != nullptr)
+	else
 	{
-		PMFT_RECORD_ATTRIBUTE_FILENAME psubattr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_FILENAME, pattr, pattr->Form.Resident.ValueOffset);
-		auto name = std::wstring(psubattr->Name);
-		name.resize(psubattr->NameLength);
-
-		std::cout << "[+] Extracting ";
-		std::wcout << name;
-		std::cout << " to " << opts->out << std::endl;
-
-		std::wstring output(opts->out.begin(), opts->out.end());
-		record->copy_data_to_file(output);
-
-		std::cout << "[+] " << record->datasize() << " bytes written" << std::endl;
+		std::cout << "[-] File found in record " << utils::format::hex(record->header()->MFTRecordIndex) << std::endl;
 	}
+
+	std::cout << "[-] Source      : " << opts->path << std::endl;
+	std::cout << "[-] Destination : " << opts->out << std::endl;
+
+	record->copy_data_to_file(utils::strings::from_string(opts->out));
+
+	std::cout << "[+] File extracted (" << record->datasize() << " bytes written)" << std::endl;
 
 	return 0;
 }
