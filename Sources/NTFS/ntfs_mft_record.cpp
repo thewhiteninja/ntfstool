@@ -199,14 +199,14 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 					DWORD offset = 0;
 					while (offset + sizeof(MFT_RECORD_ATTRIBUTE_HEADER) <= attribute_list_data->size())
 					{
-						PMFT_RECORD_ATTRIBUTE pAttr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, attribute_list_data->data(), offset);
-						if (pAttr->typeID == $INDEX_ROOT)
+						PMFT_RECORD_ATTRIBUTE pAttrListI = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, attribute_list_data->data(), offset);
+						if (pAttrListI->typeID == $INDEX_ROOT)
 						{
-							std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttr->recordNumber & 0xffffffffffff);
+							std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttrListI->recordNumber & 0xffffffffffff);
 							return extRecordHeader->index();
 						}
 
-						offset += pAttr->recordLength;
+						offset += pAttrListI->recordLength;
 					}
 					wprintf(L"Attribute $INDEX_ROOT not found");
 				}

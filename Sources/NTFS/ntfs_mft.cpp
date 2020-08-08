@@ -67,7 +67,7 @@ std::shared_ptr<MFTRecord> MFT::record_from_path(std::string path, ULONG64 direc
 		std::vector<std::shared_ptr<IndexEntry>> index = current_dir->index();
 		for (std::shared_ptr<IndexEntry>& entry : index)
 		{
-			if (utils::strings::lower(entry->name()) == utils::strings::lower(parts[i]))
+			if (_wcsicmp(entry->name().c_str(), parts[i].c_str()) == 0)
 			{
 				next_dir = record_from_number(entry->record_number());
 				found = true;

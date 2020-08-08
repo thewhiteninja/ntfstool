@@ -3,11 +3,15 @@
 
 #include "options.h"
 #include "Commands/commands.h"
+#include <Utils/crash_handler.h>
 
 #include <iostream>
 #include <filesystem>
 
+
 int main(int argc, char** argv) {
+
+	install_crash_handler();
 
 	SetConsoleOutputCP(CP_UTF8);
 	std::cout << std::endl;
@@ -67,6 +71,8 @@ int main(int argc, char** argv) {
 			std::cerr << "Err: " << e.what() << std::endl << std::endl;
 		}
 	}
+
+	uninstall_crash_handler();
 
 	return 0;
 }

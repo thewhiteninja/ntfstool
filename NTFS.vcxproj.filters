@@ -90,6 +90,9 @@
     <ClInclude Include="Sources\NTFS\ntfs_reader.h">
       <Filter>Header Files\NTFS</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Utils\crash_handler.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -172,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_extract.cpp">
       <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\crash_handler.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

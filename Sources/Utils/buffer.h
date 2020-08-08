@@ -12,8 +12,8 @@ template< typename T>
 class Buffer
 {
 private:
-	DWORD _size = 0;
 	T _mem = NULL;
+	DWORD _size = 0;
 
 public:
 	explicit Buffer() : _mem(NULL), _size(0)

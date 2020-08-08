@@ -254,8 +254,8 @@ void Disk::_get_volumes(HANDLE h) {
 		int partition_index = 0;
 		if (protective_mbr() && pgpt != NULL)
 		{
-			auto& entries = gpt_entries();
-			for (auto& entry : entries)
+			auto entries = gpt_entries();
+			for (auto entry : entries)
 			{
 				PARTITION_INFORMATION_EX pex;
 				pex.PartitionStyle = PARTITION_STYLE_GPT;

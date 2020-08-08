@@ -4,15 +4,15 @@
 #include <algorithm>
 
 
-inline bool is_option(char* arg, char* name) { return (strncmp(arg, name, strlen(name)) == 0) && (arg[strlen(name)] == '='); }
+bool is_option(char* arg, const char* name) { return (strncmp(arg, name, strlen(name)) == 0) && (arg[strlen(name)] == '='); }
 
-inline bool is_number(const std::string& s)
+bool is_number(const std::string& s)
 {
 	return !s.empty() && std::find_if(s.begin(),
-		s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+		s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
 }
 
-inline void read_option_ulong(char* arg, unsigned long* pul)
+void read_option_ulong(char* arg, unsigned long* pul)
 {
 	char* pos = strchr(arg, '=');
 	if (is_number(pos + 1))
@@ -27,7 +27,7 @@ inline void read_option_ulong(char* arg, unsigned long* pul)
 	}
 }
 
-inline void read_option_string(char* arg, std::string& s)
+void read_option_string(char* arg, std::string& s)
 {
 	char* pos = strchr(arg, '=');
 	s = std::string(pos + 1);
