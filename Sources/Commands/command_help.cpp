@@ -10,6 +10,8 @@
 #include <iomanip>
 #include <memory>
 
+#define VERSION "1.1"
+
 void usage(char* binname)
 {
 	std::cerr << "Usage: " << binname << " command [options]" << std::endl;
@@ -30,8 +32,11 @@ void usage(char* binname)
 	std::cerr << "    shell      : start a mini-shell" << std::endl;
 	std::cerr << "    help       : display this message or command help" << std::endl;
 	std::cerr << std::endl;
+	std::cerr << "Example:" << std::endl;
+	std::cerr << "    help extract" << std::endl;
+	std::cerr << std::endl;
 
-	std::cerr << "Build: " << __TIMESTAMP__ << std::endl;
+	std::cerr << "Version: " << VERSION << " (" << __DATE__ << ")" << std::endl;
 }
 
 void print_help_help(char* name)
