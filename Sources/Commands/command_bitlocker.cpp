@@ -368,7 +368,7 @@ void print_test_bitlocker_password(std::shared_ptr<Disk> disk, std::shared_ptr<V
 
 					std::vector<std::string> content;
 
-					bool valid = enc_key && mac_val && test_bitlocker_password(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, salt, opts->password);
+					bool valid = enc_key && mac_val && salt && test_bitlocker_password(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, salt, opts->password);
 					content.push_back(valid ? "Valid" : "Invalid");
 					if (valid)
 					{

@@ -148,12 +148,6 @@ namespace utils
 			return s;
 		}
 
-		std::wstring lower(std::wstring& s)
-		{
-			transform(s.begin(), s.end(), s.begin(), ::tolower);
-			return s;
-		}
-
 		void ltrim(std::string& s)
 		{
 			s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {

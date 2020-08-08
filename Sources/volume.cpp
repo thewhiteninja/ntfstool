@@ -46,7 +46,8 @@ bool findVolumeName(wchar_t* volName, int diskno, long long offs, long long len)
 {
 	HANDLE vol = FindFirstVolumeW(volName, MAX_PATH);
 	bool success = vol != INVALID_HANDLE_VALUE;
-	while (success)
+	bool found = false;
+	while (success && !found)
 	{
 		volName[wcslen(volName) - 1] = '\0';
 		HANDLE volH = CreateFileW(volName, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
@@ -64,9 +65,8 @@ bool findVolumeName(wchar_t* volName, int diskno, long long offs, long long len)
 						vde->data()->Extents[i].StartingOffset.QuadPart == offs &&
 						vde->data()->Extents[i].ExtentLength.QuadPart == len)
 					{
-						CloseHandle(volH);
-						FindVolumeClose(vol);
-						return true;
+						found = true;
+						break;
 					}
 				}
 			}
@@ -76,8 +76,9 @@ bool findVolumeName(wchar_t* volName, int diskno, long long offs, long long len)
 
 		success = FindNextVolumeW(vol, volName, MAX_PATH) != 0;
 	}
+
 	FindVolumeClose(vol);
-	return false;
+	return found;
 }
 
 std::shared_ptr<Buffer<PBYTE>> read_fve(HANDLE h, LARGE_INTEGER offset)

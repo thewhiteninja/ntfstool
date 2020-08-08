@@ -33,6 +33,7 @@
     <ClInclude Include="Sources\reader.h" />
     <ClInclude Include="Sources\Utils\buffer.h" />
     <ClInclude Include="Sources\Utils\constant_names.h" />
+    <ClInclude Include="Sources\Utils\crash_handler.h" />
     <ClInclude Include="Sources\Utils\table.h" />
     <ClInclude Include="Sources\Utils\utils.h" />
     <ClInclude Include="Sources\vbr.h" />
@@ -63,6 +64,7 @@
     <ClCompile Include="Sources\options.cpp" />
     <ClCompile Include="Sources\reader.cpp" />
     <ClCompile Include="Sources\Utils\constant_names.cpp" />
+    <ClCompile Include="Sources\Utils\crash_handler.cpp" />
     <ClCompile Include="Sources\Utils\table.cpp" />
     <ClCompile Include="Sources\Utils\utils.cpp" />
     <ClCompile Include="Sources\volume.cpp" />
@@ -133,19 +135,25 @@
     <SourcePath>$(VC_SourcePath);</SourcePath>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>
     </LinkIncremental>
     <OutDir>$(SolutionDir)Builds\$(Configuration)\$(PlatformTarget)\</OutDir>
     <IntDir>$(SolutionDir)Builds\$(Configuration)\Temp\</IntDir>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)Builds\$(Configuration)\$(PlatformTarget)\</OutDir>
     <IntDir>$(SolutionDir)Builds\$(Configuration)\Temp\</IntDir>
     <SourcePath>Sources</SourcePath>
     <LinkIncremental />
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)Builds\$(Configuration)\$(PlatformTarget)\</OutDir>
@@ -153,6 +161,8 @@
     <SourcePath>Sources</SourcePath>
     <LinkIncremental>
     </LinkIncremental>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
+    <EnableMicrosoftCodeAnalysis>false</EnableMicrosoftCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
