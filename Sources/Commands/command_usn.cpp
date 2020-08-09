@@ -125,7 +125,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 					entry << std::to_string(usn_record->SourceInfo) << ",";
 					entry << std::to_string(usn_record->SecurityId) << ",";
 					entry << constants::disk::usn::fileattributes(usn_record->FileAttributes) << ",";
-					entry << utils::strings::wide_to_utf8(a) << std::endl;
+					entry << utils::strings::to_utf8(a) << std::endl;
 
 					std::string line = entry.str();
 					DWORD write_size = 0;
@@ -193,7 +193,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 					entry["SourceInfo"] = usn_record->SourceInfo;
 					entry["SecurityId"] = usn_record->SecurityId;
 					entry["FileAttributes"] = constants::disk::usn::fileattributes(usn_record->FileAttributes);
-					entry["FileName"] = utils::strings::wide_to_utf8(a);
+					entry["FileName"] = utils::strings::to_utf8(a);
 
 					std::string line = entry.dump() + ",\n";
 					DWORD line_size = 0;

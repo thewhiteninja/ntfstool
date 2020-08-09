@@ -66,7 +66,7 @@ std::vector<std::string> print_attribute_index_root(PMFT_RECORD_ATTRIBUTE_INDEX_
 			ret.push_back("Index");
 			for (auto& entry : entries)
 			{
-				ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + utils::strings::wide_to_utf8(entry->name()));
+				ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + utils::strings::to_utf8(entry->name()));
 			}
 		}
 	}
@@ -84,10 +84,10 @@ std::vector<std::string> print_attribute_reparse_point(PMFT_RECORD_ATTRIBUTE_REP
 		{
 			std::wstring subs_name = std::wstring(POINTER_ADD(PWCHAR, pAttribute->GenericReparseBuffer.DataBuffer, pAttribute->MountPointReparseBuffer.SubstituteNameOffset));
 			subs_name.resize(pAttribute->MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
-			ret.push_back("Substitute Name         : " + utils::strings::wide_to_utf8(subs_name));
+			ret.push_back("Substitute Name         : " + utils::strings::to_utf8(subs_name));
 			std::wstring display_name = std::wstring(POINTER_ADD(PWCHAR, pAttribute->GenericReparseBuffer.DataBuffer, pAttribute->MountPointReparseBuffer.PrintNameOffset));
 			display_name.resize(pAttribute->MountPointReparseBuffer.PrintNameLength / sizeof(WCHAR));
-			ret.push_back("Display Name            : " + utils::strings::wide_to_utf8(display_name));
+			ret.push_back("Display Name            : " + utils::strings::to_utf8(display_name));
 		}
 		else
 		{
@@ -210,7 +210,7 @@ std::vector<std::string> print_attribute_filename(PMFT_RECORD_ATTRIBUTE_FILENAME
 		std::wstring name = std::wstring(pAttribute->Name);
 		name.resize(pAttribute->NameLength);
 		ret.push_back("NameType                : " + constants::disk::mft::file_record_filename_name_type(pAttribute->NameType));
-		ret.push_back("Name                    : " + utils::strings::wide_to_utf8(name));
+		ret.push_back("Name                    : " + utils::strings::to_utf8(name));
 	}
 	return ret;
 }
@@ -248,9 +248,9 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 
 	if (pAttribute->NameLength > 0)
 	{
-		ret.push_back("Name                    : " + utils::strings::wide_to_utf8(name));
+		ret.push_back("Name                    : " + utils::strings::to_utf8(name));
 	}
-	ULONG64 datasize = record->datasize(utils::strings::wide_to_utf8(name));
+	ULONG64 datasize = record->datasize(utils::strings::to_utf8(name));
 	ret.push_back("Data Size               : " + std::to_string(datasize) + " (" + utils::format::size(datasize) + ")");
 
 	return ret;
@@ -262,7 +262,7 @@ std::vector<std::string> print_attribute_index_allocation(std::vector<std::share
 	ret.push_back("Index");
 	for (auto& entry : entries)
 	{
-		ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + utils::strings::wide_to_utf8(entry->name()));
+		ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + utils::strings::to_utf8(entry->name()));
 	}
 	return ret;
 }
@@ -280,7 +280,7 @@ std::vector<std::string> print_attribute_list(PMFT_RECORD_ATTRIBUTE pAttribute, 
 		if (pAttributeCurr->nameLength > 0)
 		{
 			std::wstring name = std::wstring(POINTER_ADD(PWCHAR, pAttributeCurr, pAttributeCurr->nameOffset), pAttributeCurr->nameLength);
-			ret.push_back("Name      : " + utils::strings::wide_to_utf8(name));
+			ret.push_back("Name      : " + utils::strings::to_utf8(name));
 		}
 
 		ret.push_back("Record Num: " + utils::format::hex((ULONG64)pAttributeCurr->recordNumber));
