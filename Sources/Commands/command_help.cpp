@@ -255,10 +255,10 @@ void print_help_extract(char* name)
 	std::cerr << "    " << name << " extract disk=0 volume=1 from=\"c:\\windows\\notepad.exe\" output = \"d:\\notepad.exe\"" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Extract SAM" << std::endl;
-	std::cerr << "    " << name << " extract disk=0 volume=1 --sam output = \"d:\\notepad.exe\"" << std::endl;
+	std::cerr << "    " << name << " extract disk=0 volume=1 --sam output = \"d:\\sam\"" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Extract SYSTEM file" << std::endl;
-	std::cerr << "    " << name << " extract disk=0 volume=1 --system output = \"d:\\notepad.exe\"" << std::endl;
+	std::cerr << "    " << name << " extract disk=0 volume=1 --system output = \"d:\\system\"" << std::endl;
 	std::cerr << std::endl;
 }
 
