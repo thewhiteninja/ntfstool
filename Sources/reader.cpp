@@ -21,6 +21,28 @@ Reader::Reader(std::wstring volume_name)
 	}
 }
 
+Reader::Reader(const Reader& reader_copy)
+{
+	_handle_disk = INVALID_HANDLE_VALUE;
+
+	DuplicateHandle(GetCurrentProcess(), reader_copy.handle(), GetCurrentProcess(), &_handle_disk, DUPLICATE_SAME_ACCESS, TRUE, DUPLICATE_SAME_ACCESS);
+
+	memcpy(_boot_record, reader_copy._boot_record, 512);
+
+	_current_position = reader_copy._current_position;
+}
+
+Reader& Reader::operator=(const Reader& e)
+{
+	_handle_disk = e._handle_disk;
+
+	memcpy(_boot_record, e._boot_record, 512);
+
+	_current_position = e._current_position;
+
+	return *this;
+}
+
 Reader::~Reader()
 {
 	if (_handle_disk != INVALID_HANDLE_VALUE)

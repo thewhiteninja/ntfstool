@@ -271,7 +271,7 @@ std::vector<std::string> print_attribute_list(PMFT_RECORD_ATTRIBUTE pAttribute, 
 {
 	std::vector<std::string> ret;
 	DWORD offset = 0;
-	PMFT_RECORD_ATTRIBUTE pAttributeCurr = pAttribute;
+	PMFT_RECORD_ATTRIBUTE pAttributeCurr;
 	while (offset < length)
 	{
 		pAttributeCurr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, pAttribute, offset);

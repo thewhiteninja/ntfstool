@@ -94,7 +94,7 @@ std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> MFTRecord::parse_index_bloc
 		}
 
 		blockPos += pIndexSubBlockData->AllocEntrySize + 0x18;
-		pIndexSubBlockData = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK, pIndexSubBlockData, pIndexSubBlockData->AllocEntrySize + 0x18);		
+		pIndexSubBlockData = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK, pIndexSubBlockData, pIndexSubBlockData->AllocEntrySize + 0x18);
 	}
 
 	return mapVCNToIndexBlock;
@@ -333,9 +333,6 @@ bool MFTRecord::copy_data_to_file(std::wstring dest_filename, std::string stream
 {
 	bool ret = true;
 
-	PMFT_RECORD_ATTRIBUTE_HEADER pAttributeList = attribute_header($ATTRIBUTE_LIST);
-	PMFT_RECORD_ATTRIBUTE_HEADER pAttributeData = attribute_header($DATA, stream_name);
-
 	HANDLE output = CreateFileW(dest_filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (output != INVALID_HANDLE_VALUE)
 	{
@@ -364,7 +361,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(DWORD blocks
 	if (pAttributeData != NULL)
 	{
 		DWORD64 writeSize = 0;
-		DWORD fixed_blocksize = 0;
+		DWORD fixed_blocksize;
 
 		if (pAttributeData->FormCode == RESIDENT_FORM)
 		{

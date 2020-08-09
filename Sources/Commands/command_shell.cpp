@@ -32,7 +32,10 @@ std::vector<std::string> parse_cmd_line(std::string cmdline)
 std::string remove_trailing_path_delimiter(const std::string& s)
 {
 	std::string ret = s;
-	ret.pop_back();
+	if (ret != "\\")
+	{
+		ret.pop_back();
+	}
 	return ret;
 }
 
@@ -84,6 +87,28 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 			}
 			if (cmds[0] == "cd" && cmds.size() == 2)
 			{
+				if (cmds[1] == ".")
+				{
+					continue;
+				}
+				if (cmds[1] == "..")
+				{
+					std::filesystem::path path(remove_trailing_path_delimiter(current_dir));
+					std::string next_path = path.parent_path().string();
+
+					std::shared_ptr<MFTRecord> next_dir = explorer->mft()->record_from_path(next_path);
+					if (next_dir != nullptr)
+					{
+						current_dir_record = next_dir;
+						current_dir = next_path;
+						if (current_dir.back() != '\\') current_dir += "\\";
+					}
+					else
+					{
+						std::cout << cmds[1] << ": Directory not found" << std::endl;
+					}
+					continue;
+				}
 				if (cmds[1] != "")
 				{
 					std::string next_path = cmds[1];
