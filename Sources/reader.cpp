@@ -16,7 +16,7 @@ Reader::Reader(std::wstring volume_name)
 		seek(0);
 		if (!ReadFile(_handle_disk, &_boot_record, 0x200, &read, NULL))
 		{
-			printf("ReadFile on bootsector failed (%08x)", static_cast<unsigned int>(GetLastError()));
+			printf("ReadFile on bootsector failed (%08x)\n", static_cast<unsigned int>(GetLastError()));
 		}
 	}
 }
