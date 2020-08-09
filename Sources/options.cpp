@@ -44,7 +44,6 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 
 	for (int i = 2; i < argc; i++)
 	{
-		if (is_option(argv[i], "path")) { read_option_string(argv[i], ret->path); continue; }
 		if (is_option(argv[i], "output")) { read_option_string(argv[i], ret->out); continue; }
 		if (is_option(argv[i], "from")) { read_option_string(argv[i], ret->from); continue; }
 		if (is_option(argv[i], "disk")) { read_option_ulong(argv[i], &ret->disk); continue; }
@@ -57,6 +56,8 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 		if (is_option(argv[i], "bek")) { read_option_string(argv[i], ret->bek); continue; }
 		if (is_option(argv[i], "fvek")) { read_option_string(argv[i], ret->fvek); continue; }
 		if (is_option(argv[i], "format")) { read_option_string(argv[i], ret->format); continue; }
+		if (is_option(argv[i], "--sam")) { ret->sam = true; continue; }
+		if (is_option(argv[i], "--system")) { ret->system = true; continue; }
 		if (ret->subcommand == "") { ret->subcommand = std::string(argv[i]); continue; }
 		ret->show_usage = true;
 	}
@@ -85,7 +86,7 @@ std::shared_ptr<Disk> get_disk(std::shared_ptr<Options> opts)
 		}
 		if (disk == nullptr)
 		{
-			std::cerr << "[!] Invalid or missing disk index" << std::endl;
+			std::cerr << "[!] Invalid disk index" << std::endl;
 			return nullptr;
 		}
 	}

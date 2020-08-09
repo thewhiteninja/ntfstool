@@ -46,23 +46,23 @@ private:
 
 public:
 	explicit Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index);
-	std::string name()					const { return _name; }
-	std::string label()					const { return _label; }
-	std::string filesystem()			const { return _filesystem; }
+	std::string name()						const { return _name; }
+	std::string label()						const { return _label; }
+	std::string filesystem()				const { return _filesystem; }
 	std::vector<std::string> mountpoints()	const { return _mountpoints; }
-	std::string guid_type()				const { return _guid_type; }
-	DWORD serial_number()				const { return _serial_number; }
-	DWORD partition_type()				const { return _partition_type; }
-	DWORD type()						const { return _type; }
-	DWORD index()						const { return _index; }
-	DWORD disk_index()					const { return _disk_index; }
-	DWORD64 offset()					const { return _offset; }
-	DWORD64 size()						const { return _size; }
-	DWORD64 free()						const { return _free; }
-	BOOL bootable()						const { return _bootable; }
-	bitlocker_info	bitlocker()			const { return _bitlocker; }
-	bool is_mounted()					const { return _mountpoints.size() > 0; }
-	PBYTE bootsector() { return _bootsector.data(); }
+	std::string guid_type()					const { return _guid_type; }
+	DWORD serial_number()					const { return _serial_number; }
+	DWORD partition_type()					const { return _partition_type; }
+	DWORD type()							const { return _type; }
+	DWORD index()							const { return _index; }
+	DWORD disk_index()						const { return _disk_index; }
+	DWORD64 offset()						const { return _offset; }
+	DWORD64 size()							const { return _size; }
+	DWORD64 free()							const { return _free; }
+	BOOL bootable()							const { return _bootable; }
+	bitlocker_info	bitlocker()				const { return _bitlocker; }
+	bool is_mounted()						const { return _mountpoints.size() > 0; }
+	PBYTE bootsector()						const { return _bootsector.data(); }
 };
 
 
