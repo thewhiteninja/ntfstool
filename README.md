@@ -43,6 +43,7 @@ the help command displays some examples for each command.
 | [mbr](#mbr) | Display MBR structure, code and partitions for a disk |
 | [gpt](#gpt) | Display GPT structure, code  and partitions for a disk |
 | [vbr](#vbr)  | Display VBR structure and code for a specidifed volume (ntfs, fat32, fat1x, bitlocker supported) |
+| [extract](#extract)  | Extract a file from a volume. |
 | [mft](#mft)  | Display FILE record details for a specified MFT inode. Almost all attribute types supported |
 | [bitlocker](#bitlocker)  | Display detailed information and hash ($bitlocker$) for all VMK. It is possible to test a password or recovery key. If it is correct, the decrypted VMK and FVEK is displayed. |
 | [bitdecrypt](#bitdecrypt)  | Decrypt a volume to a file using password, recovery key or bek. |
@@ -50,7 +51,7 @@ the help command displays some examples for each command.
 | [logfile](#logfile)  | Dump $LogFile file in specified format: csv, json, raw. |
 | [usn](#usn)  | Dump $UsnJrnl file  in specified format: csv, json, raw. |
 | [undelete](#undelete)  | Search and extract deleted files for a volume. |
-| [shell](#shell)  | Start a mini-shell |
+| [shell](#shell-1)  | Start a mini-shell |
 
 
 ## Limitations
@@ -717,5 +718,33 @@ the help command displays some examples for each command.
 </table>
 
 
+### extract
+<table>
+<tr><td>extract disk=0 volume=4 --system output=d:\system</td></tr>
+<tr><td>
+
+    Extract file from \\.\PhysicalDrive3 > Volume:1
+    -----------------------------------------------
+
+    [+] Opening \\?\Volume{00023d5d-0000-0000-0002-000000000000}\
+    [-] Source      : \bob.txt
+    [-] Destination : d:\bob.txt
+    [-] Record Num  : 47 (0000002fh)
+    [+] File extracted (42 bytes written)
+    
+</td></tr>
+<tr><td>
+
+    Extract file from \\.\PhysicalDrive0 > Volume:4
+    -----------------------------------------------
+
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [-] Source      : c:\windows\system32\config\system
+    [-] Destination : d:\system
+    [-] Record Num  : 623636 (00098414h)
+    [+] File extracted (19398656 bytes written)
+    
+</td></tr>
+</table>
 
 
