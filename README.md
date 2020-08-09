@@ -232,6 +232,38 @@ the help command displays some examples for each command.
 </td></tr>
 </table>
 
+
+### Extract
+<table>
+<tr><td>extract disk=0 volume=4 --system output=d:\system</td></tr>
+<tr><td>
+
+    Extract file from \\.\PhysicalDrive3 > Volume:1
+    -----------------------------------------------
+
+    [+] Opening \\?\Volume{00023d5d-0000-0000-0002-000000000000}\
+    [-] Source      : \bob.txt
+    [-] Destination : d:\bob.txt
+    [-] Record Num  : 47 (0000002fh)
+    [+] File extracted (42 bytes written)
+    
+</td></tr>
+<tr><td>extract disk=3 volume=1 from=\bob.txt output=d:\bob.txt</td></tr>
+<tr><td>
+
+    Extract file from \\.\PhysicalDrive0 > Volume:4
+    -----------------------------------------------
+
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [-] Source      : c:\windows\system32\config\system
+    [-] Destination : d:\system
+    [-] Record Num  : 623636 (00098414h)
+    [+] File extracted (19398656 bytes written)
+    
+</td></tr>
+</table>
+
+
 ### MFT
 <table>
 <tr><td>mft disk=2 volume=1 inode=5 (root folder)</td></tr>
@@ -716,35 +748,3 @@ the help command displays some examples for each command.
     
 </td></tr>
 </table>
-
-
-### extract
-<table>
-<tr><td>extract disk=0 volume=4 --system output=d:\system</td></tr>
-<tr><td>
-
-    Extract file from \\.\PhysicalDrive3 > Volume:1
-    -----------------------------------------------
-
-    [+] Opening \\?\Volume{00023d5d-0000-0000-0002-000000000000}\
-    [-] Source      : \bob.txt
-    [-] Destination : d:\bob.txt
-    [-] Record Num  : 47 (0000002fh)
-    [+] File extracted (42 bytes written)
-    
-</td></tr>
-<tr><td>
-
-    Extract file from \\.\PhysicalDrive0 > Volume:4
-    -----------------------------------------------
-
-    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
-    [-] Source      : c:\windows\system32\config\system
-    [-] Destination : d:\system
-    [-] Record Num  : 623636 (00098414h)
-    [+] File extracted (19398656 bytes written)
-    
-</td></tr>
-</table>
-
-
