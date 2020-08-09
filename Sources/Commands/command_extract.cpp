@@ -45,7 +45,7 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 	}
 	else
 	{
-		std::cout << "[-] Record Num  :" << utils::format::hex(record->header()->MFTRecordIndex) << std::endl;
+		std::cout << "[-] Record Num  : " << record->header()->MFTRecordIndex << " (" << utils::format::hex(record->header()->MFTRecordIndex, true) << ")" << std::endl;
 	}
 
 	record->copy_data_to_file(utils::strings::from_string(opts->out), from_file.second);
