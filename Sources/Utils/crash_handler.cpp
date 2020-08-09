@@ -21,29 +21,13 @@
 #include "Utils\utils.h"
 #include <Utils\table.h>
 
-typedef struct _CRASH_MODULE_DATA {
-	std::wstring image_name;
-	std::wstring module_name;
-	PVOID base_address = nullptr;
-	DWORD load_size = 0;
-} CRASH_MODULE_DATA;
-
-
-typedef struct
-{
-	DWORD64 address;
-	std::wstring function;
-	std::wstring filename;
-	DWORD line;
-} CRASH_STACK_TRACE;
-
 class Crash
 {
 private:
 	PEXCEPTION_POINTERS _ex;
 
 public:
-	Crash(PEXCEPTION_POINTERS pEx)
+	explicit Crash(PEXCEPTION_POINTERS pEx)
 	{
 		_ex = pEx;
 	}

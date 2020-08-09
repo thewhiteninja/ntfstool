@@ -271,8 +271,6 @@ int extract_deleted_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol
 	std::cout << std::setfill('0');
 	utils::ui::title("Extract deleted file from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
-	DWORD cluster_size = ((PBOOT_SECTOR_NTFS)vol->bootsector())->bytePerSector * ((PBOOT_SECTOR_NTFS)vol->bootsector())->sectorPerCluster;
-
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));

@@ -16,7 +16,12 @@ protected:
 
 public:
 	explicit Reader(std::wstring volume_name);
+
 	~Reader();
+
+	Reader(const Reader& reader2);
+
+	Reader& operator= (const Reader& e);
 
 	HANDLE handle() const { return _handle_disk; }
 
