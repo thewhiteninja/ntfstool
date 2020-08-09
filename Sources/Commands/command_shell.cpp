@@ -16,25 +16,17 @@
 
 #define CTRL_PLUS_D	("\x04")
 
-std::pair<std::string, std::string> parse_cmd_line(std::string cmdline)
+std::vector<std::string> parse_cmd_line(std::string cmdline)
 {
-	std::string cmd, args;
+	std::vector<std::string> cmds;
 	std::istringstream iss(cmdline);
-	std::vector<std::string> result{ std::istream_iterator<std::string>(iss), {} };
-	if (result.size() > 0)
-	{
-		cmd = result[0];
-		for (size_t i = 1; i < result.size(); i++)
-		{
-			args += result[i] + " ";
-		}
-		if (args.size() > 0)
-		{
-			args.pop_back();
-		}
+
+	std::string s;
+	while (iss >> std::quoted(s)) {
+		cmds.push_back(s);
 	}
 
-	return std::pair<std::string, std::string>(cmd, args);
+	return cmds;
 }
 
 std::string remove_trailing_path_delimiter(const std::string& s)
@@ -46,10 +38,11 @@ std::string remove_trailing_path_delimiter(const std::string& s)
 
 const std::map<std::string, std::string> help_strings = {
 	{"cat", "Print file content (limited to 1Mb file)"},
+	{"cp", "Copy file (same volume as destination is not recommended)"},
 	{"cd", "Change directory"},
 	{"exit", "See \"quit\" command."},
 	{"ls","List directory content"},
-	{"pwd","Print working directory"},
+	{"pwd","Print current working directory"},
 	{"quit","Quit program"},
 	{"help","This command"} };
 
@@ -80,20 +73,20 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 	{
 		std::cout << "disk" << disk->index() << ":volume" << vol->index() << ":" << remove_trailing_path_delimiter(current_dir) << "> ";
 		std::getline(std::cin, cmdline);
-		std::pair<std::string, std::string> cmds = parse_cmd_line(cmdline);
+		std::vector<std::string> cmds = parse_cmd_line(cmdline);
 
-		if (cmds.first != "")
+		if (!cmds.empty() && cmds[0] != "")
 		{
-			if ((cmds.first == "exit") || (cmds.first == "quit") || (cmds.first == CTRL_PLUS_D))
+			if ((cmds[0] == "exit") || (cmds[0] == "quit") || (cmds[0] == CTRL_PLUS_D))
 			{
 				quit = true;
 				continue;
 			}
-			if (cmds.first == "cd")
+			if (cmds[0] == "cd" && cmds.size() == 2)
 			{
-				if (cmds.second != "")
+				if (cmds[1] != "")
 				{
-					std::string next_path = cmds.second;
+					std::string next_path = cmds[1];
 					std::filesystem::path path(next_path);
 					if (path.root_directory() != "\\")
 					{
@@ -108,17 +101,17 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 					}
 					else
 					{
-						std::cout << cmds.second << ": Directory not found" << std::endl;
+						std::cout << cmds[1] << ": Directory not found" << std::endl;
 					}
 				}
 				continue;
 			}
-			if (cmds.first == "help")
+			if (cmds[0] == "help")
 			{
-				help(cmds.first);
+				help(cmds[0]);
 				continue;
 			}
-			if (cmds.first == "ls")
+			if (cmds[0] == "ls")
 			{
 				std::vector<std::shared_ptr<IndexEntry>> index = current_dir_record->index();
 				std::set<DWORD64> win32_named_entries;
@@ -166,7 +159,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 							tab->add_item_multiline(types);
 						}
 						std::vector<std::string> names;
-						names.push_back(utils::strings::wide_to_utf8(entry->name()));
+						names.push_back(utils::strings::to_utf8(entry->name()));
 						for (auto& ads : ads_names)
 						{
 							names.push_back("  " + ads);
@@ -225,11 +218,11 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 				}
 				continue;
 			}
-			if (cmds.first == "cat")
+			if (cmds[0] == "cat" && cmds.size() == 2)
 			{
-				if (cmds.second != "")
+				if (cmds[1] != "")
 				{
-					std::string filetocat = cmds.second;
+					std::string filetocat = cmds[1];
 					size_t ads_sep = filetocat.find(':');
 					std::string stream_name = "";
 					if (ads_sep != std::string::npos)
@@ -242,7 +235,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 					std::vector<std::shared_ptr<IndexEntry>> index = current_dir_record->index();
 					for (std::shared_ptr<IndexEntry>& entry : index)
 					{
-						if (utils::strings::wide_to_utf8(entry->name()) == filetocat)
+						if (_strcmpi(utils::strings::to_utf8(entry->name()).c_str(), filetocat.c_str()) == 0)
 						{
 							std::shared_ptr<MFTRecord> filetocat_record = explorer->mft()->record_from_number(entry->record_number());
 							if (!(filetocat_record->header()->flag & MFT_RECORD_IS_DIRECTORY))
@@ -257,7 +250,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 								}
 								else
 								{
-									std::cout << cmds.second << ": File too big to be cat-ed" << std::endl;
+									std::cout << cmds[1] << ": File too big to be cat-ed" << std::endl;
 								}
 							}
 							break;
@@ -265,18 +258,63 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 					}
 					if (!found)
 					{
-						std::cout << cmds.second << ": File not found" << std::endl;
+						std::cout << cmds[1] << ": File not found" << std::endl;
 					}
 				}
 				continue;
 			}
-			if (cmds.first == "pwd")
+			if (cmds[0] == "cp" && cmds.size() == 3)
+			{
+				if (cmds[1] != "" && cmds[2] != "")
+				{
+					// Parse input file name (check :ads)
+					std::string copyfrom = cmds[1];
+					size_t ads_sep = copyfrom.find(':');
+					std::string stream_name = "";
+					if (ads_sep != std::string::npos)
+					{
+						stream_name = copyfrom.substr(ads_sep + 1);
+						copyfrom = copyfrom.substr(0, ads_sep);
+					}
+
+					std::string copyto = cmds[2];
+
+					bool found = false;
+					std::vector<std::shared_ptr<IndexEntry>> index = current_dir_record->index();
+					for (std::shared_ptr<IndexEntry>& entry : index)
+					{
+						if (_strcmpi(utils::strings::to_utf8(entry->name()).c_str(), copyfrom.c_str()) == 0)
+						{
+							found = true;
+							std::shared_ptr<MFTRecord> copyfrom_record = explorer->mft()->record_from_number(entry->record_number());
+							if (!(copyfrom_record->header()->flag & MFT_RECORD_IS_DIRECTORY))
+							{
+								if (copyfrom_record->copy_data_to_file(utils::strings::from_string(copyto).c_str(), stream_name))
+								{
+									std::cout << "1 file copied" << std::endl;
+								}
+							}
+							else
+							{
+								std::cout << cmds[1] << ": Is not a file" << std::endl;
+							}
+							break;
+						}
+					}
+					if (!found)
+					{
+						std::cout << cmds[1] << ": File not found" << std::endl;
+					}
+				}
+				continue;
+			}
+			if (cmds[0] == "pwd")
 			{
 				if (current_dir.size() == 1) std::cout << current_dir << std::endl;
 				else std::cout << remove_trailing_path_delimiter(current_dir) << std::endl;
 				continue;
 			}
-			std::cout << "Unknown command : " << cmds.first << ". Type \"help\" for command list." << std::endl;
+			std::cout << "Unknown command : " << cmds[0] << ". Type \"help\" for command list." << std::endl;
 		}
 	}
 	return 0;
