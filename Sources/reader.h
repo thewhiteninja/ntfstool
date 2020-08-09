@@ -12,6 +12,8 @@ protected:
 
 	BYTE _boot_record[512] = { 0 };
 
+	DWORD64 _current_position = 0;
+
 public:
 	explicit Reader(std::wstring volume_name);
 	~Reader();

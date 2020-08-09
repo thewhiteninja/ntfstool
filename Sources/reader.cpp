@@ -31,26 +31,37 @@ Reader::~Reader()
 
 bool Reader::seek(ULONG64 position)
 {
-	LARGE_INTEGER pos;
-	pos.QuadPart = (LONGLONG)position;
-	LARGE_INTEGER result;
-
-	if (_handle_disk != INVALID_HANDLE_VALUE)
+	if (_current_position != position)
 	{
-		return SetFilePointerEx(_handle_disk, pos, &result, SEEK_SET) || pos.QuadPart != result.QuadPart;
-	}
+		_current_position = position;
 
-	return false;
+		if (_handle_disk != INVALID_HANDLE_VALUE)
+		{
+			LARGE_INTEGER pos;
+			pos.QuadPart = (LONGLONG)position;
+			LARGE_INTEGER result;
+
+			return SetFilePointerEx(_handle_disk, pos, &result, SEEK_SET) || pos.QuadPart != result.QuadPart;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 bool Reader::read(LPVOID lpBuffer, ULONG32 nNumberOfBytesToRead)
 {
+	bool ret = false;
 	DWORD readBytes = 0;
 
 	if (_handle_disk != INVALID_HANDLE_VALUE)
 	{
-		return ReadFile(_handle_disk, lpBuffer, nNumberOfBytesToRead, &readBytes, NULL);
+		ret = ReadFile(_handle_disk, lpBuffer, nNumberOfBytesToRead, &readBytes, NULL);
+		_current_position += readBytes;
+		return ret;
 	}
 
-	return false;
+	return ret;
 }

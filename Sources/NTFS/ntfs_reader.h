@@ -25,6 +25,8 @@ public:
 		ULONG32 record_size = 0;
 
 		ULONG32 block_size = 0;
+
+		ULONG32 sector_size = 0;
 	} sizes;
 
 	PBOOT_SECTOR_NTFS boot_record() { return (PBOOT_SECTOR_NTFS)&_boot_record; }

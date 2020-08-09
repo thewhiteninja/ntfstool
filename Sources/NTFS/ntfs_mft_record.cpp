@@ -5,19 +5,22 @@
 #include "Utils/utils.h"
 #include "Utils/buffer.h"
 #include "ntfs_mft.h"
+#include "ntfs_reader.h"
 #include "ntfs_index_entry.h"
 
 #include "ntfs_explorer.h"
 
-MFTRecord::MFTRecord(PMFT_RECORD_HEADER pRH, MFT* mft, std::shared_ptr<NTFSReader> reader)
+MFTRecord::MFTRecord(PMFT_RECORD_HEADER pRecordHeader, MFT* mft, std::shared_ptr<NTFSReader> reader)
 {
 	_reader = reader;
 	_mft = mft;
 
-	if (pRH != NULL)
+	if (pRecordHeader != NULL)
 	{
 		_record = std::make_shared<Buffer<PMFT_RECORD_HEADER>>(_reader->sizes.record_size);
-		memcpy(_record->data(), pRH, _reader->sizes.record_size);
+		memcpy(_record->data(), pRecordHeader, _reader->sizes.record_size);
+
+		apply_fixups(_record->data(), _record->data()->updateOffset, _record->data()->updateNumber);
 	}
 }
 
@@ -76,39 +79,22 @@ ULONG64 MFTRecord::datasize(std::string stream_name)
 	return 0;
 }
 
-std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> parse_index_block(std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>> pIndexBlock, DWORD blocksize, DWORD sectorsize)
+std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> MFTRecord::parse_index_block(std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>> pIndexBlock, DWORD blocksize, DWORD sectorsize)
 {
 	std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> mapVCNToIndexBlock;
 
-	PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK pIndexMainBlockData = pIndexBlock->data();
-	if (pIndexMainBlockData == nullptr)
-	{
-		return mapVCNToIndexBlock;
-	}
-
-	PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK pIndexSubBlockData = pIndexMainBlockData;
-	uint32_t blockIndex = 0;
-	while (blockIndex < (pIndexBlock->size() / blocksize))
+	PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK pIndexSubBlockData = pIndexBlock->data();
+	DWORD blockPos = 0;
+	while (blockPos < pIndexBlock->size())
 	{
 		if (RtlCompareMemory(&pIndexSubBlockData->Magic, "INDX", 4) == 4)
 		{
-			PWORD usnaddr = POINTER_ADD(PWORD, pIndexSubBlockData, pIndexSubBlockData->OffsetOfUS);
-			PWORD usarray = usnaddr + 1;
-			DWORD sectors = blocksize / sectorsize;
-
-			PWORD sector = (PWORD)pIndexSubBlockData;
-			for (DWORD i = 0; i < sectors; i++)
-			{
-				sector += ((sectorsize >> 1) - 1);
-				*sector = usarray[i];
-				sector++;
-			}
-
+			apply_fixups(pIndexSubBlockData, pIndexSubBlockData->OffsetOfUS, pIndexSubBlockData->SizeOfUS);
 			mapVCNToIndexBlock[pIndexSubBlockData->VCN] = pIndexSubBlockData;
 		}
 
-		pIndexSubBlockData = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK, pIndexSubBlockData, blocksize);
-		blockIndex++;
+		blockPos += pIndexSubBlockData->AllocEntrySize + 0x18;
+		pIndexSubBlockData = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK, pIndexSubBlockData, pIndexSubBlockData->AllocEntrySize + 0x18);		
 	}
 
 	return mapVCNToIndexBlock;
@@ -304,6 +290,18 @@ std::vector<MFT_DATARUN> MFTRecord::read_dataruns(PMFT_RECORD_ATTRIBUTE_HEADER p
 	}
 
 	return result;
+}
+
+void MFTRecord::apply_fixups(PVOID buffer, WORD updateOffset, WORD updateSize)
+{
+	PWORD usarray = POINTER_ADD(PWORD, buffer, updateOffset);
+	PWORD sector = (PWORD)buffer;
+
+	for (DWORD i = 1; i < updateSize; i++)
+	{
+		sector[(_reader->sizes.sector_size - 2) / sizeof(WORD)] = usarray[i];
+		sector = POINTER_ADD(PWORD, sector, _reader->sizes.sector_size);
+	}
 }
 
 PMFT_RECORD_ATTRIBUTE_HEADER MFTRecord::attribute_header(DWORD type, std::string name, int index)

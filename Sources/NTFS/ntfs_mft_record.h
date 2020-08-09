@@ -30,6 +30,10 @@ private:
 
 	MFT* _mft = nullptr;
 
+	void apply_fixups(PVOID buffer, WORD updateOffset, WORD updateSize);
+
+	std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> parse_index_block(std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>> pIndexBlock, DWORD blocksize, DWORD sectorsize);
+
 public:
 
 	MFTRecord(PMFT_RECORD_HEADER pRH, MFT* mft, std::shared_ptr<NTFSReader> reader);
@@ -38,6 +42,9 @@ public:
 	PMFT_RECORD_HEADER header() { return _record->data(); }
 
 	PMFT_RECORD_ATTRIBUTE_HEADER attribute_header(DWORD type, std::string name = "", int index = 0);
+
+	template < typename T >
+	std::shared_ptr<Buffer<T>> attribute_data(PMFT_RECORD_ATTRIBUTE_HEADER attr);
 
 	ULONG64 datasize(std::string stream_name = "");
 
@@ -52,7 +59,4 @@ public:
 	std::vector<std::shared_ptr<IndexEntry>> index();
 
 	static std::vector<MFT_DATARUN> read_dataruns(PMFT_RECORD_ATTRIBUTE_HEADER pAttribute);
-
-	template < typename T >
-	std::shared_ptr<Buffer<T>> attribute_data(PMFT_RECORD_ATTRIBUTE_HEADER attr);
 };
