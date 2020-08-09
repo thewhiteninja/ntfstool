@@ -473,6 +473,22 @@ namespace utils
 				return str.substr(found + 1);
 			}
 		}
+
+		std::pair<std::string, std::string> split_file_and_stream(std::string& str)
+		{
+			std::filesystem::path p(str);
+
+			size_t ads_sep = p.filename().string().find(':');
+			std::string stream_name = "";
+			if (ads_sep != std::string::npos)
+			{
+				stream_name = p.filename().string().substr(ads_sep + 1);
+				int last_sep = str.find_last_of(":");
+				str = str.substr(0, last_sep);
+			}
+
+			return std::make_pair(str, stream_name);
+		}
 	}
 
 	namespace id

@@ -38,7 +38,7 @@ std::string remove_trailing_path_delimiter(const std::string& s)
 
 const std::map<std::string, std::string> help_strings = {
 	{"cat", "Print file content (limited to 1Mb file)"},
-	{"cp", "Copy file (same volume as destination is not recommended)"},
+	{"cp", "Copy file"},
 	{"cd", "Change directory"},
 	{"exit", "See \"quit\" command."},
 	{"ls","List directory content"},
@@ -222,29 +222,22 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 			{
 				if (cmds[1] != "")
 				{
-					std::string filetocat = cmds[1];
-					size_t ads_sep = filetocat.find(':');
-					std::string stream_name = "";
-					if (ads_sep != std::string::npos)
-					{
-						stream_name = filetocat.substr(ads_sep + 1);
-						filetocat = filetocat.substr(0, ads_sep);
-					}
+					auto from_file = utils::files::split_file_and_stream(cmds[1]);
 
 					bool found = false;
 					std::vector<std::shared_ptr<IndexEntry>> index = current_dir_record->index();
 					for (std::shared_ptr<IndexEntry>& entry : index)
 					{
-						if (_strcmpi(utils::strings::to_utf8(entry->name()).c_str(), filetocat.c_str()) == 0)
+						if (_strcmpi(utils::strings::to_utf8(entry->name()).c_str(), from_file.first.c_str()) == 0)
 						{
 							std::shared_ptr<MFTRecord> filetocat_record = explorer->mft()->record_from_number(entry->record_number());
 							if (!(filetocat_record->header()->flag & MFT_RECORD_IS_DIRECTORY))
 							{
 
 								found = true;
-								if (filetocat_record->datasize(stream_name) <= 1 * 1024 * 1024)
+								if (filetocat_record->datasize(from_file.second) <= 1 * 1024 * 1024)
 								{
-									auto databuf = filetocat_record->data(stream_name);
+									auto databuf = filetocat_record->data(from_file.second);
 									std::string content = std::string((PCHAR)databuf->data(), databuf->size());
 									std::cout << content << std::endl;
 								}
@@ -267,29 +260,20 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 			{
 				if (cmds[1] != "" && cmds[2] != "")
 				{
-					// Parse input file name (check :ads)
-					std::string copyfrom = cmds[1];
-					size_t ads_sep = copyfrom.find(':');
-					std::string stream_name = "";
-					if (ads_sep != std::string::npos)
-					{
-						stream_name = copyfrom.substr(ads_sep + 1);
-						copyfrom = copyfrom.substr(0, ads_sep);
-					}
-
+					auto from_file = utils::files::split_file_and_stream(cmds[1]);
 					std::string copyto = cmds[2];
 
 					bool found = false;
 					std::vector<std::shared_ptr<IndexEntry>> index = current_dir_record->index();
 					for (std::shared_ptr<IndexEntry>& entry : index)
 					{
-						if (_strcmpi(utils::strings::to_utf8(entry->name()).c_str(), copyfrom.c_str()) == 0)
+						if (_strcmpi(utils::strings::to_utf8(entry->name()).c_str(), from_file.first.c_str()) == 0)
 						{
 							found = true;
 							std::shared_ptr<MFTRecord> copyfrom_record = explorer->mft()->record_from_number(entry->record_number());
 							if (!(copyfrom_record->header()->flag & MFT_RECORD_IS_DIRECTORY))
 							{
-								if (copyfrom_record->copy_data_to_file(utils::strings::from_string(copyto).c_str(), stream_name))
+								if (copyfrom_record->copy_data_to_file(utils::strings::from_string(copyto).c_str(), from_file.second))
 								{
 									std::cout << "1 file copied" << std::endl;
 								}
