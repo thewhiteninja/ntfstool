@@ -35,6 +35,18 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));
 
+	// Parse input file name (check :ads)
+	std::filesystem::path p(opts->from);
+
+	size_t ads_sep = p.filename().string().find(':');
+	std::string stream_name = "";
+	if (ads_sep != std::string::npos)
+	{
+		stream_name = p.filename().string().substr(ads_sep + 1);
+		int last_sep = opts->from.find_last_of(":");
+		opts->from = opts->from.substr(0, last_sep);
+	}
+
 	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_path(opts->from);
 
 	if (record == nullptr)
@@ -49,15 +61,6 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 
 	std::cout << "[-] Source      : " << opts->from << std::endl;
 	std::cout << "[-] Destination : " << opts->out << std::endl;
-
-	// Parse input file name (check :ads)
-	size_t ads_sep = opts->from.find(':');
-	std::string stream_name = "";
-	if (ads_sep != std::string::npos)
-	{
-		stream_name = opts->from.substr(ads_sep + 1);
-		opts->from = opts->from.substr(0, ads_sep);
-	}
 
 	record->copy_data_to_file(utils::strings::from_string(opts->out), stream_name);
 
