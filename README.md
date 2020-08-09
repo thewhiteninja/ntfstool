@@ -235,7 +235,7 @@ the help command displays some examples for each command.
 
 ### Extract
 <table>
-<tr><td>extract disk=0 volume=4 --system output=d:\system</td></tr>
+<tr><td>extract disk=3 volume=1 from=\bob.txt output=d:\bob.txt</td></tr>
 <tr><td>
 
     Extract file from \\.\PhysicalDrive3 > Volume:1
@@ -248,7 +248,7 @@ the help command displays some examples for each command.
     [+] File extracted (42 bytes written)
     
 </td></tr>
-<tr><td>extract disk=3 volume=1 from=\bob.txt output=d:\bob.txt</td></tr>
+<tr><td>extract disk=0 volume=4 --system output=d:\system</td></tr>
 <tr><td>
 
     Extract file from \\.\PhysicalDrive0 > Volume:4
