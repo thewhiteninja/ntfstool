@@ -43,7 +43,7 @@ public:
 
 	std::shared_ptr<Buffer<PBYTE>> data(std::string stream_name = "");
 
-	bool copy_data_to_file(std::wstring filename, std::string stream_name = "");
+	bool copy_data_to_file(std::wstring dest_filename, std::string stream_name = "");
 
 	cppcoro::generator<std::pair<PBYTE, DWORD>> process_data(DWORD blocksize, std::string stream_name = "");
 
