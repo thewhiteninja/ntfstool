@@ -50,7 +50,16 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 	std::cout << "[-] Source      : " << opts->from << std::endl;
 	std::cout << "[-] Destination : " << opts->out << std::endl;
 
-	record->copy_data_to_file(utils::strings::from_string(opts->out));
+	// Parse input file name (check :ads)
+	size_t ads_sep = opts->from.find(':');
+	std::string stream_name = "";
+	if (ads_sep != std::string::npos)
+	{
+		stream_name = opts->from.substr(ads_sep + 1);
+		opts->from = opts->from.substr(0, ads_sep);
+	}
+
+	record->copy_data_to_file(utils::strings::from_string(opts->out), stream_name);
 
 	std::cout << "[+] File extracted (" << record->datasize() << " bytes written)" << std::endl;
 
