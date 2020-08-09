@@ -19,7 +19,7 @@
 #include <iterator>
 
 
-void fixup(PRECORD_PAGE_HEADER prh)
+void fixup_sequence(PRECORD_PAGE_HEADER prh)
 {
 	if (prh->update_sequence_array_count > 1)
 	{
@@ -233,7 +233,7 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 		DWORD processed = 0;
 		for (PRECORD_PAGE_HEADER prh : record_page_offsets)
 		{
-			fixup(prh);
+			fixup_sequence(prh);
 
 			DWORD offset = 64;
 			DWORD index = 1;

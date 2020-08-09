@@ -36,9 +36,10 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));
 
 	auto from_file = utils::files::split_file_and_stream(opts->from);
+	std::cout << "[-] Source      : " << from_file.first << (from_file.second == "" ? "" : ":" + from_file.second) << std::endl;
+	std::cout << "[-] Destination : " << opts->out << std::endl;
 
 	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_path(from_file.first);
-
 	if (record == nullptr)
 	{
 		std::cout << "[!] Invalid or non-existent path" << std::endl;
@@ -46,11 +47,8 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 	}
 	else
 	{
-		std::cout << "[-] File found in record " << utils::format::hex(record->header()->MFTRecordIndex) << std::endl;
+		std::cout << "[-] Record Num  :" << utils::format::hex(record->header()->MFTRecordIndex) << std::endl;
 	}
-
-	std::cout << "[-] Source      : " << from_file.first << (from_file.second == "" ? "" : ":" + from_file.second) << std::endl;
-	std::cout << "[-] Destination : " << opts->out << std::endl;
 
 	record->copy_data_to_file(utils::strings::from_string(opts->out), from_file.second);
 

@@ -124,21 +124,7 @@ std::shared_ptr<MFTRecord> MFT::record_from_number(ULONG64 record_number)
 		}
 	}
 
-	PMFT_RECORD_HEADER pHeader = (PMFT_RECORD_HEADER)buffer->data();
-	LPWORD update = LPWORD(buffer->address() + pHeader->updateOffset);
-
-	if (LPBYTE(update + pHeader->updateNumber) > LPBYTE(buffer->address() + _reader->sizes.record_size))
-	{
-		wprintf(L"Invalid update sequence number");
-		return nullptr;
-	}
-
-	for (int i = 1; i < pHeader->updateNumber; i++)
-	{
-		*LPWORD(buffer->address() + i * _reader->boot_record()->bytePerSector - 2) = update[i];
-	}
-
-	std::shared_ptr<MFTRecord> ret = std::make_shared<MFTRecord>(pHeader, this, _reader);
+	std::shared_ptr<MFTRecord> ret = std::make_shared<MFTRecord>(buffer->data(), this, _reader);
 
 	buffer = nullptr;
 

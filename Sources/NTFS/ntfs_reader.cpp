@@ -6,6 +6,7 @@ NTFSReader::NTFSReader(std::wstring volume_name) : Reader(volume_name)
 	sizes.cluster_size = pbs->bytePerSector * pbs->sectorPerCluster;
 	sizes.record_size = pbs->clusterPerRecord >= 0 ? pbs->clusterPerRecord * sizes.cluster_size : 1 << -pbs->clusterPerRecord;
 	sizes.block_size = pbs->clusterPerBlock >= 0 ? pbs->clusterPerBlock * sizes.cluster_size : 1 << -pbs->clusterPerBlock;
+	sizes.sector_size = pbs->bytePerSector;
 }
 
 NTFSReader::~NTFSReader()
