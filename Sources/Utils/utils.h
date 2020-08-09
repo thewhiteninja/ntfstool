@@ -45,7 +45,7 @@ namespace utils
 
 		std::string str_to_utf8(std::string s, DWORD encoding = CP_ACP);
 
-		std::string wide_to_utf8(std::wstring s, DWORD encoding = CP_UTF8);
+		std::string to_utf8(std::wstring s, DWORD encoding = CP_UTF8);
 
 		std::string reverse(std::string input);
 

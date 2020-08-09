@@ -249,7 +249,7 @@ namespace utils
 			return bufu.data();
 		}
 
-		std::string wide_to_utf8(std::wstring ws, DWORD encoding)
+		std::string to_utf8(std::wstring ws, DWORD encoding)
 		{
 			if (ws.empty()) return "";
 

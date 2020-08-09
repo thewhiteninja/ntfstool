@@ -74,7 +74,10 @@ bool findVolumeName(wchar_t* volName, int diskno, long long offs, long long len)
 			CloseHandle(volH);
 		}
 
-		success = FindNextVolumeW(vol, volName, MAX_PATH) != 0;
+		if (!found)
+		{
+			success = FindNextVolumeW(vol, volName, MAX_PATH) != 0;
+		}
 	}
 
 	FindVolumeClose(vol);
@@ -177,7 +180,7 @@ Volume::Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index)
 		wchar_t volumeName[MAX_PATH];
 		if (findVolumeName(volumeName, index, _offset, _size))
 		{
-			_name = utils::strings::wide_to_utf8(volumeName);
+			_name = utils::strings::to_utf8(volumeName);
 
 			ULARGE_INTEGER li;
 			if (GetDiskFreeSpaceExW(volumeName, NULL, NULL, &li)) _free = li.QuadPart;
@@ -189,7 +192,7 @@ Volume::Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index)
 			DWORD fileSystemFlags = 0;
 			if (GetVolumeInformationW(volumeName, labelName, MAX_PATH + 1, &serialNumber, &maxComponentLen, &fileSystemFlags, fileSystemName, ARRAYSIZE(fileSystemName)))
 			{
-				_label = utils::strings::wide_to_utf8(labelName);
+				_label = utils::strings::to_utf8(labelName);
 				_serial_number = serialNumber;
 			}
 
@@ -209,7 +212,7 @@ Volume::Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index)
 				size_t i = 0;
 				while (letters[i] != NULL)
 				{
-					_mountpoints.push_back(utils::strings::wide_to_utf8(letters));
+					_mountpoints.push_back(utils::strings::to_utf8(letters));
 					i += wcslen(letters);
 				}
 			}
