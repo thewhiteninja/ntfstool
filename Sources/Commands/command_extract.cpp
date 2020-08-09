@@ -35,7 +35,7 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));
 
-	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_path(opts->path);
+	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_path(opts->from);
 
 	if (record == nullptr)
 	{
@@ -47,7 +47,7 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 		std::cout << "[-] File found in record " << utils::format::hex(record->header()->MFTRecordIndex) << std::endl;
 	}
 
-	std::cout << "[-] Source      : " << opts->path << std::endl;
+	std::cout << "[-] Source      : " << opts->from << std::endl;
 	std::cout << "[-] Destination : " << opts->out << std::endl;
 
 	record->copy_data_to_file(utils::strings::from_string(opts->out));
@@ -71,7 +71,15 @@ namespace commands {
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					if (opts->path != "")
+					if (opts->from == "" && opts->sam)
+					{
+						opts->from = "c:\\windows\\system32\\config\\sam";
+					}
+					if (opts->from == "" && opts->system)
+					{
+						opts->from = "c:\\windows\\system32\\config\\system";
+					}
+					if (opts->from != "")
 					{
 						if (opts->out != "")
 						{
@@ -85,7 +93,7 @@ namespace commands {
 					}
 					else
 					{
-						std::cerr << "[!] Invalid or missing path file";
+						std::cerr << "[!] Invalid or missing from file";
 						return 1;
 					}
 				}

@@ -304,7 +304,7 @@ Disk::Disk(HANDLE h, int index)
 
 Disk::Disk(HANDLE h, std::string filename)
 {
-	_index = 0;
+	_index = -1;
 	_name = filename;
 
 	_get_mbr(h);

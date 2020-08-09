@@ -246,13 +246,19 @@ void print_help_extract(char* name)
 	std::cerr << "Extract commmand" << std::endl;
 	std::cerr << "-------------" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "    " << name << " extract [disk id] [volume id] [path] [output]" << std::endl;
+	std::cerr << "    " << name << " extract [disk id] [volume id] [from] [output]" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Extract a file specified by a path to output." << std::endl;
+	std::cerr << "    Extract a file specified by a path in from to output." << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "    Example: Extract SAM file" << std::endl;
-	std::cerr << "    " << name << " extract disk=0 volume=1 path=\"c:\\windows\\system32\\config\\sam\" output=\"d:\\sam_backup\"" << std::endl;
+	std::cerr << "    Example: Extract a file" << std::endl;
+	std::cerr << "    " << name << " extract disk=0 volume=1 from=\"c:\\windows\\notepad.exe\" output = \"d:\\notepad.exe\"" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Extract SAM" << std::endl;
+	std::cerr << "    " << name << " extract disk=0 volume=1 --sam output = \"d:\\notepad.exe\"" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Extract SYSTEM file" << std::endl;
+	std::cerr << "    " << name << " extract disk=0 volume=1 --system output = \"d:\\notepad.exe\"" << std::endl;
 	std::cerr << std::endl;
 }
 
