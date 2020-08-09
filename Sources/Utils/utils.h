@@ -85,6 +85,8 @@ namespace utils
 	namespace files
 	{
 		std::string basename(const std::string& str);
+
+		std::pair<std::string, std::string> split_file_and_stream(std::string& str);
 	}
 
 	namespace times

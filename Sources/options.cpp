@@ -2,6 +2,7 @@
 #include "options.h"
 #include <iostream>
 #include <algorithm>
+#include <cstring>
 
 
 bool is_option(char* arg, const char* name) { return (strncmp(arg, name, strlen(name)) == 0) && (arg[strlen(name)] == '='); }
@@ -56,8 +57,8 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 		if (is_option(argv[i], "bek")) { read_option_string(argv[i], ret->bek); continue; }
 		if (is_option(argv[i], "fvek")) { read_option_string(argv[i], ret->fvek); continue; }
 		if (is_option(argv[i], "format")) { read_option_string(argv[i], ret->format); continue; }
-		if (is_option(argv[i], "--sam")) { ret->sam = true; continue; }
-		if (is_option(argv[i], "--system")) { ret->system = true; continue; }
+		if (!strncmp(argv[i], "--sam", 5)) { ret->sam = true; continue; }
+		if (!strncmp(argv[i], "--system", 8)) { ret->system = true; continue; }
 		if (ret->subcommand == "") { ret->subcommand = std::string(argv[i]); continue; }
 		ret->show_usage = true;
 	}
