@@ -179,7 +179,7 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 					utils::times::ull_to_local_systemtime(psubattr->MFTTime, &st);
 				}
 
-				index_to_name.insert(std::make_pair(pmrh->MFTRecordIndex, utils::strings::wide_to_utf8(name)));
+				index_to_name.insert(std::make_pair(pmrh->MFTRecordIndex, utils::strings::to_utf8(name)));
 				index_to_parent.insert(std::make_pair(pmrh->MFTRecordIndex, parent));
 
 				if ((pmrh->flag & FILE_RECORD_FLAG_INUSE) == 0)

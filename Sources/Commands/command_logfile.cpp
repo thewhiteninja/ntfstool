@@ -71,7 +71,7 @@ std::vector<std::string> get_log_clients(PRESTART_AREA ra)
 		{
 			std::wstring client_name = std::wstring(plcr->client_name);
 			client_name.resize(plcr->client_name_length);
-			ret.push_back(utils::strings::wide_to_utf8(client_name));
+			ret.push_back(utils::strings::to_utf8(client_name));
 			plcr = POINTER_ADD(PLOG_CLIENT_RECORD, plcr, plcr->next_client);
 		}
 	}

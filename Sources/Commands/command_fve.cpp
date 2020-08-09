@@ -71,7 +71,7 @@ std::vector<std::string> get_fve_entry_values(PFVE_ENTRY entry, const std::strin
 		break;
 	case FVE_METADATA_ENTRY_VALUE_TYPE_UNICODE_STRING:
 	{
-		ret.push_back("String        : " + utils::strings::wide_to_utf8(((PFVE_ENTRY_UNICODE)entry->data)->string));
+		ret.push_back("String        : " + utils::strings::to_utf8(((PFVE_ENTRY_UNICODE)entry->data)->string));
 		break;
 	}
 	case FVE_METADATA_ENTRY_VALUE_TYPE_STRETCH_KEY:

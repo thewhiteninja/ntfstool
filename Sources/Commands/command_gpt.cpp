@@ -65,7 +65,7 @@ namespace commands {
 					for (GPT_PARTITION_ENTRY entry : gpt_entries) {
 						n_partitions++;
 						partitions->add_item_line(std::to_string(n_partitions));
-						partitions->add_item_line(utils::strings::wide_to_utf8(entry.PartitionName));
+						partitions->add_item_line(utils::strings::to_utf8(entry.PartitionName));
 						partitions->add_item_line(utils::id::guid_to_string(entry.UniquePartitionGUID));
 						partitions->add_item_line(std::to_string(entry.StartingLBA));
 						partitions->add_item_line(std::to_string(entry.EndingLBA));
