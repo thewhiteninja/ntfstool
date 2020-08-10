@@ -304,7 +304,7 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 		return 1;
 	}
 
-	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_number(inode);
 	PMFT_RECORD_HEADER record_header = record->header();
 

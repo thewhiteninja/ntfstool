@@ -29,9 +29,9 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 	std::cout << std::setfill('0');
 	utils::ui::title("Extract file from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
-	std::cout << "[+] Opening " << vol->name() << std::endl;
+	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
-	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
 	auto from_file = utils::files::split_file_and_stream(opts->from);
 	std::cout << "[-] Source      : " << from_file.first << (from_file.second == "" ? "" : ":" + from_file.second) << std::endl;

@@ -231,7 +231,7 @@ void Disk::_get_volumes(HANDLE h) {
 	Buffer<PDRIVE_LAYOUT_INFORMATION_EX> partitions(partitionsSize);
 
 	DWORD ior = 0;
-	if (DeviceIoControl(h, IOCTL_DISK_GET_DRIVE_LAYOUT_EX, NULL, 0, (LPVOID)partitions.data(), partitionsSize, &ior, NULL))
+	if (_index != DISK_INDEX_IMAGE && DeviceIoControl(h, IOCTL_DISK_GET_DRIVE_LAYOUT_EX, NULL, 0, (LPVOID)partitions.data(), partitionsSize, &ior, NULL))
 	{
 		_partition_type = partitions.data()->PartitionStyle;
 
@@ -239,7 +239,7 @@ void Disk::_get_volumes(HANDLE h) {
 		{
 			if (partitions.data()->PartitionEntry[iPart].PartitionLength.QuadPart > 0)
 			{
-				std::shared_ptr<Volume> v = std::make_shared<Volume>(h, partitions.data()->PartitionEntry[iPart], _index);
+				std::shared_ptr<Volume> v = std::make_shared<Volume>(h, partitions.data()->PartitionEntry[iPart], _index, this);
 				if (v->name().length() > 0)
 				{
 					_volumes.push_back(v);
@@ -264,7 +264,7 @@ void Disk::_get_volumes(HANDLE h) {
 				pex.PartitionLength.QuadPart = (LONGLONG)entry.EndingLBA * 512;
 				pex.Gpt.PartitionType = entry.PartitionTypeGUID;
 				pex.Gpt.PartitionId = entry.UniquePartitionGUID;
-				std::shared_ptr<Volume> v = std::make_shared<Volume>(h, pex, _index);
+				std::shared_ptr<Volume> v = std::make_shared<Volume>(h, pex, _index, this);
 				_volumes.push_back(v);
 			}
 		}
@@ -280,7 +280,7 @@ void Disk::_get_volumes(HANDLE h) {
 					pex.PartitionLength.QuadPart = (LONGLONG)pmbr->partition[i].sectors * 512;
 					pex.Mbr.BootIndicator = pmbr->partition[i].status == 0x80;
 					pex.Mbr.PartitionType = pmbr->partition[i].partition_type;
-					std::shared_ptr<Volume> v = std::make_shared<Volume>(h, pex, _index);
+					std::shared_ptr<Volume> v = std::make_shared<Volume>(h, pex, _index, this);
 					_volumes.push_back(v);
 				}
 			}
@@ -304,7 +304,7 @@ Disk::Disk(HANDLE h, int index)
 
 Disk::Disk(HANDLE h, std::string filename)
 {
-	_index = -1;
+	_index = DISK_INDEX_IMAGE;
 	_name = filename;
 
 	_get_mbr(h);

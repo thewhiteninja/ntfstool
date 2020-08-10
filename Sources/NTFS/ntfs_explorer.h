@@ -10,6 +10,8 @@
 #include "ntfs.h"
 #include "ntfs_reader.h"
 
+#include "Drive/volume.h"
+
 #include <memory>
 #include <vector>
 
@@ -23,7 +25,7 @@ private:
 	std::shared_ptr<NTFSReader> _reader;
 
 public:
-	explicit NTFSExplorer(std::wstring volume_name);
+	explicit NTFSExplorer(std::shared_ptr<Volume> volume);
 	~NTFSExplorer();
 
 	std::wstring volume_name() const { return _volume_name; }

@@ -35,7 +35,6 @@ private:
 	DWORD		_partition_type;
 	DWORD		_type;
 	DWORD		_index;
-	DWORD		_disk_index;
 	DWORD64		_offset;
 	DWORD64		_size;
 	DWORD64		_free;
@@ -43,8 +42,10 @@ private:
 	bitlocker_info	_bitlocker;
 	Buffer<PBYTE> _bootsector;
 
+	PVOID _parent = nullptr;
+
 public:
-	explicit Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index);
+	explicit Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index, PVOID parent);
 	std::string name()						const { return _name; }
 	std::string label()						const { return _label; }
 	std::string filesystem()				const { return _filesystem; }
@@ -54,7 +55,8 @@ public:
 	DWORD partition_type()					const { return _partition_type; }
 	DWORD type()							const { return _type; }
 	DWORD index()							const { return _index; }
-	DWORD disk_index()						const { return _disk_index; }
+	DWORD disk_index();
+	PVOID parent()							const { return _parent; }
 	DWORD64 offset()						const { return _offset; }
 	DWORD64 size()							const { return _size; }
 	DWORD64 free()							const { return _free; }
