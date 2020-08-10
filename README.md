@@ -1,6 +1,6 @@
 # ntfstool
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/nlohmann/json/master/LICENSE.MIT)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.MIT)
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-brightgreen.svg?tyle=flat-square)](#)
 [![x64](https://img.shields.io/badge/Windows-64_bit-0078d7.svg)](#)
 [![x86](https://img.shields.io/badge/Windows-32_bit-0078d7.svg)](#)
