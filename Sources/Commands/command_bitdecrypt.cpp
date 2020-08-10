@@ -7,10 +7,10 @@
 #include <memory>
 #include <stdexcept>
 
-#include "disk.h"
-#include "vbr.h"
-#include "reader.h"
-#include "bitlocker.h"
+#include "Drive/disk.h"
+#include "Drive/vbr.h"
+#include "Drive/reader.h"
+#include "Bitlocker/bitlocker.h"
 #include "options.h"
 #include "Utils/utils.h"
 #include "Utils/constant_names.h"

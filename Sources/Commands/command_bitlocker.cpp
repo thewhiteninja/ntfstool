@@ -9,9 +9,9 @@
 #include <stdexcept>
 #include <fstream>
 
-#include "disk.h"
-#include "vbr.h"
-#include "bitlocker.h"
+#include "Drive/disk.h"
+#include "Drive/vbr.h"
+#include "Bitlocker/bitlocker.h"
 #include "options.h"
 #include "Utils/utils.h"
 #include "Utils/constant_names.h"

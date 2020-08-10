@@ -126,7 +126,7 @@ namespace utils
 
 	namespace disass
 	{
-		std::vector<std::string> buffer(PBYTE code, ULONG32 size, _DecodeType type, _OffsetType offset);
+		std::vector<std::string> buffer(PVOID code, ULONG32 size, _DecodeType type, _OffsetType offset);
 	}
 
 }

@@ -8,8 +8,8 @@
 #include <stdexcept>
 #include <distorm.h>
 
-#include "disk.h"
-#include "vbr.h"
+#include "Drive/disk.h"
+#include "Drive/vbr.h"
 #include "options.h"
 
 #include "NTFS/ntfs.h"

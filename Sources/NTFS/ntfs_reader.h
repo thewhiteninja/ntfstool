@@ -4,7 +4,7 @@
 #include <Windows.h>
 
 #include "ntfs.h"
-#include "reader.h"
+#include "Drive/reader.h"
 
 #include <memory>
 #include <string>

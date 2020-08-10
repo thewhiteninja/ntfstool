@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "disk.h"
+#include "Drive/disk.h"
 
 class Options {
 private:

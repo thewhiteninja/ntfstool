@@ -7,8 +7,7 @@
 #include <string>
 #include <memory>
 
-#include "definitions.h"
-#include "bitlocker.h"
+#include "Bitlocker/bitlocker.h"
 
 #include "Utils/buffer.h"
 

@@ -7,7 +7,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include "disk.h"
+#include "Drive/disk.h"
 #include "options.h"
 #include "NTFS/ntfs.h"
 #include "NTFS/ntfs_explorer.h"
