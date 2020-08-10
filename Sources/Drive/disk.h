@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "volume.h"
-#include "definitions.h"
+#include "Drive/mbr_gpt.h"
 
 
 class Disk

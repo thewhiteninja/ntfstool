@@ -601,7 +601,7 @@ std::string utils::os::short_version()
 	return osname;
 }
 
-std::vector<std::string> utils::disass::buffer(PBYTE code, ULONG32 size, _DecodeType type, _OffsetType offset)
+std::vector<std::string> utils::disass::buffer(PVOID code, ULONG32 size, _DecodeType type, _OffsetType offset)
 {
 	std::vector<std::string> ret;
 

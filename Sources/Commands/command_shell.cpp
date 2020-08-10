@@ -5,8 +5,8 @@
 #include "NTFS/ntfs_explorer.h"
 
 #include "options.h"
-#include "disk.h"
-#include "volume.h"
+#include "Drive/disk.h"
+#include "Drive/volume.h"
 #include "Utils/table.h"
 
 #include <iterator>

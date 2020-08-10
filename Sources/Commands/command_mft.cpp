@@ -9,8 +9,8 @@
 #include "Utils/table.h"
 
 #include "options.h"
-#include "disk.h"
-#include "volume.h"
+#include "Drive/disk.h"
+#include "Drive/volume.h"
 
 
 std::vector<std::string> print_attribute_standard(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION pAttribute)

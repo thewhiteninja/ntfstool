@@ -1,7 +1,7 @@
 #include "Utils/constant_names.h"
 #include "Utils/utils.h"
-#include "definitions.h"
-#include "bitlocker.h"
+#include "Drive/mbr_gpt.h"
+#include "Bitlocker/bitlocker.h"
 #include "NTFS/ntfs.h"
 
 #include <map>

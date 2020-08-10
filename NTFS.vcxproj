@@ -19,10 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sources\bitlocker.h" />
+    <ClInclude Include="Sources\Bitlocker\bitlocker.h" />
     <ClInclude Include="Sources\Commands\commands.h" />
-    <ClInclude Include="Sources\mbr_gpt.h" />
-    <ClInclude Include="Sources\disk.h" />
+    <ClInclude Include="Sources\Drive\disk.h" />
+    <ClInclude Include="Sources\Drive\mbr_gpt.h" />
+    <ClInclude Include="Sources\Drive\reader.h" />
+    <ClInclude Include="Sources\Drive\vbr.h" />
+    <ClInclude Include="Sources\Drive\volume.h" />
     <ClInclude Include="Sources\NTFS\ntfs.h" />
     <ClInclude Include="Sources\NTFS\ntfs_explorer.h" />
     <ClInclude Include="Sources\NTFS\ntfs_index_entry.h" />
@@ -30,14 +33,11 @@
     <ClInclude Include="Sources\NTFS\ntfs_mft_record.h" />
     <ClInclude Include="Sources\NTFS\ntfs_reader.h" />
     <ClInclude Include="Sources\options.h" />
-    <ClInclude Include="Sources\reader.h" />
     <ClInclude Include="Sources\Utils\buffer.h" />
     <ClInclude Include="Sources\Utils\constant_names.h" />
     <ClInclude Include="Sources\Utils\crash_handler.h" />
     <ClInclude Include="Sources\Utils\table.h" />
     <ClInclude Include="Sources\Utils\utils.h" />
-    <ClInclude Include="Sources\vbr.h" />
-    <ClInclude Include="Sources\volume.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Commands\command_bitdecrypt.cpp" />
@@ -54,7 +54,9 @@
     <ClCompile Include="Sources\Commands\command_help.cpp" />
     <ClCompile Include="Sources\Commands\command_info.cpp" />
     <ClCompile Include="Sources\Commands\command_mbr.cpp" />
-    <ClCompile Include="Sources\disk.cpp" />
+    <ClCompile Include="Sources\Drive\disk.cpp" />
+    <ClCompile Include="Sources\Drive\reader.cpp" />
+    <ClCompile Include="Sources\Drive\volume.cpp" />
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\NTFS\ntfs_explorer.cpp" />
     <ClCompile Include="Sources\NTFS\ntfs_index_entry.cpp" />
@@ -62,12 +64,10 @@
     <ClCompile Include="Sources\NTFS\ntfs_mft_record.cpp" />
     <ClCompile Include="Sources\NTFS\ntfs_reader.cpp" />
     <ClCompile Include="Sources\options.cpp" />
-    <ClCompile Include="Sources\reader.cpp" />
     <ClCompile Include="Sources\Utils\constant_names.cpp" />
     <ClCompile Include="Sources\Utils\crash_handler.cpp" />
     <ClCompile Include="Sources\Utils\table.cpp" />
     <ClCompile Include="Sources\Utils\utils.cpp" />
-    <ClCompile Include="Sources\volume.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LICENSE" />

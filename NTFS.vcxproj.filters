@@ -34,14 +34,17 @@
     <Filter Include="Other files">
       <UniqueIdentifier>{3c7a6abd-2fcc-40af-a9d5-97bf10420d63}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Drive">
+      <UniqueIdentifier>{7af2d745-f48a-4a40-9609-0df512780cfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Drive">
+      <UniqueIdentifier>{ecf5f47c-221e-40e8-83fa-5655440f0040}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Bitlocker">
+      <UniqueIdentifier>{0b244c9a-1243-4232-918f-1e4745d82215}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sources\disk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\volume.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -59,18 +62,6 @@
     </ClInclude>
     <ClInclude Include="Sources\Utils\utils.h">
       <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\bitlocker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\vbr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\mbr_gpt.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sources\NTFS\ntfs.h">
       <Filter>Header Files\NTFS</Filter>
@@ -93,15 +84,27 @@
     <ClInclude Include="Sources\Utils\crash_handler.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Drive\disk.h">
+      <Filter>Header Files\Drive</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Drive\mbr_gpt.h">
+      <Filter>Header Files\Drive</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Drive\reader.h">
+      <Filter>Header Files\Drive</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Drive\vbr.h">
+      <Filter>Header Files\Drive</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Drive\volume.h">
+      <Filter>Header Files\Drive</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Bitlocker\bitlocker.h">
+      <Filter>Header Files\Bitlocker</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\disk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\volume.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Sources\options.cpp">
@@ -149,9 +152,6 @@
     <ClCompile Include="Sources\Commands\command_logfile.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\reader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\Commands\command_undelete.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
@@ -178,6 +178,15 @@
     </ClCompile>
     <ClCompile Include="Sources\Utils\crash_handler.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Drive\disk.cpp">
+      <Filter>Source Files\Drive</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Drive\reader.cpp">
+      <Filter>Source Files\Drive</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Drive\volume.cpp">
+      <Filter>Source Files\Drive</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
