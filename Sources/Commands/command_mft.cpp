@@ -458,23 +458,10 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 		}
 		case $BITMAP:
 		{
-			PMFT_RECORD_ATTRIBUTE_BITMAP pattr = nullptr;
-			std::shared_ptr<Buffer<PBYTE>> attr_buf = nullptr;
+			std::shared_ptr<Buffer<PBYTE>> attr_buf = record->attribute_data<PBYTE>(pAttribute);
 
-			DWORD len = 0;
-			if (pAttribute->FormCode == RESIDENT_FORM)
-			{
-				pattr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_BITMAP, pAttribute, pAttribute->Form.Resident.ValueOffset);
-				len = pAttribute->Form.Resident.ValueLength;
-			}
-			else
-			{
-				len = pAttribute->Form.Nonresident.ValidDataLength & 0xffffffff;
-				attr_buf = record->attribute_data<PBYTE>(pAttribute);
-				pattr = (PMFT_RECORD_ATTRIBUTE_BITMAP)attr_buf->data();
+			fr_attributes->add_item_multiline(print_attribute_bitmap(reinterpret_cast<PMFT_RECORD_ATTRIBUTE_BITMAP>(attr_buf->data()), attr_buf->size()));
 
-			};
-			fr_attributes->add_item_multiline(print_attribute_bitmap(pattr, len));
 			break;
 		}
 		case $ATTRIBUTE_LIST:

@@ -211,10 +211,8 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 		{
 			filesize = static_cast<DWORD>(attr->Form.Nonresident.FileSize);
 		}
-		ret = std::make_shared<Buffer<T>>(filesize);
+		ret = std::make_shared<Buffer<T>>(attr->Form.Nonresident.AllocatedLength);
 		DWORD readSize = 0;
-
-		RtlZeroMemory(ret->data(), ret->size());
 
 		bool err = false;
 		std::vector<MFT_DATARUN> runList = read_dataruns(attr);
