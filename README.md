@@ -16,12 +16,12 @@ See examples below that show some features !
 ### Forensics
 
 NTFSTool displays the complete structure of master boot record, volume boot record, partition table and MFT file record.
-It is also possible to dump any file (even hidden $mft) or parse $usnjrnl, $logfile.
+It is also possible to dump any file (even hidden $mft) or parse $usnjrnl, $logfile including file from Alternate Data Stream (ADS).
 The undelete command will search for any file record marked as "not in use" and allow you to retrieve the file (or part of the file if it was already rewritten).
 
 ### Bitlocker support
 
-For bitlocked partition, it can check a password and support 3 formats (bek, password, recovery key).
+For bitlocked partition, it can display FVE records, check a password and support 3 formats (bek, password, recovery key), extract VMK and FVEK.
 There is no bruteforcing feature because GPU-based cracking is better (see [Bitcracker][1] and [Hashcat][2]).
 
 [1]: https://arxiv.org/pdf/1901.01337
@@ -29,7 +29,7 @@ There is no bruteforcing feature because GPU-based cracking is better (see [Bitc
 
 ### Shell
 
-There is a very limited shell with few commands (exit, cd, ls , cat , pwd).
+There is a limited shell with few commands (exit, cd, ls , cat , pwd, cp).
 
 ## Help & Examples
 
