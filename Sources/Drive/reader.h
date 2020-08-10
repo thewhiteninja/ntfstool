@@ -13,9 +13,10 @@ protected:
 	BYTE _boot_record[512] = { 0 };
 
 	DWORD64 _current_position = 0;
+	DWORD64 _image_volume_offset = 0;
 
 public:
-	explicit Reader(std::wstring volume_name);
+	explicit Reader(std::wstring volume_name, DWORD64 volume_offset = 0);
 
 	~Reader();
 

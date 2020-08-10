@@ -11,6 +11,7 @@
 #include "volume.h"
 #include "Drive/mbr_gpt.h"
 
+#define DISK_INDEX_IMAGE (-1)
 
 class Disk
 {

@@ -13,8 +13,13 @@
 #include <iomanip>
 #include <sstream>
 #include <filesystem>
+#include <csignal>
 
 #define CTRL_PLUS_D	("\x04")
+
+void signal_callback_handler(int signum) {
+	exit(signum);
+}
 
 std::vector<std::string> parse_cmd_line(std::string cmdline)
 {
@@ -59,6 +64,18 @@ void help(std::string cmd)
 	}
 }
 
+std::string clean_disk_name(std::shared_ptr<Disk> disk)
+{
+	if (disk->index() == DISK_INDEX_IMAGE)
+	{
+		return "(" + std::filesystem::path(disk->name()).filename().string() + ")";
+	}
+	else
+	{
+		return std::to_string(disk->index());
+	}
+}
+
 int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 {
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
@@ -66,15 +83,18 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 		std::cerr << "[!] NTFS volume required" << std::endl;
 		return 1;
 	}
-	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 	std::shared_ptr<MFTRecord> current_dir_record = explorer->mft()->record_from_number(ROOT_FILE_NAME_INDEX_NUMBER);
 	std::string current_dir = "\\";
+
+	signal(SIGINT, signal_callback_handler);
 
 	std::string cmdline;
 	bool quit = false;
 	while (!quit)
 	{
-		std::cout << "disk" << disk->index() << ":volume" << vol->index() << ":" << remove_trailing_path_delimiter(current_dir) << "> ";
+		std::cout << "disk" << clean_disk_name(disk) << ":volume" << vol->index() << ":" << remove_trailing_path_delimiter(current_dir) << "> ";
+		std::cout.flush();
 		std::getline(std::cin, cmdline);
 		std::vector<std::string> cmds = parse_cmd_line(cmdline);
 

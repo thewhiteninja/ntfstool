@@ -1,7 +1,7 @@
 
 #include "reader.h"
 
-Reader::Reader(std::wstring volume_name)
+Reader::Reader(std::wstring volume_name, DWORD64 volume_offset)
 {
 	std::wstring valid_name = volume_name;
 	if (valid_name.back() == '\\') valid_name.pop_back();
@@ -12,6 +12,13 @@ Reader::Reader(std::wstring volume_name)
 	}
 	else
 	{
+		_image_volume_offset = volume_offset;
+
+		LARGE_INTEGER result;
+		LARGE_INTEGER pos;
+		pos.QuadPart = volume_offset;
+		SetFilePointerEx(_handle_disk, pos, &result, SEEK_SET);
+
 		DWORD read = 0;
 		seek(0);
 		if (!ReadFile(_handle_disk, &_boot_record, 0x200, &read, NULL))
@@ -20,6 +27,7 @@ Reader::Reader(std::wstring volume_name)
 		}
 	}
 }
+
 
 Reader::Reader(const Reader& reader_copy)
 {
@@ -60,7 +68,7 @@ bool Reader::seek(ULONG64 position)
 		if (_handle_disk != INVALID_HANDLE_VALUE)
 		{
 			LARGE_INTEGER pos;
-			pos.QuadPart = (LONGLONG)position;
+			pos.QuadPart = (LONGLONG)position + _image_volume_offset;
 			LARGE_INTEGER result;
 
 			return SetFilePointerEx(_handle_disk, pos, &result, SEEK_SET) || pos.QuadPart != result.QuadPart;

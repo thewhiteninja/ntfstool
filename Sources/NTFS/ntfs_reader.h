@@ -16,7 +16,7 @@ private:
 
 
 public:
-	explicit NTFSReader(std::wstring volume_name);
+	explicit NTFSReader(std::wstring volume_name, DWORD64 volume_offset = 0);
 	~NTFSReader();
 
 	struct {

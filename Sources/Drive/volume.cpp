@@ -105,9 +105,8 @@ std::shared_ptr<Buffer<PBYTE>> read_fve(HANDLE h, LARGE_INTEGER offset)
 	return nullptr;
 }
 
-Volume::Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index)
+Volume::Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index, PVOID parent)
 {
-	_disk_index = index;
 	_partition_type = p.PartitionStyle;
 	_offset = p.StartingOffset.QuadPart;
 	_size = p.PartitionLength.QuadPart;
@@ -117,6 +116,7 @@ Volume::Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index)
 	_type = 0;
 	_bootable = false;
 	_bitlocker.bitlocked = false;
+	_parent = parent;
 
 	if (_partition_type == PARTITION_STYLE_GPT || _partition_type == PARTITION_STYLE_MBR)
 	{
@@ -250,3 +250,9 @@ Volume::Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index)
 		}
 	}
 }
+
+DWORD Volume::disk_index()
+{
+	if (_parent) return reinterpret_cast<Disk*>(_parent)->index(); else return 0;
+}
+

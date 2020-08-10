@@ -134,7 +134,7 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
-	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
 	std::cout << "[+] Reading $LogFile record" << std::endl;
 

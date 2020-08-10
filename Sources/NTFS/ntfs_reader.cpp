@@ -1,6 +1,6 @@
 #include "ntfs_reader.h"
 
-NTFSReader::NTFSReader(std::wstring volume_name) : Reader(volume_name)
+NTFSReader::NTFSReader(std::wstring volume_name, DWORD64 volume_offset) : Reader(volume_name, volume_offset)
 {
 	PBOOT_SECTOR_NTFS pbs = (PBOOT_SECTOR_NTFS)_boot_record;
 	sizes.cluster_size = pbs->bytePerSector * pbs->sectorPerCluster;

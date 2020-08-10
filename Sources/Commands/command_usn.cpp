@@ -32,7 +32,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
-	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
 	std::cout << "[+] Finding $Extend\\$UsnJrnl record" << std::endl;
 

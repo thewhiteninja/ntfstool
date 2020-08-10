@@ -108,7 +108,7 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
-	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
 	DWORD cluster_size = ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->bytePerSector * ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->sectorPerCluster;
 	DWORD record_size = ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord >= 0 ? ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord * cluster_size : 1 << -((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord;
@@ -273,7 +273,7 @@ int extract_deleted_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
-	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(utils::strings::from_string(vol->name()));
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
 	std::cout << "[+] Reading file record : " << std::to_string(opts->inode) << std::endl;
 
