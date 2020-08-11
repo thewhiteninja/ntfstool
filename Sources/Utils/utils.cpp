@@ -629,3 +629,11 @@ std::vector<std::string> utils::disass::buffer(PVOID code, ULONG32 size, _Decode
 
 	return ret;
 }
+
+void utils::crypto::xor_buffer(PVOID data, DWORD datalen, PVOID key, DWORD keylen)
+{
+	for (DWORD i = 0; i < datalen; i++)
+	{
+		PBYTE(data)[i] ^= PBYTE(key)[i % keylen];
+	}
+}
