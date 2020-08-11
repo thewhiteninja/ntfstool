@@ -19,7 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\Bitlocker\bek.h" />
     <ClInclude Include="Sources\Bitlocker\bitlocker.h" />
+    <ClInclude Include="Sources\Bitlocker\decryption.h" />
+    <ClInclude Include="Sources\Bitlocker\fve.h" />
+    <ClInclude Include="Sources\Bitlocker\password.h" />
+    <ClInclude Include="Sources\Bitlocker\recovery.h" />
     <ClInclude Include="Sources\Commands\commands.h" />
     <ClInclude Include="Sources\Drive\disk.h" />
     <ClInclude Include="Sources\Drive\mbr_gpt.h" />
@@ -40,6 +45,11 @@
     <ClInclude Include="Sources\Utils\utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\Bitlocker\bek.cpp" />
+    <ClCompile Include="Sources\Bitlocker\bitlocker.cpp" />
+    <ClCompile Include="Sources\Bitlocker\decryption.cpp" />
+    <ClCompile Include="Sources\Bitlocker\password.cpp" />
+    <ClCompile Include="Sources\Bitlocker\recovery.cpp" />
     <ClCompile Include="Sources\Commands\command_bitdecrypt.cpp" />
     <ClCompile Include="Sources\Commands\command_bitlocker.cpp" />
     <ClCompile Include="Sources\Commands\command_extract.cpp" />

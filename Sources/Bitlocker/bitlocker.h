@@ -1,44 +1,18 @@
 #pragma once
 
+#include <WinSock2.h>
 #include <Windows.h>
 
-#define FVE_METADATA_ENTRY_VALUE_TYPE_ERASED				0x0000
-#define FVE_METADATA_ENTRY_VALUE_TYPE_KEY					0x0001
-#define FVE_METADATA_ENTRY_VALUE_TYPE_UNICODE_STRING		0x0002
-#define FVE_METADATA_ENTRY_VALUE_TYPE_STRETCH_KEY			0x0003
-#define FVE_METADATA_ENTRY_VALUE_TYPE_USE_KEY				0x0004
-#define FVE_METADATA_ENTRY_VALUE_TYPE_AES_CCM_ENCRYPTED_KEY 0x0005
-#define FVE_METADATA_ENTRY_VALUE_TYPE_TPM_ENCODED_KEY		0x0006
-#define FVE_METADATA_ENTRY_VALUE_TYPE_VALIDATION			0x0007
-#define FVE_METADATA_ENTRY_VALUE_TYPE_VOLUME_MASTER_KEY		0x0008
-#define FVE_METADATA_ENTRY_VALUE_TYPE_EXTERNAL_KEY			0x0009
-#define FVE_METADATA_ENTRY_VALUE_TYPE_UPDATE				0x000a
-#define FVE_METADATA_ENTRY_VALUE_TYPE_ERROR					0x000b
-#define FVE_METADATA_ENTRY_VALUE_TYPE_ASYMMETRIC_ENCRYPTION	0x000c
-#define FVE_METADATA_ENTRY_VALUE_TYPE_EXPORTED_KEY			0x000d
-#define FVE_METADATA_ENTRY_VALUE_TYPE_PUBLIC_KEY			0x000e
-#define FVE_METADATA_ENTRY_VALUE_TYPE_OFFSET_AND_SIZE		0x000f
-#define FVE_METADATA_ENTRY_VALUE_TYPE_CONCAT_HASH_KEY		0x0012
+#include <memory>
+#include <string>
 
-#define FVE_METADATA_ENTRY_TYPE_PROPERTY					0x0000
-#define FVE_METADATA_ENTRY_TYPE_VMK							0x0002
-#define FVE_METADATA_ENTRY_TYPE_FKEV						0x0003
-#define FVE_METADATA_ENTRY_TYPE_VALIDATION					0x0004
-#define FVE_METADATA_ENTRY_TYPE_STARTUP_KEY					0x0006
-#define FVE_METADATA_ENTRY_TYPE_DRIVE_LABEL					0x0007
-#define FVE_METADATA_ENTRY_TYPE_UNKNOWN						0x000b
-#define FVE_METADATA_ENTRY_TYPE_VOLUME_HEADER_BLOCK			0x000f
+#include "openssl/sha.h"
+#include "openssl/aes.h"
 
-#define FVE_METADATA_KEY_PROTECTION_TYPE_CLEARTEXT			0x0000
-#define FVE_METADATA_KEY_PROTECTION_TYPE_TPM				0x0100
-#define FVE_METADATA_KEY_PROTECTION_TYPE_STARTUP_KEY		0x0200
-#define FVE_METADATA_KEY_PROTECTION_TYPE_TPM_PIN			0x0500
-#define FVE_METADATA_KEY_PROTECTION_TYPE_RECOVERY_PASSWORD	0x0800
-#define FVE_METADATA_KEY_PROTECTION_TYPE_PASSWORD			0x2000
+#include "Utils/buffer.h"
+#include "Utils/utils.h"
 
-#define FVE_METADATA_MAC_LEN								16
-#define FVE_METADATA_NONCE_LEN								12
-
+#include "Bitlocker/fve.h"
 
 #pragma pack(push, 1)
 
@@ -174,3 +148,11 @@ typedef struct
 } EXTERNAL_KEY_FILE, * PEXTERNAL_KEY_FILE;
 
 #pragma pack(pop)
+
+void bitlocker_derive_key(unsigned char* password_hash, unsigned char* password_salt, unsigned int iterations, unsigned char* key);
+
+void bitlocker_decrypt_data(PBYTE encrypted_data, ULONG32 encrypted_data_size, PBYTE key, PBYTE mac, PBYTE nonce, PBYTE decrypted_data);
+
+bool bitlocker_mac_check(PBYTE clear_mac, PBYTE key, PBYTE nonce, PBYTE data, ULONG32 data_size);
+
+void get_fvek_from_vmk(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_fvek, ULONG32 enc_size, PBYTE vmk, PBYTE fvek);

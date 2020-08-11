@@ -129,4 +129,9 @@ namespace utils
 		std::vector<std::string> buffer(PVOID code, ULONG32 size, _DecodeType type, _OffsetType offset);
 	}
 
+	namespace crypto
+	{
+		void xor_buffer(PVOID data, DWORD datalen, PVOID key, DWORD keylen);
+	}
+
 }
