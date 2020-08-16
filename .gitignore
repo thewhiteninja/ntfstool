@@ -1,6 +1,7 @@
 # Prerequisites
 *.d
 *.filters
+Docs\sources
 
 # Compiled Object files
 *.slo
