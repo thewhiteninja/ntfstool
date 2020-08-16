@@ -206,6 +206,10 @@ void Disk::_get_info_using_ioctl(HANDLE h)
 		if (descrip->VendorIdOffset != 0)
 		{
 			_vendor_id = std::string((char*)(buf->address() + descrip->VendorIdOffset));
+			
+			if (_vendor_id.length() > 0) {
+				if (_vendor_id.back() == ',') _vendor_id.pop_back();
+			}
 		}
 		if (descrip->ProductIdOffset != 0)
 		{

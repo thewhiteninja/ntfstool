@@ -186,7 +186,7 @@ namespace utils
 			}
 		}
 
-		std::string join(std::vector<std::string>& items, const std::string separator)
+		std::string join(std::vector<std::string> items, const std::string separator)
 		{
 			std::ostringstream out;
 			if (items.size() > 0) out << items[0];
@@ -483,7 +483,7 @@ namespace utils
 			if (ads_sep != std::string::npos)
 			{
 				stream_name = p.filename().string().substr(ads_sep + 1);
-				int last_sep = str.find_last_of(":");
+				size_t last_sep = str.find_last_of(":");
 				str = str.substr(0, last_sep);
 			}
 
