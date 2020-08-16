@@ -53,7 +53,7 @@ namespace utils
 
 		std::vector<std::string> split(const std::string& text, TCHAR delimiter);
 
-		std::string join(std::vector<std::string>& items, std::string separator);
+		std::string join(std::vector<std::string> items, std::string separator);
 	}
 
 	namespace format
