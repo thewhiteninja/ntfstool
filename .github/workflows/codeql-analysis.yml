@@ -62,7 +62,7 @@ jobs:
 
     - name: MSBuild
       working-directory: .
-      run: msbuild NTFS.vcxproj
+      run: msbuild /p:Configuration=Release /p:Platform=x86 NTFS.vcxproj 
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
