@@ -356,7 +356,7 @@ typedef struct {
 			WCHAR PathBuffer[1];
 		} MountPointReparseBuffer;
 		struct {
-			UCHAR  DataBuffer[1];
+			WCHAR  DataBuffer[1];
 		} GenericReparseBuffer;
 	} DUMMYUNIONNAME;
 } MFT_RECORD_ATTRIBUTE_REPARSE_POINT, * PMFT_RECORD_ATTRIBUTE_REPARSE_POINT;

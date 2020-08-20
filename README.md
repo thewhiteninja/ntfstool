@@ -18,6 +18,8 @@ See examples below that show some features !
 NTFSTool displays the complete structure of master boot record, volume boot record, partition table and MFT file record.
 It is also possible to dump any file (even hidden $mft) or parse $usnjrnl, $logfile including file from Alternate Data Stream (ADS).
 The undelete command will search for any file record marked as "not in use" and allow you to retrieve the file (or part of the file if it was already rewritten).
+It support input from image file or live disks. You can also use tools like [OSFMount][3] to mount your disk image.
+Sparse and compressed files are also (partially) supported.
 
 ### Bitlocker support
 
@@ -57,15 +59,14 @@ the help command displays some examples for each command.
 ## Limitations
 
 - May contains bugs and unsupported cases.
-- No image file support. You can use tools like [OSFMount][3] to mount your disk image.
 - No documentation :no_mouth:.
 
 ## Third-parties
 
-- openssl (vcpkg): OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
-- nlohmann-json (vcpkg): JSON for Modern C++
-- distorm (vcpkg): Powerful Disassembler Library For x86/AMD64
-- cppcoro (vcpkg): A library of C++ coroutine abstractions for the coroutines TS.
+- [openssl](https://www.openssl.org/) (vcpkg): OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
+- [nlohmann-json](https://github.com/nlohmann/json) (vcpkg): JSON for Modern C++
+- [distorm](https://github.com/gdabah/distorm) (vcpkg): Powerful Disassembler Library For x86/AMD64
+- [cppcoro](https://github.com/lewissbaker/cppcoro) (vcpkg): A library of C++ coroutine abstractions for the coroutines TS.
   
 
 [3]: https://www.osforensics.com/tools/mount-disk-images.html
