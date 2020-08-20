@@ -263,7 +263,7 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 		{
 			ret.push_back("Flags                   : ");
 
-			if (pAttribute->Flags & ATTR_FLAG_COMPRESSED)
+			if (pAttribute->Flags & ATTRIBUTE_FLAG_COMPRESSED)
 			{
 				if (pAttribute->Form.Nonresident.CompressionUnit == 0)
 				{
@@ -274,8 +274,8 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 					ret.push_back("    Compressed (unit: " + std::to_string(1 << pAttribute->Form.Nonresident.CompressionUnit) + " clusters)");
 				}
 			}
-			if (pAttribute->Flags & ATTR_FLAG_ENCRYPTED) ret.push_back("    Encrypted");
-			if (pAttribute->Flags & ATTR_FLAG_SPARSE) ret.push_back("    Sparse");
+			if (pAttribute->Flags & ATTRIBUTE_FLAG_ENCRYPTED) ret.push_back("    Encrypted");
+			if (pAttribute->Flags & ATTRIBUTE_FLAG_SPARSE) ret.push_back("    Sparse");
 		}
 
 		auto dataruns = record->read_dataruns(pAttribute);
