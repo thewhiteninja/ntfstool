@@ -70,6 +70,8 @@ namespace utils
 
 		std::string hex(ULONG64 value, bool suffix = false, bool swap = false);
 
+		std::string hex(LONG64 value, bool suffix = false, bool swap = false);
+
 		std::string hex(std::u16string value, bool suffix = false, bool swap = false);
 
 		std::string hex(std::string value, bool suffix = false, bool swap = false);

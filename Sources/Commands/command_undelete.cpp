@@ -83,7 +83,7 @@ LONGLONG check_cluster_used(std::shared_ptr<Buffer<PBYTE>> bitmap, PMFT_DATARUN 
 	return reused;
 }
 
-bool check_datatuns_still_valid(ULONG64 datasize, ULONG64 clustersize, const std::vector<MFT_DATARUN>& dataruns)
+bool check_dataruns_still_valid(ULONG64 datasize, ULONG64 clustersize, const std::vector<MFT_DATARUN>& dataruns)
 {
 	ULONG64 size_from_dataruns = 0;
 
@@ -193,7 +193,7 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 							if (pattr->FormCode == NON_RESIDENT_FORM)
 							{
 								std::vector<MFT_DATARUN> dataruns = MFTRecord::read_dataruns(pattr);
-								if (check_datatuns_still_valid(f->datasize(), cluster_size, dataruns))
+								if (check_dataruns_still_valid(f->datasize(), cluster_size, dataruns))
 								{
 									LONGLONG cluster_needed = 0;
 									LONGLONG cluster_reused = 0;

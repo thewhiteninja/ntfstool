@@ -251,7 +251,32 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 		ret.push_back("Name                    : " + utils::strings::to_utf8(name));
 	}
 	ULONG64 datasize = record->datasize(utils::strings::to_utf8(name));
+
 	ret.push_back("Data Size               : " + std::to_string(datasize) + " (" + utils::format::size(datasize) + ")");
+
+	if (pAttribute->FormCode == NON_RESIDENT_FORM)
+	{
+		if (pAttribute->Flags)
+		{
+			ret.push_back("Flags                   : ");
+
+			if (pAttribute->Flags & ATTR_FLAG_COMPRESSED) ret.push_back("    Compressed (unit: " + std::to_string(1 << pAttribute->Form.Nonresident.CompressionUnit) + " clusters)");
+			if (pAttribute->Flags & ATTR_FLAG_ENCRYPTED) ret.push_back("    Encrypted");
+			if (pAttribute->Flags & ATTR_FLAG_SPARSE) ret.push_back("    Sparse");
+		}
+
+		auto dataruns = record->read_dataruns(pAttribute);
+		if (!dataruns.empty())
+		{
+			ret.push_back("Dataruns                : ");
+			LONGLONG last = 0;
+			for (const auto& run : dataruns)
+			{
+				ret.push_back("    Length: " + utils::format::hex(static_cast<DWORD>(run.length)) + " Offset: " + utils::format::hex(static_cast<DWORD>(run.offset)) + (last == run.offset ? " (Sparse)" : ""));
+				last = run.offset;
+			}
+		}
+	}
 
 	return ret;
 }
@@ -321,7 +346,7 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 	std::cout << "Flags             : " << constants::disk::mft::file_record_flags(record_header->flag) << std::endl;
 	std::cout << "Real Size         : " << record_header->usedSize << std::endl;
 	std::cout << "Allocated Size    : " << record_header->allocatedSize << std::endl;
-	std::cout << "Base File Record  : " << record_header->baseRecord << std::endl;
+	std::cout << "Base File Record  : " << utils::format::hex(record_header->baseRecord, true) << std::endl;
 	std::cout << "Next Attribute ID : " << record_header->nextAttributeID << std::endl;
 	std::cout << "MFT Record Index  : " << record_header->MFTRecordIndex << std::endl;
 	std::cout << "Update Seq Number : " << record_header->updateSequenceNumber << std::endl;

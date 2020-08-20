@@ -26,6 +26,7 @@
     <ClInclude Include="Sources\Bitlocker\password.h" />
     <ClInclude Include="Sources\Bitlocker\recovery.h" />
     <ClInclude Include="Sources\Commands\commands.h" />
+    <ClInclude Include="Sources\Compression\definitions.h" />
     <ClInclude Include="Sources\Drive\disk.h" />
     <ClInclude Include="Sources\Drive\mbr_gpt.h" />
     <ClInclude Include="Sources\Drive\reader.h" />
@@ -74,6 +75,7 @@
     <ClCompile Include="Sources\NTFS\ntfs_mft_record.cpp" />
     <ClCompile Include="Sources\NTFS\ntfs_reader.cpp" />
     <ClCompile Include="Sources\options.cpp" />
+    <ClCompile Include="Sources\test.cpp" />
     <ClCompile Include="Sources\Utils\constant_names.cpp" />
     <ClCompile Include="Sources\Utils\crash_handler.cpp" />
     <ClCompile Include="Sources\Utils\table.cpp" />
@@ -144,7 +146,7 @@
     <IntDir>$(SolutionDir)Builds\$(Configuration)\Temp\</IntDir>
     <SourcePath>$(VC_SourcePath);</SourcePath>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
@@ -164,7 +166,7 @@
     <LinkIncremental />
     <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
     <EnableMicrosoftCodeAnalysis>true</EnableMicrosoftCodeAnalysis>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)Builds\$(Configuration)\$(PlatformTarget)\</OutDir>
