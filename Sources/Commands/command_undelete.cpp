@@ -291,7 +291,7 @@ int extract_deleted_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol
 		std::cout << " to " << opts->out << std::endl;
 
 		std::wstring output(opts->out.begin(), opts->out.end());
-		record->copy_data_to_file(output);
+		record->data_to_file(output);
 
 		std::cout << "[+] " << record->datasize() << " bytes written" << std::endl;
 	}

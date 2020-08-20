@@ -195,30 +195,42 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 }
 
 template<typename T>
-std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADER attr)
+std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADER pAttributeData)
 {
 	std::shared_ptr<Buffer<T>> ret = nullptr;
 
-	if (attr->FormCode == RESIDENT_FORM)
+	if (pAttributeData->FormCode == RESIDENT_FORM)
 	{
-		ret = std::make_shared<Buffer<T>>(attr->Form.Resident.ValueLength);
-		memcpy(ret->data(), POINTER_ADD(LPBYTE, attr, attr->Form.Resident.ValueOffset), attr->Form.Resident.ValueLength);
+		ret = std::make_shared<Buffer<T>>(pAttributeData->Form.Resident.ValueLength);
+		memcpy(ret->data(), POINTER_ADD(LPBYTE, pAttributeData, pAttributeData->Form.Resident.ValueOffset), pAttributeData->Form.Resident.ValueLength);
 	}
 	else
 	{
 		DWORD filesize = 0;
-		if (ULongLongToDWord(attr->Form.Nonresident.FileSize, &filesize) != S_OK)
+		if (ULongLongToDWord(pAttributeData->Form.Nonresident.FileSize, &filesize) != S_OK)
 		{
-			filesize = static_cast<DWORD>(attr->Form.Nonresident.FileSize);
+			filesize = static_cast<DWORD>(pAttributeData->Form.Nonresident.FileSize);
 		}
-		ret = std::make_shared<Buffer<T>>(attr->Form.Nonresident.AllocatedLength);
+		ret = std::make_shared<Buffer<T>>(pAttributeData->Form.Nonresident.AllocatedLength);
 		DWORD readSize = 0;
 
+		bool compressed = pAttributeData->Flags & ATTR_FLAG_COMPRESSED;
+
 		bool err = false;
-		std::vector<MFT_DATARUN> runList = read_dataruns(attr);
+		LONGLONG last_offset = 0;
+		std::vector<MFT_DATARUN> runList = read_dataruns(pAttributeData);
 		for (const MFT_DATARUN& run : runList)
 		{
 			if (err) break;
+
+			if (compressed && run.offset == last_offset)
+			{
+				continue;
+			}
+			else
+			{
+				last_offset = run.offset;
+			}
 
 			if (run.offset == 0)
 			{
@@ -327,7 +339,7 @@ PMFT_RECORD_ATTRIBUTE_HEADER MFTRecord::attribute_header(DWORD type, std::string
 	return nullptr;
 }
 
-bool MFTRecord::copy_data_to_file(std::wstring dest_filename, std::string stream_name)
+bool MFTRecord::data_to_file(std::wstring dest_filename, std::string stream_name)
 {
 	bool ret = true;
 
@@ -375,23 +387,35 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(DWORD blocks
 				}
 				if (writeSize != pAttributeData->Form.Resident.ValueLength)
 				{
-					wprintf(L"Invalid read file size");
+					std::cout << "[!] Invalid read file size" << std::endl;
 				}
 			}
 			else
 			{
-				wprintf(L"Invalid size of resident data");
+				std::cout << "[!] Invalid size of resident data" << std::endl;
 			}
 		}
 		else if (pAttributeData->FormCode == NON_RESIDENT_FORM)
 		{
 			Buffer<PBYTE> buffer(blocksize);
 
+			bool compressed = pAttributeData->Flags & ATTR_FLAG_COMPRESSED;
+
 			bool err = false;
+			LONGLONG last_offset = 0;
 			std::vector<MFT_DATARUN> data_runs = read_dataruns(pAttributeData);
 			for (const MFT_DATARUN& run : data_runs)
 			{
 				if (err) break;
+
+				if (compressed && run.offset == last_offset)
+				{
+					continue;
+				}
+				else
+				{
+					last_offset = run.offset;
+				}
 
 				if (run.offset == 0)
 				{
@@ -412,7 +436,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(DWORD blocks
 					{
 						if (!_reader->read(buffer.data(), blocksize))
 						{
-							wprintf(L"ReadFile failed");
+							std::cout << "[!] ReadFile failed" << std::endl;
 							err = true;
 							break;
 						}
@@ -424,7 +448,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(DWORD blocks
 			}
 			if (writeSize != pAttributeData->Form.Nonresident.FileSize)
 			{
-				wprintf(L"Invalid read file size");
+				std::cout << "[!] Invalid read file size" << std::endl;
 			}
 		}
 	}
@@ -461,7 +485,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(DWORD blocks
 
 		if (!data_attribute_found)
 		{
-			wprintf(L"Unable to find $DATA attribute");
+			std::cout << "[!] Unable to find $DATA attribute" << std::endl;
 		}
 	}
 }
@@ -497,7 +521,7 @@ std::shared_ptr<Buffer<PBYTE>> MFTRecord::data(std::string stream_name)
 				}
 			}
 		}
-		wprintf(L"Unable to find $DATA attribute");
+		std::cout << "[!] Unable to find $DATA attribute" << std::endl;
 	}
 	return ret;
 }
