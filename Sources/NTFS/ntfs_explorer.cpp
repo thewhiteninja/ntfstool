@@ -21,18 +21,3 @@ NTFSExplorer::NTFSExplorer(std::shared_ptr<Volume> volume)
 NTFSExplorer::~NTFSExplorer()
 {
 }
-
-std::vector<std::wstring> NTFSExplorer::list(std::string directory)
-{
-	wprintf(L"Listing directory");
-
-	std::vector<std::wstring> ret;
-
-	std::shared_ptr<MFTRecord> rec = _MFT->record_from_path(directory);
-	for (std::shared_ptr<IndexEntry> entry : rec->index())
-	{
-		ret.push_back(entry->name());
-	}
-
-	return ret;
-}

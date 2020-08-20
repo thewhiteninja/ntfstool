@@ -59,9 +59,9 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 		std::cout << "[-] Record Num  : " << record->header()->MFTRecordIndex << " (" << utils::format::hex(record->header()->MFTRecordIndex, true) << ")" << std::endl;
 	}
 
-	record->data_to_file(utils::strings::from_string(opts->out), stream_name);
+	ULONG64 written = record->data_to_file(utils::strings::from_string(opts->out), stream_name);
 
-	std::cout << "[+] " << record->datasize(stream_name) << " bytes written" << std::endl;
+	std::cout << "[+] " << written << " bytes (" + utils::format::size(written) << ") written" << std::endl;
 
 	return 0;
 }

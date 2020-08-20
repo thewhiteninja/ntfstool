@@ -339,30 +339,33 @@ PMFT_RECORD_ATTRIBUTE_HEADER MFTRecord::attribute_header(DWORD type, std::string
 	return nullptr;
 }
 
-bool MFTRecord::data_to_file(std::wstring dest_filename, std::string stream_name)
+ULONG64 MFTRecord::data_to_file(std::wstring dest_filename, std::string stream_name)
 {
-	bool ret = true;
+	ULONG64 written_bytes = 0ULL;
 
 	HANDLE output = CreateFileW(dest_filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (output != INVALID_HANDLE_VALUE)
 	{
 		for (auto data_block : process_data(1024 * 1024, stream_name))
 		{
-			DWORD written;
-			if (!WriteFile(output, data_block.first, data_block.second, &written, NULL))
+			DWORD written_block;
+			if (!WriteFile(output, data_block.first, data_block.second, &written_block, NULL))
 			{
-				wprintf(L"WriteFile failed");
-				ret = false;
+				std::cout << "[!] WriteFile failed" << std::endl;
 				break;
+			}
+			else
+			{
+				written_bytes += written_block;
 			}
 		}
 		CloseHandle(output);
 	}
 	else
 	{
-		wprintf(L"CreateFile for output file failed");
+		std::cout << "[!] CreateFile failed" << std::endl;
 	}
-	return ret;
+	return written_bytes;
 }
 
 cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(DWORD blocksize, std::string stream_name)
