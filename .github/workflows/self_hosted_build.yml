@@ -1,0 +1,46 @@
+name: "Build"
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'hello'
+        required: false
+  
+jobs:
+  build:
+    name: Build
+    runs-on: [self-hosted]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+
+    - run: git checkout HEAD^2
+      if: ${{ github.event_name == 'pull_request' }}
+
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.1
+      with:
+        vswhere-path: 'C:\ProgramData\cmder\bin'
+
+    - name: Prepare vcpkg
+      uses: lukka/run-vcpkg@v2
+      id: runvcpkg
+      with:
+        vcpkgArguments: openssl:x86-windows-static distorm:x86-windows-static cppcoro:x86-windows-static nlohmann-json:x86-windows-static openssl:x64-windows-static distorm:x64-windows-static cppcoro:x64-windows-static nlohmann-json:x64-windows-static
+        vcpkgGitCommitId: 7ad163e476f6ad9db9b6508d52f8f403b85c80d0
+
+    - name: Vcpkg install
+      working-directory: .
+      run: vcpkg integrate install
+
+    - name: MSBuild x86
+      working-directory: .
+      run: msbuild /p:Configuration=Release /p:Platform=x86 NTFS.vcxproj 
+      
+    - name: MSBuild x64
+      working-directory: .
+      run: msbuild /p:Configuration=Release /p:Platform=x64 NTFS.vcxproj 
