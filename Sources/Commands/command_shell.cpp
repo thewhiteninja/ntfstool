@@ -318,7 +318,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 							std::shared_ptr<MFTRecord> copyfrom_record = explorer->mft()->record_from_number(entry->record_number());
 							if (!(copyfrom_record->header()->flag & MFT_RECORD_IS_DIRECTORY))
 							{
-								if (copyfrom_record->copy_data_to_file(utils::strings::from_string(copyto).c_str(), from_file.second))
+								if (copyfrom_record->data_to_file(utils::strings::from_string(copyto).c_str(), from_file.second))
 								{
 									std::cout << "1 file copied" << std::endl;
 								}

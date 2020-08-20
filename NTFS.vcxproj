@@ -75,7 +75,6 @@
     <ClCompile Include="Sources\NTFS\ntfs_mft_record.cpp" />
     <ClCompile Include="Sources\NTFS\ntfs_reader.cpp" />
     <ClCompile Include="Sources\options.cpp" />
-    <ClCompile Include="Sources\test.cpp" />
     <ClCompile Include="Sources\Utils\constant_names.cpp" />
     <ClCompile Include="Sources\Utils\crash_handler.cpp" />
     <ClCompile Include="Sources\Utils\table.cpp" />

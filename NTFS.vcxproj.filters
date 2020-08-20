@@ -230,9 +230,6 @@
     <ClCompile Include="Sources\Bitlocker\decryption.cpp">
       <Filter>Source Files\Bitlocker</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">

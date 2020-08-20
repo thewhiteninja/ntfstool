@@ -33,11 +33,22 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
-	auto from_file = utils::files::split_file_and_stream(opts->from);
-	std::cout << "[-] Source      : " << from_file.first << (from_file.second == "" ? "" : ":" + from_file.second) << std::endl;
+	std::shared_ptr<MFTRecord> record = nullptr;
+
+	auto [filepath, stream_name] = utils::files::split_file_and_stream(opts->from);
+
+	if (opts->from != "")
+	{
+		std::cout << "[-] Source      : " << filepath << (stream_name == "" ? "" : ":" + stream_name) << std::endl;
+		record = explorer->mft()->record_from_path(filepath);
+	}
+	else
+	{
+		std::cout << "[-] Source      : Inode(" << opts->inode << ")" << std::endl;
+		record = explorer->mft()->record_from_number(opts->inode);
+	}
 	std::cout << "[-] Destination : " << opts->out << std::endl;
 
-	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_path(from_file.first);
 	if (record == nullptr)
 	{
 		std::cout << "[!] Invalid or non-existent path" << std::endl;
@@ -48,9 +59,9 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 		std::cout << "[-] Record Num  : " << record->header()->MFTRecordIndex << " (" << utils::format::hex(record->header()->MFTRecordIndex, true) << ")" << std::endl;
 	}
 
-	record->copy_data_to_file(utils::strings::from_string(opts->out), from_file.second);
+	record->data_to_file(utils::strings::from_string(opts->out), stream_name);
 
-	std::cout << "[+] File extracted (" << record->datasize(from_file.second) << " bytes written)" << std::endl;
+	std::cout << "[+] " << record->datasize(stream_name) << " bytes written" << std::endl;
 
 	return 0;
 }
@@ -77,21 +88,18 @@ namespace commands {
 					{
 						opts->from = "c:\\windows\\system32\\config\\system";
 					}
-					if (opts->from != "")
+					if (opts->from == "" && opts->inode == 0)
 					{
-						if (opts->out != "")
-						{
-							extract_file(disk, volume, opts);
-						}
-						else
-						{
-							std::cerr << "[!] Invalid or missing output file";
-							return 1;
-						}
+						std::cerr << "[!] Invalid or missing from file/inode";
+						return 1;
+					}
+					if (opts->out != "")
+					{
+						extract_file(disk, volume, opts);
 					}
 					else
 					{
-						std::cerr << "[!] Invalid or missing from file";
+						std::cerr << "[!] Invalid or missing output file";
 						return 1;
 					}
 				}
