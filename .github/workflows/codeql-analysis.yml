@@ -53,7 +53,7 @@ jobs:
       uses: lukka/run-vcpkg@v2
       id: runvcpkg
       with:
-        vcpkgArguments: openssl:x86-windows-static distorm:x86-windows-static cppcoro:x86-windows-static
+        vcpkgArguments: openssl:x86-windows-static distorm:x86-windows-static cppcoro:x86-windows-static nlohmann-json:x86-windows-static
         vcpkgGitCommitId: 7ad163e476f6ad9db9b6508d52f8f403b85c80d0
 
     - name: Vcpkg install
