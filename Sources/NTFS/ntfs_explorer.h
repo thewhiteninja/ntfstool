@@ -35,6 +35,4 @@ public:
 	HANDLE handle() { return _reader->handle(); }
 
 	std::shared_ptr<MFT> mft() { return _MFT; }
-
-	std::vector<std::wstring> list(std::string directory);
 };

@@ -239,7 +239,7 @@ std::vector<std::string> print_attribute_bitmap(PMFT_RECORD_ATTRIBUTE_BITMAP pAt
 	return ret;
 }
 
-std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record, PMFT_RECORD_ATTRIBUTE_HEADER pAttribute)
+std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record, PMFT_RECORD_ATTRIBUTE_HEADER pAttribute, ULONG32 cluster_size)
 {
 	std::vector<std::string> ret;
 
@@ -270,11 +270,17 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 		{
 			ret.push_back("Dataruns                : ");
 			LONGLONG last = 0;
+			ULONGLONG size_on_disk = 0;
 			for (const auto& run : dataruns)
 			{
-				ret.push_back("    Length: " + utils::format::hex(static_cast<DWORD>(run.length)) + " Offset: " + utils::format::hex(static_cast<DWORD>(run.offset)) + (last == run.offset ? " (Sparse)" : ""));
+				if (last != run.offset)
+				{
+					size_on_disk += (run.length * cluster_size);
+				}
+				ret.push_back("    Length: " + utils::format::hex(static_cast<DWORD>(run.length)) + " Offset: " + utils::format::hex(static_cast<DWORD>(run.offset)) + (last == run.offset ? " (S)" : ""));
 				last = run.offset;
 			}
+			ret.push_back("Size on disk            : " + std::to_string(size_on_disk) + " (" + utils::format::size(size_on_disk) + ")");
 		}
 	}
 
@@ -473,7 +479,7 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 		}
 		case $DATA:
 		{
-			fr_attributes->add_item_multiline(print_attribute_data(record, pAttribute));
+			fr_attributes->add_item_multiline(print_attribute_data(record, pAttribute, explorer->reader()->sizes.cluster_size));
 			break;
 		}
 		case $LOGGED_UTILITY_STREAM:
