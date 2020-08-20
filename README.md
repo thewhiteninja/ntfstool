@@ -62,6 +62,9 @@ the help command displays some examples for each command.
 
 ## Third-parties
 
+- openssl (vcpkg): OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
+- nlohmann-json (vcpkg): JSON for Modern C++
+- distorm (vcpkg): Powerful Disassembler Library For x86/AMD64
 - cppcoro (vcpkg): A library of C++ coroutine abstractions for the coroutines TS.
   
 
