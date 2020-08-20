@@ -369,6 +369,11 @@ namespace utils
 			return os.str();
 		}
 
+		std::string hex(LONG64 value, bool suffix, bool swap)
+		{
+			return hex((ULONG64)value, suffix, swap);
+		}
+
 		std::string hex(std::u16string value, bool suffix, bool swap)
 		{
 			return hex(((PBYTE)value.c_str()), value.size() * sizeof(char16_t), suffix, swap);

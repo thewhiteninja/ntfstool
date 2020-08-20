@@ -46,6 +46,10 @@
 #define RESIDENT_FORM							(0x00)
 #define NON_RESIDENT_FORM						(0x01)
 
+#define ATTR_FLAG_COMPRESSED					(0x0001)
+#define ATTR_FLAG_ENCRYPTED						(0x4000)
+#define ATTR_FLAG_SPARSE						(0x8000)
+
 #define $STANDARD_INFORMATION					(0x10)
 #define $ATTRIBUTE_LIST							(0x20)
 #define $FILE_NAME								(0x30)
@@ -294,22 +298,22 @@ typedef struct
 	ULONGLONG	MFTTime;
 	ULONGLONG	ReadTime;
 	union {
-	struct {
-		DWORD readonly : 1;
-		DWORD hidden : 1;
-		DWORD system : 1;
-		DWORD unused0 : 2;
-		DWORD archive : 1;
-		DWORD device : 1;
-		DWORD normal : 1;
-		DWORD temp : 1;
-		DWORD sparse : 1;
-		DWORD reparse : 1;
-		DWORD compressed : 1;
-		DWORD offline : 1;
-		DWORD not_indexed : 1;
-		DWORD encrypted : 1;
-	} Permission;
+		struct {
+			DWORD readonly : 1;
+			DWORD hidden : 1;
+			DWORD system : 1;
+			DWORD unused0 : 2;
+			DWORD archive : 1;
+			DWORD device : 1;
+			DWORD normal : 1;
+			DWORD temp : 1;
+			DWORD sparse : 1;
+			DWORD reparse : 1;
+			DWORD compressed : 1;
+			DWORD offline : 1;
+			DWORD not_indexed : 1;
+			DWORD encrypted : 1;
+		} Permission;
 		DWORD dword_part;
 	} u;
 	DWORD		MaxVersionNo;

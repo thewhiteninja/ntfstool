@@ -46,6 +46,12 @@
     <Filter Include="Source Files\Bitlocker">
       <UniqueIdentifier>{f2ff212a-06d4-48f5-af1d-c2ce3a3b2fa3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Compression">
+      <UniqueIdentifier>{7d215bd9-efc3-42a9-a550-ee3ba1be1b7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Compression">
+      <UniqueIdentifier>{91e9b92c-3374-43d6-9138-b05d7476800b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\options.h">
@@ -119,6 +125,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Bitlocker\decryption.h">
       <Filter>Header Files\Bitlocker</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Compression\definitions.h">
+      <Filter>Header Files\Compression</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -220,6 +229,9 @@
     </ClCompile>
     <ClCompile Include="Sources\Bitlocker\decryption.cpp">
       <Filter>Source Files\Bitlocker</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\test.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
