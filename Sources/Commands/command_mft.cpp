@@ -250,9 +250,12 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 	{
 		ret.push_back("Name                    : " + utils::strings::to_utf8(name));
 	}
-	ULONG64 datasize = record->datasize(utils::strings::to_utf8(name));
 
-	ret.push_back("Data Size               : " + std::to_string(datasize) + " (" + utils::format::size(datasize) + ")");
+	ULONG64 datasize = record->datasize(utils::strings::to_utf8(name));
+	if (record->header()->baseRecord == 0)
+	{
+		ret.push_back("Data Size               : " + std::to_string(datasize) + " (" + utils::format::size(datasize) + ")");
+	}
 
 	if (pAttribute->FormCode == NON_RESIDENT_FORM)
 	{
@@ -260,7 +263,17 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 		{
 			ret.push_back("Flags                   : ");
 
-			if (pAttribute->Flags & ATTR_FLAG_COMPRESSED) ret.push_back("    Compressed (unit: " + std::to_string(1 << pAttribute->Form.Nonresident.CompressionUnit) + " clusters)");
+			if (pAttribute->Flags & ATTR_FLAG_COMPRESSED)
+			{
+				if (pAttribute->Form.Nonresident.CompressionUnit == 0)
+				{
+					ret.push_back("    Compressed (Uncompressed data)");
+				}
+				else
+				{
+					ret.push_back("    Compressed (unit: " + std::to_string(1 << pAttribute->Form.Nonresident.CompressionUnit) + " clusters)");
+				}
+			}
 			if (pAttribute->Flags & ATTR_FLAG_ENCRYPTED) ret.push_back("    Encrypted");
 			if (pAttribute->Flags & ATTR_FLAG_SPARSE) ret.push_back("    Sparse");
 		}
@@ -479,7 +492,7 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 		}
 		case $DATA:
 		{
-			fr_attributes->add_item_multiline(print_attribute_data(record, pAttribute, explorer->reader()->sizes.cluster_size));
+			fr_attributes->add_item_multiline(print_attribute_data(record, pAttribute, explorer->reader()->sizes.cluster_size), 46);
 			break;
 		}
 		case $LOGGED_UTILITY_STREAM:
