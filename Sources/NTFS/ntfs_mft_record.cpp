@@ -4,11 +4,11 @@
 
 #include "Utils/utils.h"
 #include "Utils/buffer.h"
-#include "ntfs_mft.h"
-#include "ntfs_reader.h"
-#include "ntfs_index_entry.h"
-
-#include "ntfs_explorer.h"
+#include "NTFS/ntfs_mft.h"
+#include "NTFS/ntfs_reader.h"
+#include "NTFS/ntfs_index_entry.h"
+#include "Compression/definitions.h"
+#include "NTFS/ntfs_explorer.h"
 
 MFTRecord::MFTRecord(PMFT_RECORD_HEADER pRecordHeader, MFT* mft, std::shared_ptr<NTFSReader> reader)
 {
@@ -214,7 +214,7 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 		ret = std::make_shared<Buffer<T>>(pAttributeData->Form.Nonresident.AllocatedLength);
 		DWORD readSize = 0;
 
-		bool compressed = pAttributeData->Flags & ATTR_FLAG_COMPRESSED;
+		bool compressed = pAttributeData->Flags & ATTRIBUTE_FLAG_COMPRESSED;
 
 		bool err = false;
 		LONGLONG last_offset = 0;
@@ -400,56 +400,133 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(DWORD blocks
 		}
 		else if (pAttributeData->FormCode == NON_RESIDENT_FORM)
 		{
-			Buffer<PBYTE> buffer(blocksize);
-
-			bool compressed = pAttributeData->Flags & ATTR_FLAG_COMPRESSED;
+			bool compressed = pAttributeData->Flags & ATTRIBUTE_FLAG_COMPRESSED;
 
 			bool err = false;
-			LONGLONG last_offset = 0;
 			std::vector<MFT_DATARUN> data_runs = read_dataruns(pAttributeData);
-			for (const MFT_DATARUN& run : data_runs)
+
+			if (compressed)
 			{
-				if (err) break;
+				_RtlDecompressBuffer RtlDecompressBuffer = nullptr;
 
-				if (compressed && run.offset == last_offset)
+				auto ntdll = GetModuleHandle("ntdll.dll");
+				if (ntdll != nullptr)
 				{
-					continue;
-				}
-				else
-				{
-					last_offset = run.offset;
-				}
+					RtlDecompressBuffer = (_RtlDecompressBuffer)GetProcAddress(ntdll, "RtlDecompressBuffer");
 
-				if (run.offset == 0)
-				{
-					RtlZeroMemory(buffer.data(), blocksize);
-					DWORD64 total_size = run.length * _reader->sizes.cluster_size;
-					for (DWORD64 i = 0; i < total_size; i += blocksize)
+					if (RtlDecompressBuffer == nullptr)
 					{
-						fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, blocksize));
-						co_yield std::pair<PBYTE, DWORD>(buffer.data(), fixed_blocksize);
-						writeSize += fixed_blocksize;
+						std::cout << "[!] Loading RtlDecompressBuffer failed" << std::endl;
+						co_return;
 					}
 				}
 				else
 				{
-					_reader->seek(run.offset * _reader->sizes.cluster_size);
-					DWORD64 total_size = run.length * _reader->sizes.cluster_size;
-					for (DWORD64 i = 0; i < total_size; i += blocksize)
+					std::cout << "[!] Loading ntdll for runtime functions failed" << std::endl;
+					co_return;
+				}
+
+				auto compression_unit = max(1ULL << pAttributeData->Form.Nonresident.CompressionUnit, 16);
+				auto expansion_factor = 15;
+
+				Buffer<PBYTE> buffer_decompressed(static_cast<DWORD>(static_cast<DWORD>(expansion_factor * 1024UL * 1024UL)));
+				Buffer<PBYTE> buffer_compressed(static_cast<DWORD>(compression_unit * _reader->sizes.cluster_size));
+				LONGLONG last_offset = 0;
+
+				for (const MFT_DATARUN& run : data_runs)
+				{
+					if (err) break;
+
+					if (last_offset == run.offset) // Padding run
 					{
-						if (!_reader->read(buffer.data(), blocksize))
+						continue;
+					}
+					last_offset = run.offset;
+
+					if (run.offset == 0)
+					{
+						RtlZeroMemory(buffer_compressed.data(), blocksize);
+						DWORD64 total_size = run.length * _reader->sizes.cluster_size;
+						for (DWORD64 i = 0; i < total_size; i += blocksize)
+						{
+							fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, blocksize));
+							co_yield std::pair<PBYTE, DWORD>(buffer_compressed.data(), fixed_blocksize);
+							writeSize += fixed_blocksize;
+						}
+					}
+					else
+					{
+						_reader->seek(run.offset * _reader->sizes.cluster_size);
+						DWORD64 total_size = run.length * _reader->sizes.cluster_size;
+
+						if (!_reader->read(buffer_compressed.data(), static_cast<DWORD>(total_size)))
 						{
 							std::cout << "[!] ReadFile failed" << std::endl;
 							err = true;
 							break;
 						}
-						fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, blocksize));
-						co_yield std::pair<PBYTE, DWORD>(buffer.data(), fixed_blocksize);
-						writeSize += fixed_blocksize;
+
+						ULONG Final = 0;
+						NTSTATUS status;
+						if (status = RtlDecompressBuffer(COMPRESSION_FORMAT_LZNT1, buffer_decompressed.data(), buffer_decompressed.size(), buffer_compressed.data(), static_cast<DWORD>(total_size), &Final))
+						{
+							std::cout << "[!] Decompression failed" << std::endl;
+							err = true;
+							break;
+						}
+
+						if (Final == 0)
+						{
+							std::cout << "[!] Invalid compressed buffer" << std::endl;
+							err = true;
+							break;
+						}
+
+						co_yield std::pair<PBYTE, DWORD>(buffer_decompressed.data(), Final);
+						writeSize += Final;
+
 					}
 				}
 			}
-			if (writeSize != pAttributeData->Form.Nonresident.FileSize)
+			else
+			{
+				Buffer<PBYTE> buffer(blocksize);
+
+				for (const MFT_DATARUN& run : data_runs)
+				{
+					if (err) break;
+
+					if (run.offset == 0)
+					{
+						RtlZeroMemory(buffer.data(), blocksize);
+						DWORD64 total_size = run.length * _reader->sizes.cluster_size;
+						for (DWORD64 i = 0; i < total_size; i += blocksize)
+						{
+							fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, blocksize));
+							co_yield std::pair<PBYTE, DWORD>(buffer.data(), fixed_blocksize);
+							writeSize += fixed_blocksize;
+						}
+					}
+					else
+					{
+						_reader->seek(run.offset * _reader->sizes.cluster_size);
+						DWORD64 total_size = run.length * _reader->sizes.cluster_size;
+						for (DWORD64 i = 0; i < total_size; i += blocksize)
+						{
+							if (!_reader->read(buffer.data(), blocksize))
+							{
+								std::cout << "[!] ReadFile failed" << std::endl;
+								err = true;
+								break;
+							}
+							fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, blocksize));
+							co_yield std::pair<PBYTE, DWORD>(buffer.data(), fixed_blocksize);
+							writeSize += fixed_blocksize;
+						}
+					}
+				}
+			}
+			if (!compressed && writeSize != pAttributeData->Form.Nonresident.FileSize)
 			{
 				std::cout << "[!] Invalid read file size" << std::endl;
 			}
@@ -474,14 +551,18 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(DWORD blocks
 						data_attribute_found = true;
 
 						std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttrListI->recordNumber & 0xffffffffffff);
-						for (std::pair<PBYTE, DWORD>& b : extRecordHeader->process_data(blocksize, stream_name))
+						for (std::pair<PBYTE, DWORD> b : extRecordHeader->process_data(blocksize, stream_name))
 						{
 							co_yield b;
 						}
-						break;
 					}
 
 					offset += pAttrListI->recordLength;
+
+					if (pAttrListI->recordLength == 0)
+					{
+						break;
+					}
 				}
 			}
 		}
