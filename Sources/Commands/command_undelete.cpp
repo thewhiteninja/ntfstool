@@ -137,7 +137,7 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 	const auto& prof_start = std::chrono::high_resolution_clock::now();
 
 	ULONG64 processed_count = 0;
-	for (auto& block : record->process_data(8 * cluster_size))
+	for (auto& block : record->process_data())
 	{
 		DWORD offset = 0;
 		for (offset = 0; offset <= block.second - record_size; offset += record_size)

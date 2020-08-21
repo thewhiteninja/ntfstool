@@ -154,7 +154,7 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 	if (format == "raw")
 	{
 		ULONG64 processed_count = 0;
-		for (auto& block : record->process_data(cluster_size))
+		for (auto& block : record->process_data())
 		{
 			DWORD written = 0;
 			WriteFile(houtput, block.first, block.second, &written, NULL);

@@ -68,7 +68,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 
 	if (format == "raw")
 	{
-		for (auto& block : record->process_data(cluster_size, MFT_ATTRIBUTE_DATA_USN_NAME))
+		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME))
 		{
 			std::cout << "\r[+] Processing cluster : " << std::to_string(++processed_count);
 			DWORD written = 0;
@@ -82,7 +82,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 		DWORD header_size = 0;
 		if (!FAILED(SizeTToDWord(csv_header.size(), &header_size))) WriteFile(houtput, csv_header.c_str(), header_size, &written, NULL);
 
-		for (auto& block : record->process_data(cluster_size, MFT_ATTRIBUTE_DATA_USN_NAME))
+		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME))
 		{
 			memcpy(clusterBuf.data() + filled_size, block.first, block.second);
 			filled_size += block.second;
@@ -150,7 +150,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 		DWORD written = 0;
 		WriteFile(houtput, "[\n", 2, &written, NULL);
 
-		for (auto& block : record->process_data(cluster_size, MFT_ATTRIBUTE_DATA_USN_NAME))
+		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME))
 		{
 			memcpy(clusterBuf.data() + filled_size, block.first, block.second);
 			filled_size += block.second;
