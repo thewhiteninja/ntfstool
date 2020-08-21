@@ -227,10 +227,10 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	return 0;
 }
 
-namespace commands {
-
-	namespace usn {
-
+namespace commands
+{
+	namespace usn
+	{
 		int print_usn_journal(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
@@ -252,9 +252,9 @@ namespace commands {
 					}
 				}
 			}
+
 			std::cout.flags(flag_backup);
 			return 0;
 		}
 	}
-
 }

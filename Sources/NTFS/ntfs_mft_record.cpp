@@ -202,35 +202,21 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 	if (pAttributeData->FormCode == RESIDENT_FORM)
 	{
 		ret = std::make_shared<Buffer<T>>(pAttributeData->Form.Resident.ValueLength);
-		memcpy(ret->data(), POINTER_ADD(LPBYTE, pAttributeData, pAttributeData->Form.Resident.ValueOffset), pAttributeData->Form.Resident.ValueLength);
+		memcpy_s(ret->data(), ret->size(), POINTER_ADD(LPBYTE, pAttributeData, pAttributeData->Form.Resident.ValueOffset), pAttributeData->Form.Resident.ValueLength);
 	}
-	else
+	else if (pAttributeData->FormCode == NON_RESIDENT_FORM)
 	{
-		DWORD filesize = 0;
-		if (ULongLongToDWord(pAttributeData->Form.Nonresident.FileSize, &filesize) != S_OK)
-		{
-			filesize = static_cast<DWORD>(pAttributeData->Form.Nonresident.FileSize);
-		}
-		ret = std::make_shared<Buffer<T>>(pAttributeData->Form.Nonresident.AllocatedLength);
-		DWORD readSize = 0;
+		ULONGLONG readSize = 0;
+		ULONGLONG filesize = pAttributeData->Form.Nonresident.FileSize;
 
-		bool compressed = pAttributeData->Flags & ATTRIBUTE_FLAG_COMPRESSED;
+		ret = std::make_shared<Buffer<T>>(pAttributeData->Form.Nonresident.AllocatedLength);
 
 		bool err = false;
-		LONGLONG last_offset = 0;
+
 		std::vector<MFT_DATARUN> runList = read_dataruns(pAttributeData);
 		for (const MFT_DATARUN& run : runList)
 		{
 			if (err) break;
-
-			if (compressed && run.offset == last_offset)
-			{
-				continue;
-			}
-			else
-			{
-				last_offset = run.offset;
-			}
 
 			if (run.offset == 0)
 			{
@@ -245,19 +231,20 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 
 				if (!_reader->read(POINTER_ADD(PBYTE, ret->data(), DWORD(readSize)), static_cast<DWORD>(run.length) * _reader->sizes.cluster_size))
 				{
-					wprintf(L"ReadFile failed");
+					std::cout << "[!] ReadFile failed" << std::endl;
 					err = true;
 					break;
 				}
 				else
 				{
-					readSize += min(filesize - readSize, static_cast<DWORD>(run.length) * _reader->sizes.cluster_size);
+					readSize += min(filesize - readSize, run.length * _reader->sizes.cluster_size);
 				}
 			}
 		}
 		if (readSize != filesize)
 		{
-			wprintf(L"Invalid read size");
+			std::cout << "[!] Invalid read file size" << std::endl;
+			ret = nullptr;
 		}
 	}
 
@@ -417,9 +404,9 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 				}
 
 				auto compression_unit = max(1ULL << pAttributeData->Form.Nonresident.CompressionUnit, 16);
-				auto expansion_factor = 15;
+				auto expansion_factor = 15ULL;
 
-				Buffer<PBYTE> buffer_decompressed(static_cast<DWORD>(static_cast<DWORD>(expansion_factor * 1024UL * 1024UL)));
+				Buffer<PBYTE> buffer_decompressed(static_cast<DWORD>(static_cast<DWORD>(expansion_factor * 1024ULL * 1024ULL)));
 				Buffer<PBYTE> buffer_compressed(static_cast<DWORD>(compression_unit * _reader->sizes.cluster_size));
 				LONGLONG last_offset = 0;
 
@@ -556,7 +543,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 						{
 							if (filesize_left < b.second)
 							{
-								b.second = filesize_left;
+								b.second = static_cast<DWORD>(filesize_left);
 							}
 							co_yield b;
 							filesize_left -= b.second;

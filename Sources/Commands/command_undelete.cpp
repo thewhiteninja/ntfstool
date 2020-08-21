@@ -113,18 +113,14 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 	DWORD cluster_size = ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->bytePerSector * ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->sectorPerCluster;
 	DWORD record_size = ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord >= 0 ? ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord * cluster_size : 1 << -((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord;
 
-	std::cout << "[+] Reading $MFT record" << std::endl;
-
 	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_number(0);
 	ULONG64 total_size = record->datasize();
 
-	std::cout << "[+] $MFT size : " << utils::format::size(total_size) << " (~" << std::to_string(total_size / record_size) << " records)" << std::endl;
-
-	std::cout << "[+] Reading $BITMAP record" << std::endl;
+	std::cout << "[-] $MFT size     :" << utils::format::size(total_size) << " (~" << std::to_string(total_size / record_size) << " records)" << std::endl;
 
 	std::shared_ptr<MFTRecord> bitmap_record = explorer->mft()->record_from_number(6);
 
-	std::cout << "[+] $BITMAP size : " << utils::format::size(bitmap_record->datasize()) << std::endl;
+	std::cout << "[-] $BITMAP size  :" << utils::format::size(bitmap_record->datasize()) << std::endl;
 
 	std::shared_ptr<Buffer<PBYTE>> bitmap = bitmap_record->data();
 
@@ -218,20 +214,24 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 			}
 		}
 		processed_count += block.second;
-		std::cout << "\r[+] Processed data size : " << std::to_string(processed_count) << " (" << std::to_string(100 * processed_count / total_size) << "%)";
+		std::cout << "\r[-] Processed data: " << std::to_string(processed_count) << " (" << std::to_string(100 * processed_count / total_size) << "%)";
 	}
 	std::cout << std::endl;
 
-	std::cout << "[+] Duration : " << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - prof_start).count() / 1000 << "ms" << std::endl << std::endl;
+	std::cout << "[-] Duration      : " << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - prof_start).count() / 1000 << "ms" << std::endl;
+
+	std::cout << "[+] Deleted Files : " << deleted_files.size() << std::endl;
 
 	if (deleted_files.size() > 0)
 	{
+		std::cout << std::endl;
+
 		std::shared_ptr<utils::ui::Table> df_table = std::make_shared<utils::ui::Table>();
 		df_table->set_interline(true);
 
 		df_table->add_header_line("Id");
 		df_table->add_header_line("MFT Index");
-		df_table->add_header_line("Flag");
+		df_table->add_header_line("Type");
 		df_table->add_header_line("Filename");
 		df_table->add_header_line("Size");
 		df_table->add_header_line("Deletion Date");
@@ -253,7 +253,6 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 			df_table->new_line();
 		}
 
-		utils::ui::title("Deleted Files Found");
 		df_table->render(std::cout);
 		std::cout << std::endl;
 	}
