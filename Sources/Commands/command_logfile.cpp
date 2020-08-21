@@ -130,8 +130,6 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 
 	utils::ui::title("$LogFile from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
-	DWORD cluster_size = ((PBOOT_SECTOR_NTFS)vol->bootsector())->bytePerSector * ((PBOOT_SECTOR_NTFS)vol->bootsector())->sectorPerCluster;
-
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
@@ -168,8 +166,7 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 		{
 			std::string header = "LSN,ClientPreviousLSN,UndoNextLSN,ClientID,RecordType,TransactionID,RedoOperation,UndoOperation,MFTClusterIndex,TargetVCN,TargetLCN\n";
 			DWORD written = 0;
-			DWORD write_size = 0;
-			if (!FAILED(SizeTToDWord(header.size(), &write_size))) WriteFile(houtput, header.c_str(), write_size, &written, NULL);
+			WriteFile(houtput, header.c_str(), static_cast<DWORD>(header.size()), &written, NULL);
 		}
 		if (format == "json")
 		{
@@ -178,8 +175,6 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 		}
 
 		std::shared_ptr<Buffer<PBYTE>> logfile = record->data();
-
-		//////////
 
 		std::cout << "[+] Parsing $LogFile Restart Pages" << std::endl;
 
