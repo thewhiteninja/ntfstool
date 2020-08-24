@@ -466,7 +466,7 @@ void print_bitlocker_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 				}
 				else
 				{
-					table->add_item_line("suce");
+					table->add_item_line("Datasize: " + std::to_string(psubentry->size));
 				}
 				table->new_line();
 			}
