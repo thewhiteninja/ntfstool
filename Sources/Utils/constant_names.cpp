@@ -241,7 +241,7 @@ std::string constants::bitlocker::fve_entry_type(ULONG32 t)
 	case FVE_METADATA_ENTRY_TYPE_VALIDATION: return "Validation";
 	case FVE_METADATA_ENTRY_TYPE_STARTUP_KEY: return "Startup Key";
 	case FVE_METADATA_ENTRY_TYPE_DRIVE_LABEL: return "Drive Label";
-	case FVE_METADATA_ENTRY_TYPE_UNKNOWN: return "Unknown";
+	case FVE_METADATA_ENTRY_TYPE_AUTO_UNLOCK: return "Auto Unlock";
 	case FVE_METADATA_ENTRY_TYPE_VOLUME_HEADER_BLOCK: return "Volume Header Block";
 	default:
 		return "Unknown (" + utils::format::hex(t) + ")";
@@ -270,7 +270,7 @@ std::string constants::bitlocker::fve_value_type(ULONG32 t)
 	case FVE_METADATA_ENTRY_VALUE_TYPE_OFFSET_AND_SIZE: return "Offset and Size";
 	case FVE_METADATA_ENTRY_VALUE_TYPE_CONCAT_HASH_KEY: return "Concat Hash Key";
 	default:
-		return "Unknown (" + utils::format::hex(t) + ")";
+		return "Unknown (" + std::to_string(t) + ")";
 	}
 }
 
