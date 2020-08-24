@@ -1,7 +1,7 @@
 # Prerequisites
 *.d
 *.filters
-Docs\sources
+Docs\sources_private
 
 # Compiled Object files
 *.slo
@@ -41,4 +41,4 @@ Docs\sources
 .user
 /.vs
 /NTFS.vcxproj.user
-/Docs/sources
+/Docs/sources_private
