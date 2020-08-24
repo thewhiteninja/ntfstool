@@ -69,6 +69,15 @@ namespace core
 	}
 }
 
+chs add_chs(chs& a, chs& b)
+{
+	chs r;
+	r.cylinder = a.cylinder + b.cylinder;
+	r.head = a.head + b.head;
+	r.sector = a.sector + b.sector;
+	return r;
+}
+
 void Disk::_get_mbr(HANDLE h)
 {
 	DWORD ior = 0;
@@ -93,20 +102,42 @@ void Disk::_get_mbr(HANDLE h)
 		_protective_mbr = (n_partitions == 1) && (_mbr.partition[0].partition_type == PARTITION_EDI_HEADER);
 		if (_protective_mbr) _partition_type = PARTITION_STYLE_GPT;
 
+
 		for (int i = 0; i < 4; i++) {
-			if (_mbr.partition[i].partition_type == PARTITION_EXTENDED)
+			if ((_mbr.partition[i].partition_type == PARTITION_EXTENDED) || (_mbr.partition[i].partition_type == PARTITION_XINT13_EXTENDED))
 			{
 				EBR curr_ebr = { 0 };
+
+				uint32_t last_lba = _mbr.partition[i].first_sector_lba;
+				chs last_first = _mbr.partition[i].first_sector;
+				chs last_last = _mbr.partition[i].last_sector;
+
 				pos.QuadPart = (ULONG64)_mbr.partition[i].first_sector_lba * LOGICAL_SECTOR_SIZE;
 				SetFilePointerEx(h, pos, &result, SEEK_SET);
 				if (ReadFile(h, &curr_ebr, sizeof(EBR), &ior, NULL))
 				{
 					while (curr_ebr.mbr_signature == 0xAA55)
 					{
+						curr_ebr.partition[0].first_sector_lba = last_lba + curr_ebr.partition[0].first_sector_lba;
+						curr_ebr.partition[0].first_sector = add_chs(last_first, curr_ebr.partition[0].first_sector);
+						curr_ebr.partition[0].last_sector = add_chs(last_last, curr_ebr.partition[0].last_sector);
+
+						last_lba = _mbr.partition[i].first_sector_lba + curr_ebr.partition[1].first_sector_lba;
+						last_first = add_chs(_mbr.partition[i].first_sector, curr_ebr.partition[1].first_sector);
+						last_last = add_chs(_mbr.partition[i].first_sector, curr_ebr.partition[1].first_sector);
+
 						_ebrs.push_back(curr_ebr);
-						pos.QuadPart = ((ULONG64)curr_ebr.partition[0].first_sector_lba + (ULONG64)curr_ebr.partition[1].first_sector_lba) * LOGICAL_SECTOR_SIZE;
-						SetFilePointerEx(h, pos, &result, SEEK_SET);
-						if (!ReadFile(h, &curr_ebr, sizeof(EBR), &ior, NULL))
+
+						if (curr_ebr.partition[1].first_sector_lba)
+						{
+							pos.QuadPart = ((ULONG64)_mbr.partition[i].first_sector_lba + (ULONG64)curr_ebr.partition[1].first_sector_lba) * LOGICAL_SECTOR_SIZE;
+							SetFilePointerEx(h, pos, &result, SEEK_SET);
+							if (!ReadFile(h, &curr_ebr, sizeof(EBR), &ior, NULL))
+							{
+								break;
+							}
+						}
+						else
 						{
 							break;
 						}
@@ -206,7 +237,7 @@ void Disk::_get_info_using_ioctl(HANDLE h)
 		if (descrip->VendorIdOffset != 0)
 		{
 			_vendor_id = std::string((char*)(buf->address() + descrip->VendorIdOffset));
-			
+
 			if (_vendor_id.length() > 0) {
 				if (_vendor_id.back() == ',') _vendor_id.pop_back();
 			}
@@ -284,13 +315,32 @@ void Disk::_get_volumes(HANDLE h) {
 					pex.PartitionLength.QuadPart = (LONGLONG)pmbr->partition[i].sectors * 512;
 					pex.Mbr.BootIndicator = pmbr->partition[i].status == 0x80;
 					pex.Mbr.PartitionType = pmbr->partition[i].partition_type;
-					std::shared_ptr<Volume> v = std::make_shared<Volume>(h, pex, _index, this);
-					_volumes.push_back(v);
+
+					if (pex.Mbr.PartitionType == 0xf)
+					{
+						for (const auto& ebr_entry : _ebrs)
+						{
+							pex.PartitionNumber = partition_index++;
+							pex.StartingOffset.QuadPart = (LONGLONG)ebr_entry.partition[0].first_sector_lba * 512;
+							pex.PartitionLength.QuadPart = (LONGLONG)ebr_entry.partition[0].sectors * 512;
+							pex.Mbr.BootIndicator = ebr_entry.partition[0].status == 0x80;
+							pex.Mbr.PartitionType = ebr_entry.partition[0].partition_type;
+
+							std::shared_ptr<Volume> v = std::make_shared<Volume>(h, pex, _index, this);
+							_volumes.push_back(v);
+						}
+					}
+					else
+					{
+						std::shared_ptr<Volume> v = std::make_shared<Volume>(h, pex, _index, this);
+						_volumes.push_back(v);
+					}
 				}
 			}
 		}
 	}
 }
+
 
 Disk::Disk(HANDLE h, int index)
 {
