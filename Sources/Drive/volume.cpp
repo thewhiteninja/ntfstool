@@ -247,6 +247,10 @@ Volume::Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index, PVOID parent)
 					_filesystem = "FAT12";
 				}
 			}
+			else if (_partition_type == PARTITION_STYLE_MBR)
+			{
+				_filesystem = constants::disk::mbr_type(p.Mbr.PartitionType);
+			}
 		}
 	}
 }

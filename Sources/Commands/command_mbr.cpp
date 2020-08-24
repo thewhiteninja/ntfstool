@@ -32,10 +32,12 @@ void print_mbr(std::shared_ptr<Disk> disk)
 
 	partitions->add_header_line("Id");
 	partitions->add_header_line("Boot");
-	partitions->add_header_line("Type");
+	partitions->add_header_line("Flags");
+	partitions->add_header_line("Filesystem");
 	partitions->add_header_line("First sector");
 	partitions->add_header_line("Last sector");
 	partitions->add_header_line("Offset");
+	partitions->add_header_line("Sectors");
 	partitions->add_header_line("Size");
 
 	unsigned int n_partitions = 0;
@@ -45,11 +47,13 @@ void print_mbr(std::shared_ptr<Disk> disk)
 			n_partitions++;
 			partitions->add_item_line(std::to_string(n_partitions));
 			partitions->add_item_line((mbr->partition[i].status == 0x80 ? "Yes" : "No"));
+			partitions->add_item_line("Principal");
 			partitions->add_item_line(constants::disk::mbr_type(mbr->partition[i].partition_type));
 			partitions->add_item_line(std::to_string(mbr->partition[i].first_sector.cylinder) + " " + std::to_string(mbr->partition[i].first_sector.head) + " " + std::to_string(mbr->partition[i].first_sector.sector));
 			partitions->add_item_line(std::to_string(mbr->partition[i].last_sector.cylinder) + " " + std::to_string(mbr->partition[i].last_sector.head) + " " + std::to_string(mbr->partition[i].last_sector.sector));
 			partitions->add_item_line(std::to_string(mbr->partition[i].first_sector_lba));
 			partitions->add_item_line(std::to_string(mbr->partition[i].sectors));
+			partitions->add_item_line(utils::format::size(mbr->partition[i].sectors * 512));
 			partitions->new_line();
 		}
 	}
@@ -58,11 +62,13 @@ void print_mbr(std::shared_ptr<Disk> disk)
 		n_partitions++;
 		partitions->add_item_line(std::to_string(n_partitions));
 		partitions->add_item_line((ebr.partition[0].status == 0x80 ? "Yes" : "No"));
+		partitions->add_item_line("Logical");
 		partitions->add_item_line(constants::disk::mbr_type(ebr.partition[0].partition_type));
 		partitions->add_item_line(std::to_string(ebr.partition[0].first_sector.cylinder) + " " + std::to_string(ebr.partition[0].first_sector.head) + " " + std::to_string(ebr.partition[0].first_sector.sector));
 		partitions->add_item_line(std::to_string(ebr.partition[0].last_sector.cylinder) + " " + std::to_string(ebr.partition[0].last_sector.head) + " " + std::to_string(ebr.partition[0].last_sector.sector));
 		partitions->add_item_line(std::to_string(ebr.partition[0].first_sector_lba));
 		partitions->add_item_line(std::to_string(ebr.partition[0].sectors));
+		partitions->add_item_line(utils::format::size(ebr.partition[0].sectors * LOGICAL_SECTOR_SIZE));
 		partitions->new_line();
 	}
 

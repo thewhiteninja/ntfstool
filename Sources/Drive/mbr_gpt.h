@@ -106,9 +106,9 @@ const GUID PARTITION_CHROME_RESERVED_GUID = { 0x2E0A753D, 0x9E48, 0x43B0, 0x83, 
 #pragma pack(push, 1)
 
 struct chs {
-	uint8_t cylinder;
 	uint8_t head;
 	uint8_t sector;
+	uint8_t cylinder;
 };
 
 struct mbr_partition {
