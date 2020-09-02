@@ -80,18 +80,27 @@ std::vector<std::string> print_attribute_reparse_point(PMFT_RECORD_ATTRIBUTE_REP
 	{
 		ret.push_back("Type                    : " + constants::disk::mft::file_record_reparse_point_type(pAttribute->ReparseTag));
 
-		if (pAttribute->ReparseTag == 0xa000000c)
+		if (pAttribute->ReparseTag == IO_REPARSE_TAG_SYMLINK)
 		{
-			std::wstring subs_name = std::wstring(POINTER_ADD(PWCHAR, pAttribute->GenericReparseBuffer.DataBuffer, pAttribute->MountPointReparseBuffer.SubstituteNameOffset));
+			std::wstring subs_name = std::wstring(POINTER_ADD(PWCHAR, pAttribute->SymbolicLinkReparseBuffer.PathBuffer, pAttribute->SymbolicLinkReparseBuffer.SubstituteNameOffset));
+			subs_name.resize(pAttribute->SymbolicLinkReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
+			ret.push_back("Substitute Name         : " + utils::strings::to_utf8(subs_name));
+			std::wstring display_name = std::wstring(POINTER_ADD(PWCHAR, pAttribute->SymbolicLinkReparseBuffer.PathBuffer, pAttribute->SymbolicLinkReparseBuffer.PrintNameOffset));
+			display_name.resize(pAttribute->SymbolicLinkReparseBuffer.PrintNameLength / sizeof(WCHAR));
+			ret.push_back("Display Name            : " + utils::strings::to_utf8(display_name));
+		}
+		else if (pAttribute->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
+		{
+			std::wstring subs_name = std::wstring(POINTER_ADD(PWCHAR, pAttribute->MountPointReparseBuffer.PathBuffer, pAttribute->MountPointReparseBuffer.SubstituteNameOffset));
 			subs_name.resize(pAttribute->MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
 			ret.push_back("Substitute Name         : " + utils::strings::to_utf8(subs_name));
-			std::wstring display_name = std::wstring(POINTER_ADD(PWCHAR, pAttribute->GenericReparseBuffer.DataBuffer, pAttribute->MountPointReparseBuffer.PrintNameOffset));
+			std::wstring display_name = std::wstring(POINTER_ADD(PWCHAR, pAttribute->MountPointReparseBuffer.PathBuffer, pAttribute->MountPointReparseBuffer.PrintNameOffset));
 			display_name.resize(pAttribute->MountPointReparseBuffer.PrintNameLength / sizeof(WCHAR));
 			ret.push_back("Display Name            : " + utils::strings::to_utf8(display_name));
 		}
 		else
 		{
-			ret.push_back("Unknown Reparse Point Type");
+			ret.push_back("Unsupported reparse point type");
 		}
 	}
 

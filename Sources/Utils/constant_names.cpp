@@ -341,17 +341,47 @@ std::string constants::disk::mft::file_record_reparse_point_type(ULONG32 tag)
 {
 	switch (tag)
 	{
-	case 0x00000000: return "Reserved 0";
-	case 0x00000001: return "Reserved 1)";
-	case 0x80000005: return "Home Server Drive Extender";
-	case 0x80000006: return "Hierarchical Storage Manager 2";
-	case 0x80000007: return "Single-instance storage";
-	case 0x8000000a: return "Distributed File System";
-	case 0x8000000b: return "Filter Manager Test Harness";
-	case 0x80000012: return "Distributed File System Replication";
-	case 0xa0000003: return "Mount Point";
-	case 0xa000000c: return "Symbolic Link";
-	case 0xc0000004: return "Hierarchical Storage Manager";
+	case IO_REPARSE_TAG_MOUNT_POINT: return "Mount Point";
+	case IO_REPARSE_TAG_HSM: return "Hierarchical Storage Manager";
+	case IO_REPARSE_TAG_HSM2: return "Hierarchical Storage Manager 2";
+	case IO_REPARSE_TAG_SIS: return "Single-instance Storage";
+	case IO_REPARSE_TAG_WIM: return "WIM Mount";
+	case IO_REPARSE_TAG_CSV: return "Clustered Shared Volumes";
+	case IO_REPARSE_TAG_DFS: return "Distributed File System";
+	case IO_REPARSE_TAG_SYMLINK: return "Symbolic Link";
+	case IO_REPARSE_TAG_DFSR: return "DFS filter";
+	case IO_REPARSE_TAG_DEDUP: return "Data Deduplication";
+	case IO_REPARSE_TAG_NFS: return "Network File System";
+	case IO_REPARSE_TAG_FILE_PLACEHOLDER: return "Windows Shell 8.1";
+	case IO_REPARSE_TAG_WOF: return "Windows Overlay";
+	case IO_REPARSE_TAG_WCI: return "Windows Container Isolation";
+	case IO_REPARSE_TAG_WCI_1: return "Windows Container Isolation";
+	case IO_REPARSE_TAG_GLOBAL_REPARSE: return "NPFS";
+	case IO_REPARSE_TAG_CLOUD: return "Cloud Files";
+	case IO_REPARSE_TAG_CLOUD_1: return "Cloud Files (1)";
+	case IO_REPARSE_TAG_CLOUD_2: return "Cloud Files (2)";
+	case IO_REPARSE_TAG_CLOUD_3: return "Cloud Files (3)";
+	case IO_REPARSE_TAG_CLOUD_4: return "Cloud Files (4)";
+	case IO_REPARSE_TAG_CLOUD_5: return "Cloud Files (5)";
+	case IO_REPARSE_TAG_CLOUD_6: return "Cloud Files (6)";
+	case IO_REPARSE_TAG_CLOUD_7: return "Cloud Files (7)";
+	case IO_REPARSE_TAG_CLOUD_8: return "Cloud Files (8)";
+	case IO_REPARSE_TAG_CLOUD_9: return "Cloud Files (9)";
+	case IO_REPARSE_TAG_CLOUD_A: return "Cloud Files (A)";
+	case IO_REPARSE_TAG_CLOUD_B: return "Cloud Files (B)";
+	case IO_REPARSE_TAG_CLOUD_C: return "Cloud Files (C)";
+	case IO_REPARSE_TAG_CLOUD_D: return "Cloud Files (D)";
+	case IO_REPARSE_TAG_CLOUD_E: return "Cloud Files (E)";
+	case IO_REPARSE_TAG_CLOUD_F: return "Cloud Files (F)";
+	case IO_REPARSE_TAG_CLOUD_MASK: return "Cloud Files Mask";
+	case IO_REPARSE_TAG_APPEXECLINK: return "Universal Windows Platform";
+	case IO_REPARSE_TAG_PROJFS: return "Windows Projected File System";
+	case IO_REPARSE_TAG_STORAGE_SYNC: return "Azure File Sync";
+	case IO_REPARSE_TAG_WCI_TOMBSTONE: return "Windows Container Isolation";
+	case IO_REPARSE_TAG_UNHANDLED: return "Windows Container Isolation";
+	case IO_REPARSE_TAG_ONEDRIVE: return "One Drive";
+	case IO_REPARSE_TAG_PROJFS_TOMBSTONE: return "Windows Projected File System";
+	case IO_REPARSE_TAG_AF_UNIX: return "Windows Subsystem for Linux Socket";
 	default:
 		return "Unknown (0x" + utils::format::hex(tag) + ")";
 	}
