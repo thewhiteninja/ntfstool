@@ -96,6 +96,11 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 		std::cout << "disk" << clean_disk_name(disk) << ":volume" << vol->index() << ":" << remove_trailing_path_delimiter(current_dir) << "> ";
 		std::cout.flush();
 		std::getline(std::cin, cmdline);
+		if (std::cin.fail() || std::cin.eof())
+		{
+			std::cin.clear();
+			break;
+		}
 		std::vector<std::string> cmds = parse_cmd_line(cmdline);
 
 		if (!cmds.empty() && cmds[0] != "")
@@ -140,9 +145,16 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 					std::shared_ptr<MFTRecord> next_dir = explorer->mft()->record_from_path(next_path);
 					if (next_dir != nullptr)
 					{
-						current_dir_record = next_dir;
-						current_dir = next_path;
-						if (current_dir.back() != '\\') current_dir += "\\";
+						if (next_dir->header()->flag & MFT_RECORD_IS_DIRECTORY)
+						{
+							current_dir_record = next_dir;
+							current_dir = next_path;
+							if (current_dir.back() != '\\') current_dir += "\\";
+						}
+						else
+						{
+							std::cout << cmds[1] << ": Is not a directory" << std::endl;
+						}
 					}
 					else
 					{
