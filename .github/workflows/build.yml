@@ -1,16 +1,15 @@
-name: "Build"
+name: Build
 
 on:
-  workflow_dispatch:
-    inputs:
-      name:
-        description: 'hello'
-        required: false
-  
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
 jobs:
   build:
     name: Build
-    runs-on: [self-hosted]
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
@@ -23,8 +22,6 @@ jobs:
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.1
-      with:
-        vswhere-path: 'C:\ProgramData\cmder\bin'
 
     - name: Prepare vcpkg
       uses: lukka/run-vcpkg@v2
@@ -40,7 +37,7 @@ jobs:
     - name: MSBuild x86
       working-directory: .
       run: msbuild /p:Configuration=Release /p:Platform=x86 NTFS.vcxproj 
-      
+
     - name: MSBuild x64
       working-directory: .
       run: msbuild /p:Configuration=Release /p:Platform=x64 NTFS.vcxproj 
