@@ -133,15 +133,7 @@ namespace commands {
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					if (opts->out == "")
-					{
-						print_reparse(disk, volume, opts->format, opts->out);
-					}
-					else
-					{
-						std::cerr << "[!] Invalid or missing output file";
-						return 1;
-					}
+					print_reparse(disk, volume, opts->format, opts->out);
 				}
 			}
 
