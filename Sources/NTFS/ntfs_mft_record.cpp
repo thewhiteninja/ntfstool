@@ -130,6 +130,34 @@ std::vector<std::shared_ptr<IndexEntry>> parse_entries(PMFT_RECORD_ATTRIBUTE_IND
 	return ret;
 }
 
+std::wstring MFTRecord::filename()
+{
+	PMFT_RECORD_ATTRIBUTE_HEADER pattr = attribute_header($FILE_NAME, "");
+	if (pattr != nullptr)
+	{
+		auto pattr_filename = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_FILENAME, pattr, pattr->Form.Resident.ValueOffset);
+		if (pattr_filename->NameType == 2)
+		{
+			PMFT_RECORD_ATTRIBUTE_HEADER pattr_long = attribute_header($FILE_NAME, "", 1);
+			if (pattr_long != nullptr)
+			{
+				pattr = pattr_long;
+			}
+		}
+	}
+
+	std::wstring filename;
+
+	if (pattr != nullptr)
+	{
+		PMFT_RECORD_ATTRIBUTE_FILENAME psubattr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_FILENAME, pattr, pattr->Form.Resident.ValueOffset);
+		filename = std::wstring(psubattr->Name);
+		filename.resize(psubattr->NameLength);
+	}
+
+	return filename;
+}
+
 std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 {
 	std::vector<std::shared_ptr<IndexEntry>> ret;

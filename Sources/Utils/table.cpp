@@ -53,7 +53,7 @@ void utils::ui::Table::add_item_multiline(std::vector<std::string> list, unsigne
 	{
 		if (i.length() > max_size) {
 			size_t sep = i.find(':');
-			if (sep != std::string::npos)
+			if (sep != std::string::npos && sep < i.length() - 1 && i[sep + 1] == ' ')
 			{
 				std::string key = i.substr(0, sep);
 				std::string whitespace = "";
@@ -111,6 +111,7 @@ void utils::ui::Table::render(std::ostream& out)
 {
 	std::ios_base::fmtflags flag_backup(out.flags());
 	size_t line_size = 0;
+	out << std::unitbuf;
 
 	std::vector<uint32_t> column_size(this->headers.size(), 0);
 
@@ -217,6 +218,9 @@ void utils::ui::Table::render(std::ostream& out)
 				out.width(column_size[i]);
 				if (lines_i < line[i].size())
 				{
+					int fix = (line[i][lines_i].length() - utils::strings::utf8_string_size(line[i][lines_i]));
+					out.width(column_size[i] + fix);
+
 					if (column_align[i] == TableAlign::LEFT) out << std::left << line[i][lines_i];
 					else  out << std::right << line[i][lines_i];
 				}

@@ -38,14 +38,63 @@ int print_reparse(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const
 
 	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_path("\\$Extend\\$Reparse");
 
-	auto a = record->index();
-	for (auto b : a)
+	std::shared_ptr<utils::ui::Table> df_table = std::make_shared<utils::ui::Table>();
+	df_table->set_interline(true);
+
+	df_table->add_header_line("Id");
+	df_table->add_header_line("MFT Index");
+	df_table->add_header_line("Filename");
+	df_table->add_header_line("Type");
+	df_table->add_header_line("Target");
+
+	int n = 0;
+	for (auto b : record->index())
 	{
-		if (b->type() == MFT_ATTRIBUTE_INDEX_REPARSE)
+		std::shared_ptr<MFTRecord> rp = explorer->mft()->record_from_number(b->record_number());
+		if (rp)
 		{
-			std::cout << std::hex << b->record_number() << " " << b->tag() << std::endl;
+			auto pattr = rp->attribute_header($REPARSE_POINT, "");
+			if (pattr != nullptr)
+			{
+				if (pattr->FormCode == RESIDENT_FORM)
+				{
+					df_table->add_item_line(std::to_string(n++));
+					df_table->add_item_line(utils::format::hex(rp->header()->MFTRecordIndex));
+					df_table->add_item_line(utils::strings::to_utf8(rp->filename()));
+
+					auto rp_value = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_REPARSE_POINT, pattr, pattr->Form.Resident.ValueOffset);
+
+					df_table->add_item_line(constants::disk::mft::file_record_reparse_point_type(rp_value->ReparseTag));
+
+					std::vector<std::string> target;
+
+					if (rp_value->ReparseTag == IO_REPARSE_TAG_SYMLINK)
+					{
+						std::wstring subs_name = std::wstring(POINTER_ADD(PWCHAR, rp_value->SymbolicLinkReparseBuffer.PathBuffer, rp_value->SymbolicLinkReparseBuffer.SubstituteNameOffset));
+						subs_name.resize(rp_value->SymbolicLinkReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
+						target.push_back(utils::strings::to_utf8(subs_name));
+					}
+					else if (rp_value->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
+					{
+						std::wstring subs_name = std::wstring(POINTER_ADD(PWCHAR, rp_value->MountPointReparseBuffer.PathBuffer, rp_value->MountPointReparseBuffer.SubstituteNameOffset));
+						subs_name.resize(rp_value->MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
+						target.push_back(utils::strings::to_utf8(subs_name));
+					}
+					else
+					{
+						target.push_back("Unsupported reparse point type");
+					}
+
+					df_table->add_item_multiline(target);
+
+					df_table->new_line();
+				}
+			}
 		}
 	}
+
+	df_table->render(std::cout);
+	std::cout << std::endl;
 
 	std::cout << "[+] Closing volume" << std::endl;
 

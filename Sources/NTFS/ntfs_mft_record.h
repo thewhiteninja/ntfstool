@@ -46,6 +46,8 @@ public:
 	template < typename T >
 	std::shared_ptr<Buffer<T>> attribute_data(PMFT_RECORD_ATTRIBUTE_HEADER attr);
 
+	std::wstring filename();
+
 	ULONG64 datasize(std::string stream_name = "");
 
 	std::shared_ptr<Buffer<PBYTE>> data(std::string stream_name = "");
