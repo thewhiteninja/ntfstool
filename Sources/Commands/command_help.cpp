@@ -43,7 +43,7 @@ void usage(char* binname)
 void print_help_help(char* name)
 {
 	std::cerr << "Help command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "------------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " help [command]" << std::endl;
 	std::cerr << std::endl;
@@ -58,7 +58,7 @@ void print_help_help(char* name)
 void print_help_info(char* name)
 {
 	std::cerr << "Info command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "------------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " info (disk id) (volume id)" << std::endl;
 	std::cerr << std::endl;
@@ -79,7 +79,7 @@ void print_help_info(char* name)
 void print_help_mbr(char* name)
 {
 	std::cerr << "MBR command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "-----------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " mbr [disk id]" << std::endl;
 	std::cerr << std::endl;
@@ -94,7 +94,7 @@ void print_help_mbr(char* name)
 void print_help_gpt(char* name)
 {
 	std::cerr << "GPT command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "-----------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " gpt [disk id]" << std::endl;
 	std::cerr << std::endl;
@@ -109,7 +109,7 @@ void print_help_gpt(char* name)
 void print_help_vbr(char* name)
 {
 	std::cerr << "VBR command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "-----------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " vbr [disk id] [volume id]" << std::endl;
 	std::cerr << std::endl;
@@ -125,7 +125,7 @@ void print_help_vbr(char* name)
 void print_help_mft(char* name)
 {
 	std::cerr << "MFT command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "-----------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " mft [disk id] [volume id] (inode)" << std::endl;
 	std::cerr << std::endl;
@@ -144,7 +144,7 @@ void print_help_mft(char* name)
 void print_help_bitlocker(char* name)
 {
 	std::cerr << "Bitlocker command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "-----------------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " bitlocker [disk id] [volume id] (password | recovery | bek)" << std::endl;
 	std::cerr << std::endl;
@@ -169,7 +169,7 @@ void print_help_bitlocker(char* name)
 void print_help_bitdecrypt(char* name)
 {
 	std::cerr << "Bitdecrypt command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "------------------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " bitdecrypt [disk id] [volume id] [fvek] [output]" << std::endl;
 	std::cerr << std::endl;
@@ -185,8 +185,8 @@ void print_help_bitdecrypt(char* name)
 
 void print_help_fve(char* name)
 {
-	std::cerr << "Bitdecrypt command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "FVE command" << std::endl;
+	std::cerr << "-----------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " bitdecrypt [disk id] [volume id] [fvek] [output]" << std::endl;
 	std::cerr << std::endl;
@@ -206,7 +206,7 @@ void print_help_fve(char* name)
 void print_help_logfile(char* name)
 {
 	std::cerr << "Logfile command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "---------------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " logfile [disk id] [volume id] [output] (format)" << std::endl;
 	std::cerr << std::endl;
@@ -226,7 +226,7 @@ void print_help_logfile(char* name)
 void print_help_usn(char* name)
 {
 	std::cerr << "USN command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "-----------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " usn [disk id] [volume id] [output] (format)" << std::endl;
 	std::cerr << std::endl;
@@ -245,7 +245,7 @@ void print_help_usn(char* name)
 void print_help_extract(char* name)
 {
 	std::cerr << "Extract command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "---------------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " extract [disk id] [volume id] [from] [output]" << std::endl;
 	std::cerr << std::endl;
@@ -267,7 +267,7 @@ void print_help_extract(char* name)
 void print_help_undelete(char* name)
 {
 	std::cerr << "Undelete command" << std::endl;
-	std::cerr << "-------------" << std::endl;
+	std::cerr << "----------------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " undelete [disk id] [volume id] ([inode] [output])" << std::endl;
 	std::cerr << std::endl;
@@ -302,7 +302,7 @@ void print_help_shell(char* name)
 void print_help_reparse(char* name)
 {
 	std::cerr << "Reparse command" << std::endl;
-	std::cerr << "----------------" << std::endl;
+	std::cerr << "---------------" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    " << name << " reparse [disk id] [volume id]" << std::endl;
 	std::cerr << std::endl;
