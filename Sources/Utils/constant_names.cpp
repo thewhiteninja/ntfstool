@@ -337,6 +337,17 @@ std::string constants::disk::mft::file_record_index_root_attribute_flag(ULONG32 
 	}
 }
 
+std::string constants::disk::mft::file_record_index_root_attribute_type(ULONG32 a)
+{
+	switch (a)
+	{
+	case 0x30: return "Filename";
+	case 0x00: return "Reparse points";
+	default:
+		return "Unknown (" + utils::format::hex(a) + ")";
+	}
+}
+
 std::string constants::disk::mft::file_record_reparse_point_type(ULONG32 tag)
 {
 	switch (tag)
@@ -374,7 +385,7 @@ std::string constants::disk::mft::file_record_reparse_point_type(ULONG32 tag)
 	case IO_REPARSE_TAG_CLOUD_E: return "Cloud Files (E)";
 	case IO_REPARSE_TAG_CLOUD_F: return "Cloud Files (F)";
 	case IO_REPARSE_TAG_CLOUD_MASK: return "Cloud Files Mask";
-	case IO_REPARSE_TAG_APPEXECLINK: return "Universal Windows Platform";
+	case IO_REPARSE_TAG_APPEXECLINK: return "AppExecLink";
 	case IO_REPARSE_TAG_PROJFS: return "Windows Projected File System";
 	case IO_REPARSE_TAG_STORAGE_SYNC: return "Azure File Sync";
 	case IO_REPARSE_TAG_WCI_TOMBSTONE: return "Windows Container Isolation";

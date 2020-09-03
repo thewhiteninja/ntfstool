@@ -230,6 +230,9 @@
     <ClCompile Include="Sources\Bitlocker\decryption.cpp">
       <Filter>Source Files\Bitlocker</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Commands\command_reparse.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">

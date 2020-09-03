@@ -100,12 +100,12 @@ std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> MFTRecord::parse_index_bloc
 	return mapVCNToIndexBlock;
 }
 
-std::vector<std::shared_ptr<IndexEntry>> parse_entries(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY pIndexEntry, std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> vcnToBlock)
+std::vector<std::shared_ptr<IndexEntry>> parse_entries(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY pIndexEntry, std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> vcnToBlock, std::string type)
 {
 	std::vector<std::shared_ptr<IndexEntry>> ret;
 	while (TRUE)
 	{
-		std::shared_ptr<IndexEntry> e = std::make_shared<IndexEntry>(pIndexEntry);
+		std::shared_ptr<IndexEntry> e = std::make_shared<IndexEntry>(pIndexEntry, type);
 
 		if (pIndexEntry->Flags & MFT_ATTRIBUTE_INDEX_ENTRY_FLAG_SUBNODE)
 		{
@@ -113,14 +113,14 @@ std::vector<std::shared_ptr<IndexEntry>> parse_entries(PMFT_RECORD_ATTRIBUTE_IND
 			if ((block != nullptr) && (block->Magic == 0x58444e49))
 			{
 				PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY nextEntries = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, block, block->EntryOffset + 0x18);
-				std::vector<std::shared_ptr<IndexEntry>> subentries = parse_entries(nextEntries, vcnToBlock);
+				std::vector<std::shared_ptr<IndexEntry>> subentries = parse_entries(nextEntries, vcnToBlock, type);
 				ret.insert(ret.end(), subentries.begin(), subentries.end());
 			}
 		}
 
 		if (pIndexEntry->Flags & MFT_ATTRIBUTE_INDEX_ENTRY_FLAG_LAST)
 		{
-			if (e->record_number() != 0) ret.push_back(e);
+			if (pIndexEntry->FileReference != 0) ret.push_back(e);
 			break;
 		}
 
@@ -133,64 +133,41 @@ std::vector<std::shared_ptr<IndexEntry>> parse_entries(PMFT_RECORD_ATTRIBUTE_IND
 std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 {
 	std::vector<std::shared_ptr<IndexEntry>> ret;
-	if (_record->data()->flag & MFT_RECORD_IS_DIRECTORY)
+
+	std::string type = MFT_ATTRIBUTE_INDEX_FILENAME;
+	PMFT_RECORD_ATTRIBUTE_HEADER pAttr = attribute_header($INDEX_ROOT, type.c_str());
+	if (pAttr == nullptr)
 	{
-		PMFT_RECORD_ATTRIBUTE_HEADER pAttr = attribute_header($INDEX_ROOT, MFT_ATTRIBUTE_NAME_INDEX);
-		if (pAttr != nullptr)
+		type = MFT_ATTRIBUTE_INDEX_REPARSE;
+		pAttr = attribute_header($INDEX_ROOT, type.c_str());
+	}
+
+	if (pAttr != nullptr)
+	{
+		PMFT_RECORD_ATTRIBUTE_INDEX_ROOT pAttrIndexRoot = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ROOT, pAttr, pAttr->Form.Resident.ValueOffset);
+
+		std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>> indexBlocks = nullptr;
+		std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> VCNToBlock;
+
+		if (pAttrIndexRoot->Flags & MFT_ATTRIBUTE_INDEX_ROOT_FLAG_LARGE)
 		{
-			PMFT_RECORD_ATTRIBUTE_INDEX_ROOT pAttrIndexRoot = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ROOT, pAttr, pAttr->Form.Resident.ValueOffset);
-			if (pAttrIndexRoot->AttrType == $I30)
+			PMFT_RECORD_ATTRIBUTE_HEADER pAttrAllocation = attribute_header($INDEX_ALLOCATION, type.c_str());
+			if (pAttrAllocation != nullptr)
 			{
-				std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>> indexBlocks = nullptr;
-				std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> VCNToBlock;
+				indexBlocks = attribute_data<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>(pAttrAllocation);
 
-				if (pAttrIndexRoot->Flags & MFT_ATTRIBUTE_INDEX_ROOT_FLAG_LARGE)
-				{
-					PMFT_RECORD_ATTRIBUTE_HEADER pAttrAllocation = attribute_header($INDEX_ALLOCATION, MFT_ATTRIBUTE_NAME_INDEX);
-					if (pAttrAllocation != nullptr)
-					{
-						indexBlocks = attribute_data<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>(pAttrAllocation);
-
-						VCNToBlock = parse_index_block(indexBlocks, _reader->sizes.block_size, _reader->boot_record()->bytePerSector);
-					}
-					else
-					{
-						wprintf(L"Attribute $INDEX_ALLOCATION not found");
-					}
-				}
-
-				ret = parse_entries(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pAttrIndexRoot, pAttrIndexRoot->EntryOffset + 0x10), VCNToBlock);
+				VCNToBlock = parse_index_block(indexBlocks, _reader->sizes.block_size, _reader->boot_record()->bytePerSector);
 			}
 			else
 			{
-				wprintf(L"Attribute $INDEX_ROOT is not a $I30 index");
+				wprintf(L"Attribute $INDEX_ALLOCATION not found");
 			}
 		}
-		else
-		{
-			PMFT_RECORD_ATTRIBUTE_HEADER pAttributeList = attribute_header($ATTRIBUTE_LIST);
-			if (pAttributeList != NULL)
-			{
-				std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE>> attribute_list_data = attribute_data<PMFT_RECORD_ATTRIBUTE>(pAttributeList);
-				if (attribute_list_data != nullptr)
-				{
-					DWORD offset = 0;
-					while (offset + sizeof(MFT_RECORD_ATTRIBUTE_HEADER) <= attribute_list_data->size())
-					{
-						PMFT_RECORD_ATTRIBUTE pAttrListI = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, attribute_list_data->data(), offset);
-						if (pAttrListI->typeID == $INDEX_ROOT)
-						{
-							std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttrListI->recordNumber & 0xffffffffffff);
-							return extRecordHeader->index();
-						}
 
-						offset += pAttrListI->recordLength;
-					}
-					wprintf(L"Attribute $INDEX_ROOT not found");
-				}
-			}
-		}
+		ret = parse_entries(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pAttrIndexRoot, pAttrIndexRoot->EntryOffset + 0x10), VCNToBlock, type);
+
 	}
+
 	return ret;
 }
 

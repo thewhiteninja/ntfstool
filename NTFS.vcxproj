@@ -55,6 +55,7 @@
     <ClCompile Include="Sources\Commands\command_bitlocker.cpp" />
     <ClCompile Include="Sources\Commands\command_extract.cpp" />
     <ClCompile Include="Sources\Commands\command_logfile.cpp" />
+    <ClCompile Include="Sources\Commands\command_reparse.cpp" />
     <ClCompile Include="Sources\Commands\command_shell.cpp" />
     <ClCompile Include="Sources\Commands\command_fve.cpp" />
     <ClCompile Include="Sources\Commands\command_mft.cpp" />
