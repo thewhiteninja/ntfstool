@@ -27,6 +27,10 @@ namespace commands {
 		int print_logfile(std::shared_ptr<Options> opts);
 	}
 
+	namespace reparse {
+		int print_reparse(std::shared_ptr<Options> opts);
+	}
+
 	namespace usn {
 		int print_usn_journal(std::shared_ptr<Options> opts);
 	}

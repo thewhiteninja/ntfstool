@@ -51,7 +51,7 @@ std::vector<std::string> print_attribute_index_root(PMFT_RECORD_ATTRIBUTE_INDEX_
 	std::vector<std::string> ret;
 	if (pAttribute != nullptr)
 	{
-		ret.push_back("Attribute Type          : " + utils::format::hex(pAttribute->AttrType, true));
+		ret.push_back("Attribute Type          : " + constants::disk::mft::file_record_index_root_attribute_type(pAttribute->AttrType));
 		ret.push_back("Collation Rule          : " + std::to_string(pAttribute->CollRule));
 		ret.push_back("Index Alloc Entry Size  : " + std::to_string(pAttribute->IBSize));
 		ret.push_back("Cluster/Index Record    : " + std::to_string(pAttribute->ClustersPerIB));
@@ -66,7 +66,14 @@ std::vector<std::string> print_attribute_index_root(PMFT_RECORD_ATTRIBUTE_INDEX_
 			ret.push_back("Index");
 			for (auto& entry : entries)
 			{
-				ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + utils::strings::to_utf8(entry->name()));
+				if (entry->type() == MFT_ATTRIBUTE_INDEX_FILENAME)
+				{
+					ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + utils::strings::to_utf8(entry->name()));
+				}
+				if (entry->type() == MFT_ATTRIBUTE_INDEX_REPARSE)
+				{
+					ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + constants::disk::mft::file_record_reparse_point_type(entry->tag()));
+				}
 			}
 		}
 	}
@@ -315,7 +322,14 @@ std::vector<std::string> print_attribute_index_allocation(std::vector<std::share
 	ret.push_back("Index");
 	for (auto& entry : entries)
 	{
-		ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + utils::strings::to_utf8(entry->name()));
+		if (entry->type() == MFT_ATTRIBUTE_INDEX_FILENAME)
+		{
+			ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + utils::strings::to_utf8(entry->name()));
+		}
+		if (entry->type() == MFT_ATTRIBUTE_INDEX_REPARSE)
+		{
+			ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + constants::disk::mft::file_record_reparse_point_type(entry->tag()));
+		}
 	}
 	return ret;
 }

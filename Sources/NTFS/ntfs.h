@@ -74,7 +74,8 @@
 #define	MFT_ATTRIBUTE_INDEX_ROOT_FLAG_LARGE		(0x01)
 
 #define $I30									(0x30)
-#define MFT_ATTRIBUTE_NAME_INDEX				("$I30")
+#define MFT_ATTRIBUTE_INDEX_FILENAME			("$I30")
+#define MFT_ATTRIBUTE_INDEX_REPARSE	         	("$R")
 
 #define MFT_ATTRIBUTE_DATA_USN_NAME				("$J")
 
@@ -412,14 +413,25 @@ typedef struct
 		{
 			USHORT DataOffset;
 			USHORT DataLength;
-			ULONG ReservedForZero;
+			ULONG32 ReservedForZero;
 		};
 	};
 	USHORT Length;
 	USHORT AttributeLength;
 	USHORT Flags;
 	USHORT Reserved;
-	MFT_RECORD_ATTRIBUTE_FILENAME FileName;
+	union {
+		union {
+			struct {
+				ULONGLONG vcn;
+			} asNode;
+			struct {
+				ULONG32 ReparseTag;
+				ULONGLONG FileReference;
+			} asKeys;
+		} reparse;
+		MFT_RECORD_ATTRIBUTE_FILENAME FileName;
+	};
 } MFT_RECORD_ATTRIBUTE_INDEX_ENTRY, * PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY;
 
 typedef struct
