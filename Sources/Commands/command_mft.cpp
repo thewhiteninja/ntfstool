@@ -503,7 +503,7 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 			else
 			{
 				wprintf(L"Non-resident $REPARSE_POINT is not supported");
-			};
+			}
 			fr_attributes->add_item_multiline(print_attribute_reparse_point(pattr));
 			break;
 		}
