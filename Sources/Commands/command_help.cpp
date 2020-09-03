@@ -28,6 +28,7 @@ void usage(char* binname)
 	std::cerr << "    fve        : display fve metadata" << std::endl;
 	std::cerr << "    logfile    : dump and parse log file" << std::endl;
 	std::cerr << "    usn        : dump and parse usn journal" << std::endl;
+	std::cerr << "    reparse    : parse and display reparse points" << std::endl;
 	std::cerr << "    undelete   : find deleted files" << std::endl;
 	std::cerr << "    shell      : start a mini-shell" << std::endl;
 	std::cerr << "    help       : display this message or command help" << std::endl;
@@ -298,6 +299,21 @@ void print_help_shell(char* name)
 	std::cerr << std::endl;
 }
 
+void print_help_reparse(char* name)
+{
+	std::cerr << "Reparse commmand" << std::endl;
+	std::cerr << "----------------" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    " << name << " reparse [disk id] [volume id]" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Description:" << std::endl;
+	std::cerr << "    Parse reparse points from \\$Extend\\$Reparse for selected disk and volume." << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Display reparse points for disk 1, volume 1" << std::endl;
+	std::cerr << "    " << name << " reparse disk=1 volume=1" << std::endl;
+	std::cerr << std::endl;
+}
+
 namespace commands {
 
 	namespace help {
@@ -320,6 +336,7 @@ namespace commands {
 				if (opts->subcommand == "bitdecrypt") { print_help_bitdecrypt(name); return; }
 				if (opts->subcommand == "fve") { print_help_fve(name); return; }
 				if (opts->subcommand == "logfile") { print_help_logfile(name); return; }
+				if (opts->subcommand == "reparse") { print_help_reparse(name); return; }
 				if (opts->subcommand == "usn") { print_help_usn(name); return; }
 				if (opts->subcommand == "undelete") { print_help_undelete(name); return; }
 				if (opts->subcommand == "shell") { print_help_shell(name); return; }
