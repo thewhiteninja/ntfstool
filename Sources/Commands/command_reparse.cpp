@@ -45,10 +45,13 @@ int print_reparse(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const
 	df_table->add_header_line("MFT Index");
 	df_table->add_header_line("Filename");
 	df_table->add_header_line("Type");
-	df_table->add_header_line("Target");
+	df_table->add_header_line("Target/Data");
 
 	int n = 0;
-	for (auto b : record->index())
+	auto index = record->index();
+	std::cout << "[+] " << index.size() << " entries found" << std::endl;
+
+	for (auto b : index)
 	{
 		std::shared_ptr<MFTRecord> rp = explorer->mft()->record_from_number(b->record_number());
 		if (rp)
@@ -80,9 +83,23 @@ int print_reparse(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const
 						subs_name.resize(rp_value->MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
 						target.push_back(utils::strings::to_utf8(subs_name));
 					}
+					else if (rp_value->ReparseTag == IO_REPARSE_TAG_APPEXECLINK)
+					{
+						unsigned int n = 0;
+						unsigned int i = 0;
+						while (n < rp_value->AppExecLinkReparseBuffer.StringCount && i < rp_value->ReparseDataLength)
+						{
+							std::wstring subs_name = std::wstring(POINTER_ADD(PWCHAR, rp_value->AppExecLinkReparseBuffer.StringBuffer, i));
+							target.push_back(utils::strings::to_utf8(subs_name));
+							if (n < rp_value->AppExecLinkReparseBuffer.StringCount - 1) target.push_back("");
+
+							i += (subs_name.length() + 1) * sizeof(WCHAR);
+							n++;
+						}
+					}
 					else
 					{
-						target.push_back("Unsupported reparse point type");
+						target.push_back(utils::convert::to_hex(rp_value->GenericReparseBuffer.DataBuffer, rp_value->ReparseDataLength));
 					}
 
 					df_table->add_item_multiline(target);
