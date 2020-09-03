@@ -25,6 +25,8 @@ namespace utils
 	namespace convert
 	{
 		std::shared_ptr<Buffer<PBYTE>> from_hex(std::string s);
+
+		std::string to_hex(PVOID buffer, unsigned long size);
 	}
 
 	namespace strings

@@ -359,6 +359,10 @@ typedef struct {
 		struct {
 			WCHAR  DataBuffer[1];
 		} GenericReparseBuffer;
+		struct {
+			ULONG StringCount;
+			WCHAR  StringBuffer[1];
+		} AppExecLinkReparseBuffer;
 	} DUMMYUNIONNAME;
 } MFT_RECORD_ATTRIBUTE_REPARSE_POINT, * PMFT_RECORD_ATTRIBUTE_REPARSE_POINT;
 

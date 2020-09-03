@@ -116,6 +116,20 @@ namespace utils
 			BN_bn2bin(input, ret->data());
 			return ret;
 		}
+
+		std::string to_hex(PVOID buffer, unsigned long size)
+		{
+			std::ostringstream ret;
+			PBYTE buf = reinterpret_cast<PBYTE>(buffer);
+			if (buffer != nullptr)
+			{
+				for (unsigned int i = 0; i < size; i++)
+				{
+					ret << "0123456789ABCDEF"[buf[i] >> 4] << "0123456789ABCDEF"[buf[i] & 0x0F];
+				}
+			}
+			return ret.str();
+		}
 	}
 
 	namespace strings
