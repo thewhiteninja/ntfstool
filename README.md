@@ -4,12 +4,13 @@
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-brightgreen.svg?tyle=flat-square)](#)
 [![x64](https://img.shields.io/badge/Windows-64_bit-0078d7.svg)](#)
 [![x86](https://img.shields.io/badge/Windows-32_bit-0078d7.svg)](#)
+[![v1.2](https://img.shields.io/badge/Version-1.2-ff5733.svg)](#)
 
 <br />
 
-NTFSTool is a forensic tool to play with NTFS partition.
+NTFSTool is a forensic tool to play with disks and NTFS volumes.
 It supports reading partition info (mbr, partition table, vbr) but also information on bitlocker encrypted partition (fve).
-See examples below that show some features !
+See examples below to see some of the features!
 
 ## Features
 
@@ -19,7 +20,7 @@ NTFSTool displays the complete structure of master boot record, volume boot reco
 It is also possible to dump any file (even hidden $mft) or parse $usnjrnl, $logfile including file from Alternate Data Stream (ADS).
 The undelete command will search for any file record marked as "not in use" and allow you to retrieve the file (or part of the file if it was already rewritten).
 It support input from image file or live disks. You can also use tools like [OSFMount][3] to mount your disk image.
-Sparse and compressed files are also (partially) supported.
+Sparse and compressed files are also (partially) supported. 
 
 ### Bitlocker support
 
