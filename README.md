@@ -47,6 +47,7 @@ the help command displays some examples for each command.
 | [gpt](#gpt) | Display GPT structure, code  and partitions for a disk |
 | [vbr](#vbr)  | Display VBR structure and code for a specidifed volume (ntfs, fat32, fat1x, bitlocker supported) |
 | [extract](#extract)  | Extract a file from a volume. |
+| [image](#image)  | Create an image file of a disk or volume. |
 | [mft](#mft)  | Display FILE record details for a specified MFT inode. Almost all attribute types supported |
 | [bitlocker](#bitlocker)  | Display detailed information and hash ($bitlocker$) for all VMK. It is possible to test a password or recovery key. If it is correct, the decrypted VMK and FVEK is displayed. |
 | [bitdecrypt](#bitdecrypt)  | Decrypt a volume to a file using password, recovery key or bek. |
@@ -265,6 +266,38 @@ the help command displays some examples for each command.
     [-] Destination : d:\system
     [-] Record Num  : 623636 (00098414h)
     [+] File extracted (19398656 bytes written)
+    
+</td></tr>
+</table>
+
+
+
+### Image
+<table>
+<tr><td>image disk=2 volume=2 output=d:\imagevol.raw</td></tr>
+<tr><td>
+
+    Image from \\.\PhysicalDrive2 > Volume:2
+    ----------------------------------------
+
+    [+] Opening \\?\Volume{f095dd1d-f302-4d17-bf68-7cc8c1de3965}\
+    [-] Size     : 33520128 (31.97 MiBs)
+    [-] BlockSize: 4096
+    [+] Copying  : [################################] 100% 0s
+    [+] Done
+    
+</td></tr>
+<tr><td>image disk=2 output=d:\image.raw</td></tr>
+<tr><td>
+    
+    Image from \\.\PhysicalDrive2
+    -----------------------------
+
+    [+] Opening \\.\PhysicalDrive2
+    [-] Size     : 67108864 (64.00 MiBs)
+    [-] BlockSize: 4096
+    [+] Copying  : [################################] 100% 0s
+    [+] Done
     
 </td></tr>
 </table>
