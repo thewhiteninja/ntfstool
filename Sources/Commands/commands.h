@@ -9,49 +9,64 @@
 
 namespace commands {
 
-	namespace info {
+	namespace info
+	{
 		int print_disks(std::shared_ptr<Options> opts);
 
 		int print_partitions(std::shared_ptr<Options> opts);
 	}
 
-	namespace mbr {
+	namespace mbr
+	{
 		int print_mbr(std::shared_ptr<Options> opts);
 	}
 
-	namespace gpt {
+	namespace gpt
+	{
 		int print_gpt(std::shared_ptr<Options> opts);
 	}
 
-	namespace logfile {
+	namespace logfile
+	{
 		int print_logfile(std::shared_ptr<Options> opts);
 	}
 
-	namespace reparse {
+	namespace reparse
+	{
 		int print_reparse(std::shared_ptr<Options> opts);
 	}
 
-	namespace usn {
+	namespace image {
+		int create_image(std::shared_ptr<Options> opts);
+	}
+
+	namespace usn
+	{
 		int print_usn_journal(std::shared_ptr<Options> opts);
 	}
 
-	namespace extract {
+	namespace extract
+	{
 		int extract_file(std::shared_ptr<Options> opts);
 	}
 
-	namespace shell {
+	namespace shell
+	{
 		int go(std::shared_ptr<Options> opts);
 	}
 
-	namespace vbr {
+	namespace vbr
+	{
 		int print_vbr(std::shared_ptr<Options> opts);
 	}
 
-	namespace mft {
+	namespace mft
+	{
 		int print_mft(std::shared_ptr<Options> opts);
 	}
 
-	namespace bitlocker {
+	namespace bitlocker
+	{
 		int print_fve(std::shared_ptr<Options> opts);
 
 		int print_bitlocker(std::shared_ptr<Options> opts);
@@ -61,7 +76,8 @@ namespace commands {
 		int decrypt_volume(std::shared_ptr<Options> opts);
 	}
 
-	namespace help {
+	namespace help
+	{
 		void print_help(char* name, std::shared_ptr<Options> opts);
 	}
 

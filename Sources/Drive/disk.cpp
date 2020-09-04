@@ -389,3 +389,11 @@ std::shared_ptr<Volume> Disk::volumes(DWORD index) const
 	return volume;
 }
 
+HANDLE Disk::open()
+{
+	wchar_t diskname[MAX_PATH];
+	_swprintf_p(diskname, MAX_PATH, L"\\\\.\\PhysicalDrive%d", _index);
+
+	return CreateFileW(diskname, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+}
+
