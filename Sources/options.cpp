@@ -85,11 +85,6 @@ std::shared_ptr<Disk> get_disk(std::shared_ptr<Options> opts)
 		{
 			disk = core::win::disks::by_index(opts->disk);
 		}
-		if (disk == nullptr)
-		{
-			std::cerr << "[!] Invalid disk index" << std::endl;
-			return nullptr;
-		}
 	}
 	return disk;
 }

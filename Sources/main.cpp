@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
 			else if (opts->command == "usn")		commands::usn::print_usn_journal(opts);
 			else if (opts->command == "extract")	commands::extract::extract_file(opts);
 			else if (opts->command == "vbr")		commands::vbr::print_vbr(opts);
+			else if (opts->command == "image")		commands::image::create_image(opts);
 			else if (opts->command == "undelete")	commands::undelete::print_deleted_file(opts);
 			else if (opts->command == "mft")		commands::mft::print_mft(opts);
 			else if (opts->command == "logfile") 	commands::logfile::print_logfile(opts);

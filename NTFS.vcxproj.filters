@@ -129,6 +129,9 @@
     <ClInclude Include="Sources\Compression\definitions.h">
       <Filter>Header Files\Compression</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Utils\progress_bar.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -231,6 +234,9 @@
       <Filter>Source Files\Bitlocker</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_reparse.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_image.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
   </ItemGroup>

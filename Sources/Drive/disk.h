@@ -69,6 +69,8 @@ public:
 	std::vector<std::shared_ptr<Volume>> volumes()			const { return _volumes; };
 
 	std::shared_ptr<Volume> volumes(DWORD index)	const;
+
+	HANDLE open();
 };
 
 namespace core

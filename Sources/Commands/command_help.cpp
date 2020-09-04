@@ -314,6 +314,21 @@ void print_help_reparse(char* name)
 	std::cerr << std::endl;
 }
 
+void print_help_image(char* name)
+{
+	std::cerr << "Image command" << std::endl;
+	std::cerr << "---------------" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    " << name << " image [disk id] [volume id] [output]" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Description:" << std::endl;
+	std::cerr << "    Create an image file of a disk or volume." << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Create an image of physical drive 2 to z:\\backup.img" << std::endl;
+	std::cerr << "    " << name << " image disk=2 output=z:\\backup.img" << std::endl;
+	std::cerr << std::endl;
+}
+
 namespace commands {
 
 	namespace help {
@@ -335,6 +350,7 @@ namespace commands {
 				if (opts->subcommand == "bitlocker") { print_help_bitlocker(name); return; }
 				if (opts->subcommand == "bitdecrypt") { print_help_bitdecrypt(name); return; }
 				if (opts->subcommand == "fve") { print_help_fve(name); return; }
+				if (opts->subcommand == "image") { print_help_image(name); return; }
 				if (opts->subcommand == "logfile") { print_help_logfile(name); return; }
 				if (opts->subcommand == "reparse") { print_help_reparse(name); return; }
 				if (opts->subcommand == "usn") { print_help_usn(name); return; }
