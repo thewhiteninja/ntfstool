@@ -4,12 +4,13 @@
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-brightgreen.svg?tyle=flat-square)](#)
 [![x64](https://img.shields.io/badge/Windows-64_bit-0078d7.svg)](#)
 [![x86](https://img.shields.io/badge/Windows-32_bit-0078d7.svg)](#)
+[![v1.2](https://img.shields.io/badge/Version-1.2-ff5733.svg)](#)
 
 <br />
 
-NTFSTool is a forensic tool to play with NTFS partition.
+NTFSTool is a forensic tool to play with disks and NTFS volumes.
 It supports reading partition info (mbr, partition table, vbr) but also information on bitlocker encrypted partition (fve).
-See examples below that show some features !
+See examples below to see some of the features!
 
 ## Features
 
@@ -19,7 +20,7 @@ NTFSTool displays the complete structure of master boot record, volume boot reco
 It is also possible to dump any file (even hidden $mft) or parse $usnjrnl, $logfile including file from Alternate Data Stream (ADS).
 The undelete command will search for any file record marked as "not in use" and allow you to retrieve the file (or part of the file if it was already rewritten).
 It support input from image file or live disks. You can also use tools like [OSFMount][3] to mount your disk image.
-Sparse and compressed files are also (partially) supported.
+Sparse and compressed files are also (partially) supported. 
 
 ### Bitlocker support
 
@@ -50,6 +51,7 @@ the help command displays some examples for each command.
 | [bitlocker](#bitlocker)  | Display detailed information and hash ($bitlocker$) for all VMK. It is possible to test a password or recovery key. If it is correct, the decrypted VMK and FVEK is displayed. |
 | [bitdecrypt](#bitdecrypt)  | Decrypt a volume to a file using password, recovery key or bek. |
 | [fve](#fve)  | Display information for the specified FVE block (0, 1, 2) |
+| [reparse](#reparse)  | Parse and display reparse points from \$Extend\$Reparse. |
 | [logfile](#logfile)  | Dump $LogFile file in specified format: csv, json, raw. |
 | [usn](#usn)  | Dump $UsnJrnl file  in specified format: csv, json, raw. |
 | [undelete](#undelete)  | Search and extract deleted files for a volume. |
@@ -601,6 +603,48 @@ the help command displays some examples for each command.
     +----------------------------------------------------------------------------------------------------------------+
     | 5  | 1       | 100  | Volume Header Block | Offset and Size | Offset        : 0000000002110000                 |
     |    |         |      |                     |                 | Size          : 0000000000002000                 |
+    +----------------------------------------------------------------------------------------------------------------+
+</td></tr>
+</table>
+
+
+### reparse
+<table>
+<tr><td>reparse disk=0 volume=4</td></tr>
+<tr><td>
+
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [+] Reading $Extend\$Reparse
+    [+] 104 entries found
+    +----------------------------------------------------------------------------------------------------------------+
+    | Id  | MFT Index | Filename                    | Type                        | Target/Data                      |
+    +----------------------------------------------------------------------------------------------------------------+
+    | 0   | 00000eb3  | debian.exe                  | AppExecLink                 | TheDebianProject.DebianGNULinux_ |
+    |     |           |                             |                             | 76v4gfsz19hv4                    |
+    |     |           |                             |                             |                                  |
+    |     |           |                             |                             | TheDebianProject.DebianGNULinux_ |
+    |     |           |                             |                             | 76v4gfsz19hv4!debian             |
+    |     |           |                             |                             |                                  |
+    |     |           |                             |                             | C:\Program Files\WindowsApps\The |
+    |     |           |                             |                             | DebianProject.DebianGNULinux_1.2 |
+    |     |           |                             |                             | .0.0_x64__76v4gfsz19hv4\debian.e |
+    |     |           |                             |                             | xe                               |
+    +----------------------------------------------------------------------------------------------------------------+
+    ...
+    +----------------------------------------------------------------------------------------------------------------+
+    | 13  | 000007f9  | BaseLayer                   | Mount Point                 | \??\Volume{629458e4-0000-0000-00 |
+    |     |           |                             |                             | 00-010000000000}\                |
+    +----------------------------------------------------------------------------------------------------------------+
+    | 14  | 00013e24  | Watchdog                    | Mount Point                 | \??\C:\Program Files\NVIDIA Corp |
+    |     |           |                             |                             | oration\NvContainer\Watchdog     |
+    +----------------------------------------------------------------------------------------------------------------+
+    ...
+    +----------------------------------------------------------------------------------------------------------------+
+    | 102 | 00035861  | C2R64.dll                   | Symbolic Link               | \??\C:\Program Files\Common File |
+    |     |           |                             |                             | s\Microsoft Shared\ClickToRun\C2 |
+    |     |           |                             |                             | R64.dll                          |
+    +----------------------------------------------------------------------------------------------------------------+
+    | 103 | 000986b0  | All Users                   | Symbolic Link               | \??\C:\ProgramData               |
     +----------------------------------------------------------------------------------------------------------------+
 </td></tr>
 </table>
