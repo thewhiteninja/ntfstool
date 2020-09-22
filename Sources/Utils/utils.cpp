@@ -440,6 +440,19 @@ namespace utils
 			return std::string(buf);
 		}
 
+		BOOL filetime_to_systemtime(FILETIME ft, PSYSTEMTIME pST)
+		{
+			return FileTimeToSystemTime(&ft, pST);
+		}
+
+		BOOL ull_to_systemtime(ULONGLONG ull, PSYSTEMTIME pST)
+		{
+			FILETIME ft;
+			ft.dwLowDateTime = (DWORD)(ull & 0xFFFFFFFF);
+			ft.dwHighDateTime = (DWORD)(ull >> 32);
+			return filetime_to_systemtime(ft, pST);
+		}
+
 		BOOL filetime_to_local_systemtime(FILETIME ft, PSYSTEMTIME pST)
 		{
 			FILETIME local;

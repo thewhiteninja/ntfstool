@@ -239,6 +239,9 @@
     <ClCompile Include="Sources\Commands\command_image.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Commands\command_shadow.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">

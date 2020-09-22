@@ -58,6 +58,7 @@
     <ClCompile Include="Sources\Commands\command_image.cpp" />
     <ClCompile Include="Sources\Commands\command_logfile.cpp" />
     <ClCompile Include="Sources\Commands\command_reparse.cpp" />
+    <ClCompile Include="Sources\Commands\command_shadow.cpp" />
     <ClCompile Include="Sources\Commands\command_shell.cpp" />
     <ClCompile Include="Sources\Commands\command_fve.cpp" />
     <ClCompile Include="Sources\Commands\command_mft.cpp" />

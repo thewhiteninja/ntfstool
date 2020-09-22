@@ -97,6 +97,10 @@ namespace utils
 	{
 		std::string display_systemtime(SYSTEMTIME st);
 
+		BOOL filetime_to_systemtime(FILETIME ft, PSYSTEMTIME pST);
+
+		BOOL ull_to_systemtime(ULONGLONG ull, PSYSTEMTIME pST);
+
 		BOOL filetime_to_local_systemtime(FILETIME ft, PSYSTEMTIME pST);
 
 		BOOL ull_to_local_systemtime(ULONGLONG ull, PSYSTEMTIME pST);

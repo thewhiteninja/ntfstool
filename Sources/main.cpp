@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
 			else if (opts->command == "image")		commands::image::create_image(opts);
 			else if (opts->command == "undelete")	commands::undelete::print_deleted_file(opts);
 			else if (opts->command == "mft")		commands::mft::print_mft(opts);
+			else if (opts->command == "shadow")		commands::shadow::print_volumeshadow(opts);
 			else if (opts->command == "logfile") 	commands::logfile::print_logfile(opts);
 			else if (opts->command == "reparse") 	commands::reparse::print_reparse(opts);
 			else if (opts->command == "bitdecrypt")	commands::bitlocker::decrypt_volume(opts);

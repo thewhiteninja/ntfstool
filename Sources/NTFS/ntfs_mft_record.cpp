@@ -242,7 +242,7 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 				}
 				else
 				{
-					readSize += min(filesize - readSize, run.length * _reader->sizes.cluster_size);
+					readSize += min(filesize - readSize, static_cast<DWORD>(run.length) * _reader->sizes.cluster_size);
 				}
 			}
 		}
@@ -470,7 +470,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 					}
 				}
 			}
-			else
+		else if (pAttributeData->FormCode == NON_RESIDENT_FORM)
 			{
 				Buffer<PBYTE> buffer(block_size);
 

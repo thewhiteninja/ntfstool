@@ -40,6 +40,10 @@ namespace commands {
 		int create_image(std::shared_ptr<Options> opts);
 	}
 
+	namespace shadow {
+		int print_volumeshadow(std::shared_ptr<Options> opts);
+	}
+
 	namespace usn
 	{
 		int print_usn_journal(std::shared_ptr<Options> opts);
