@@ -754,8 +754,8 @@ the help command displays some examples for each command.
     +---------------------------------------------------------------------------------------------------------------+
     | SetID/ID                               | Count | Date                | Details                                |
     +---------------------------------------------------------------------------------------------------------------+
-    | {857c9ac4-ee4f-4bc6-b822-59e935a7120f} | 1     | 2020-09-21 00:15:38 | Service Machine    : WORK-PC10        |
-    |                                        |       |                     | Originating Machine: WORK-PC10        |
+    | {857c9ac4-ee4f-4bc6-b822-59e935a7120f} | 1     | 2020-09-21 00:15:38 | Service Machine    : WORK-PC10         |
+    |                                        |       |                     | Originating Machine: WORK-PC10         |
     | {3d102db1-8de2-4e7d-8ba5-e0dd4f67740d} |       |                     | State              : Created           |
     |                                        |       |                     | Flags              : 0x0042000d        |
     |                                        |       |                     |                    - Persistent        |
@@ -764,8 +764,8 @@ the help command displays some examples for each command.
     |                                        |       |                     |                    - Differential      |
     |                                        |       |                     |                    - Auto Recover      |
     +---------------------------------------------------------------------------------------------------------------+
-    | {83bc8af4-8802-4466-ae38-717f6474616a} | 1     | 2020-09-22 06:10:00 | Service Machine    : WORK-PC10        |
-    |                                        |       |                     | Originating Machine: WORK-PC10        |
+    | {83bc8af4-8802-4466-ae38-717f6474616a} | 1     | 2020-09-22 06:10:00 | Service Machine    : WORK-PC10         |
+    |                                        |       |                     | Originating Machine: WORK-PC10         |
     | {e668c329-66a2-4ebd-beef-3c6bca81cbf7} |       |                     | State              : Created           |
     |                                        |       |                     | Flags              : 0x0042000d        |
     |                                        |       |                     |                    - Persistent        |
