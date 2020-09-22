@@ -5,6 +5,7 @@
 #include "NTFS/ntfs.h"
 
 #include <map>
+#include <vss.h>
 
 
 std::string constants::disk::mft::file_record_filename_name_type(UCHAR t)
@@ -500,4 +501,57 @@ std::string constants::disk::logfile::operation(WORD w)
 	default:
 		return "Invalid";
 	}
+}
+
+std::string constants::disk::vss::state(DWORD64 s)
+{
+	switch (s)
+	{
+	case VSS_SS_UNKNOWN: return "Unknown";
+	case VSS_SS_PREPARING: return "Preparing";
+	case VSS_SS_PROCESSING_PREPARE: return "Processing prepare";
+	case VSS_SS_PREPARED: return "Prepared";
+	case VSS_SS_PROCESSING_PRECOMMIT: return "Processing precommit";
+	case VSS_SS_PRECOMMITTED: return "Precommitted";
+	case VSS_SS_PROCESSING_COMMIT: return "Processing committed";
+	case VSS_SS_COMMITTED: return "Committed";
+	case VSS_SS_PROCESSING_POSTCOMMIT: return "Processing postcommit";
+	case VSS_SS_PROCESSING_PREFINALCOMMIT: return "Processing prefinalcommit";
+	case VSS_SS_PREFINALCOMMITTED: return "Prefinalcommitted";
+	case VSS_SS_PROCESSING_POSTFINALCOMMIT: return "Processing postfinalcommit";
+	case VSS_SS_CREATED: return "Created";
+	case VSS_SS_ABORTED: return "Aborted";
+	case VSS_SS_DELETED: return "Deleted";
+	case VSS_SS_POSTCOMMITTED: return "Postcommitted";
+	case VSS_SS_COUNT: return "Count";
+	default:
+		return "Unknown";
+	}
+}
+
+std::vector<std::string> constants::disk::vss::flags(DWORD64 f)
+{
+	std::vector<std::string> ret;
+
+	if (f & VSS_VOLSNAP_ATTR_PERSISTENT) ret.push_back("Persistent");
+	if (f & VSS_VOLSNAP_ATTR_NO_AUTORECOVERY) ret.push_back("No Autorecovery");
+	if (f & VSS_VOLSNAP_ATTR_CLIENT_ACCESSIBLE) ret.push_back("Client Accessible");
+	if (f & VSS_VOLSNAP_ATTR_NO_AUTO_RELEASE) ret.push_back("No Auto Release");
+	if (f & VSS_VOLSNAP_ATTR_NO_WRITERS) ret.push_back("No Writers");
+	if (f & VSS_VOLSNAP_ATTR_TRANSPORTABLE) ret.push_back("Transportable");
+	if (f & VSS_VOLSNAP_ATTR_NOT_SURFACED) ret.push_back("Not Surfaced");
+	if (f & VSS_VOLSNAP_ATTR_NOT_TRANSACTED) ret.push_back("Not Transacted");
+	if (f & VSS_VOLSNAP_ATTR_HARDWARE_ASSISTED) ret.push_back("Hardware Assisted");
+	if (f & VSS_VOLSNAP_ATTR_DIFFERENTIAL) ret.push_back("Differential");
+	if (f & VSS_VOLSNAP_ATTR_PLEX) ret.push_back("Plex");
+	if (f & VSS_VOLSNAP_ATTR_IMPORTED) ret.push_back("Imported");
+	if (f & VSS_VOLSNAP_ATTR_EXPOSED_LOCALLY) ret.push_back("Exposed Locally");
+	if (f & VSS_VOLSNAP_ATTR_EXPOSED_REMOTELY) ret.push_back("Exposed Remotely");
+	if (f & VSS_VOLSNAP_ATTR_AUTORECOVER) ret.push_back("Auto Recover");
+	if (f & VSS_VOLSNAP_ATTR_ROLLBACK_RECOVERY) ret.push_back("Rollback Recovery");
+	if (f & VSS_VOLSNAP_ATTR_DELAYED_POSTSNAPSHOT) ret.push_back("Delayed Postsnapshot");
+	if (f & VSS_VOLSNAP_ATTR_TXF_RECOVERY) ret.push_back("TXF Recovery");
+	if (f & VSS_VOLSNAP_ATTR_FILE_SHARE) ret.push_back("File Share");
+
+	return ret;
 }

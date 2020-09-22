@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <winternl.h>
 
 #define MASTER_FILE_TABLE_NUMBER				(0)
 #define MASTER_FILE_TABLE2_NUMBER				(1)
@@ -46,9 +47,9 @@
 #define RESIDENT_FORM							(0x00)
 #define NON_RESIDENT_FORM						(0x01)
 
-#define ATTRIBUTE_FLAG_COMPRESSED					(0x0001)
-#define ATTRIBUTE_FLAG_ENCRYPTED						(0x4000)
-#define ATTRIBUTE_FLAG_SPARSE						(0x8000)
+#define ATTRIBUTE_FLAG_COMPRESSED				(0x0001)
+#define ATTRIBUTE_FLAG_ENCRYPTED				(0x4000)
+#define ATTRIBUTE_FLAG_SPARSE					(0x8000)
 
 #define $STANDARD_INFORMATION					(0x10)
 #define $ATTRIBUTE_LIST							(0x20)
@@ -119,7 +120,83 @@
 #define LOG_RECORD_OP_TRANSACTION_TABLE_DUMP 0x20
 #define LOG_RECORD_OP_UPDATE_RECORD_DATA_ROOT 0x21
 
+const GUID VSS_VOLUME_GUID = { 0x3808876b, 0xc176, 0x4e48, 0xb7, 0xae, 0x04, 0x04, 0x6e, 0x6c, 0xc7, 0x52 };
+
 #pragma pack(push, 1)
+
+typedef struct {
+	GUID vssid;
+	DWORD version;
+	DWORD type;
+	DWORD64 current_offset;
+	DWORD64 relative_offset;
+	DWORD64 zero0;
+	DWORD64 catalog_offset;
+	DWORD64 maximum_size;
+	GUID volume;
+	GUID shadow_copy_storage_volume;
+} VSS_VOLUME_HEADER, * PVSS_VOLUME_HEADER;
+
+typedef struct {
+	DWORD64 type;
+	DWORD64 volume_size;
+	GUID store_guid;
+	DWORD64 sequence_number;
+	DWORD64 backup_schema_flags;
+	DWORD64 creation_time;
+	CHAR padding[72];
+} VSS_CATALOG_ENTRY_2, * PVSS_CATALOG_ENTRY_2;
+
+typedef struct {
+	DWORD64 type;
+	DWORD64 store_block_list_offset;
+	GUID store_guid;
+	DWORD64 store_header_offset;
+	DWORD64 store_block_range_offset;
+	DWORD64 store_current_bitmap_offset;
+	DWORD64 file_id;
+	DWORD64 allocated_size;
+	DWORD64 store_previous_bitmap_offset;
+	CHAR padding[48];
+} VSS_CATALOG_ENTRY_3, * PVSS_CATALOG_ENTRY_3;
+
+typedef struct {
+	VSS_CATALOG_ENTRY_2 entry_2;
+	VSS_CATALOG_ENTRY_3 entry_3;
+} snapshot;
+
+typedef struct {
+	GUID vssid;
+	DWORD version;
+	DWORD type;
+	DWORD64 offset_from_prev;
+	DWORD64 current_offset;
+	DWORD64 next_offset;
+	CHAR padding[80];
+	snapshot snapshots[1];
+} VSS_CATALOG_HEADER, * PVSS_CATALOG_HEADER;
+
+
+typedef struct {
+	GUID vssid;
+	DWORD version;
+	DWORD type;
+	DWORD64 offset_from_prev;
+	DWORD64 current_offset;
+	DWORD64 next_offset;
+	DWORD64 data_size;
+	CHAR padding[72];
+	GUID info_type;
+	GUID id;
+	GUID set_id;
+	DWORD state;
+	DWORD count;
+	DWORD64 flags;
+	union {
+		USHORT Length;
+		WCHAR Buffer;
+	} machines;
+} VSS_STORE_HEADER, * PVSS_STORE_HEADER;
 
 typedef struct {
 	DWORD	magic;
