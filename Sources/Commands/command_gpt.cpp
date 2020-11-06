@@ -30,7 +30,7 @@ namespace commands {
 			if (disk != nullptr)
 			{
 				PGPT_HEADER pgpt = disk->gpt();
-				if (disk->protective_mbr() && pgpt != NULL)
+				if (disk->has_protective_mbr())
 				{
 					utils::ui::title("GPT from " + disk->name());
 

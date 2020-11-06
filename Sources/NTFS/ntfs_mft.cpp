@@ -124,9 +124,5 @@ std::shared_ptr<MFTRecord> MFT::record_from_number(ULONG64 record_number)
 		}
 	}
 
-	std::shared_ptr<MFTRecord> ret = std::make_shared<MFTRecord>(buffer->data(), this, _reader);
-
-	buffer = nullptr;
-
-	return ret;
+	return std::make_shared<MFTRecord>(buffer->data(), this, _reader);
 }
