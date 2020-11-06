@@ -221,7 +221,7 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 		std::vector<MFT_DATARUN> runList = read_dataruns(pAttributeData);
 		for (const MFT_DATARUN& run : runList)
 		{
-			if (err) break;
+			if (err) break; //-V547
 
 			if (run.offset == 0)
 			{
@@ -417,7 +417,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 
 				for (const MFT_DATARUN& run : data_runs)
 				{
-					if (err) break;
+					if (err) break; //-V547
 
 					if (last_offset == run.offset) // Padding run
 					{
@@ -470,7 +470,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 					}
 				}
 			}
-		else if (pAttributeData->FormCode == NON_RESIDENT_FORM)
+			else if (pAttributeData->FormCode == NON_RESIDENT_FORM)
 			{
 				Buffer<PBYTE> buffer(block_size);
 

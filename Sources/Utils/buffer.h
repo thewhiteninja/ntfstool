@@ -29,7 +29,7 @@ public:
 	explicit Buffer(std::string s)
 	{
 		_size = s.length();
-		_mem = static_cast<T>(malloc(s.length()));
+		_mem = static_cast<T>(malloc(s.length() + 1));
 		if (_mem != NULL)
 		{
 			memcpy_s(_mem, s.length(), s.c_str(), s.length());

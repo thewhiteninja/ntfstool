@@ -73,7 +73,7 @@ void print_mbr(std::shared_ptr<Disk> disk)
 	}
 
 	std::cout << std::endl << "    Partition table";
-	if (disk->protective_mbr())
+	if (disk->has_protective_mbr())
 	{
 		std::cout << " (Protective MBR)";
 	}
