@@ -19,6 +19,7 @@
 #include "Utils/constant_names.h"
 #include "Utils/table.h"
 #include <Bitlocker\recovery.h>
+#include "commands.h"
 
 void print_test_bitlocker_password(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
@@ -482,6 +483,50 @@ void print_bitlocker_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 	}
 }
 
+std::string get_guid_from_volume(std::shared_ptr<Volume> vol)
+{
+	for (auto& entry : vol->bitlocker().metadata[0].entries)
+	{
+		if (entry->data()->entry_type == FVE_METADATA_ENTRY_TYPE_VMK && entry->data()->value_type == FVE_METADATA_ENTRY_VALUE_TYPE_VOLUME_MASTER_KEY)
+		{
+			if ((((PFVE_ENTRY_VMK)entry->data()->data)->protection_type) == FVE_METADATA_KEY_PROTECTION_TYPE_RECOVERY_PASSWORD)
+			{
+				return utils::id::guid_to_string(((PFVE_ENTRY_VMK)entry->data()->data)->key_id);
+			}
+		}
+	}
+	return "Not found";
+}
+
+void list_guid_for_all_disks(std::vector<std::shared_ptr<Disk>> disks)
+{
+	std::cout << std::setfill('0');
+	utils::ui::title("Bitlocker Recovery Key GUIDs");
+
+	std::shared_ptr<utils::ui::Table> table = std::make_shared<utils::ui::Table>();
+	table->set_interline(true);
+
+	table->add_header_line("Disk Id:Name");
+	table->add_header_line("Volume Id:Label");
+	table->add_header_line("GUID");
+
+	unsigned int n = 0;
+	for (std::shared_ptr<Disk> disk : core::win::disks::list()) {
+		for (std::shared_ptr<Volume> volume : disk->volumes()) {
+			if (volume->filesystem() == "Bitlocker")
+			{
+				table->add_item_line(std::to_string(disk->index()) + ": " + disk->product_id());
+				table->add_item_line(std::to_string(volume->index()) + ": " + volume->label());
+				table->add_item_line(get_guid_from_volume(volume));
+				table->new_line();
+			}
+		}
+	}
+
+	table->render(std::cout);
+	std::cout << std::endl;
+}
+
 
 namespace commands {
 
@@ -524,6 +569,10 @@ namespace commands {
 				{
 					print_bitlocker_info(disk, volume);
 				}
+			}
+			else
+			{
+				list_guid_for_all_disks(core::win::disks::list());
 			}
 
 			std::cout.flags(flag_backup);
