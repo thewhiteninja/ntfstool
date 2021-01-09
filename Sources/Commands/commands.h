@@ -75,6 +75,8 @@ namespace commands {
 
 		int print_bitlocker(std::shared_ptr<Options> opts);
 
+		int list_guid(std::shared_ptr<Options> opts);
+
 		int test_password(std::shared_ptr<Options> opts);
 
 		int decrypt_volume(std::shared_ptr<Options> opts);

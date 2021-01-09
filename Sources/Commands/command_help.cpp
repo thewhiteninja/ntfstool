@@ -23,7 +23,7 @@ void usage(char* binname)
 	std::cerr << "    vbr        : display volume boot record" << std::endl;
 	std::cerr << "    mft        : display master file table" << std::endl;
 	std::cerr << "    extract    : extract a file" << std::endl;
-	std::cerr << "    bitlocker  : display bitlocker status and test password, recovery or bek file" << std::endl;
+	std::cerr << "    bitlocker  : display bitlocker guid/status and test password, recovery or bek file" << std::endl;
 	std::cerr << "    bitdecrypt : decrypt volume to an image file" << std::endl;
 	std::cerr << "    fve        : display fve metadata" << std::endl;
 	std::cerr << "    logfile    : dump and parse log file" << std::endl;
