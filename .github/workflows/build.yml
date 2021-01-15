@@ -24,7 +24,7 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
 
     - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.1
+      uses: microsoft/setup-msbuild@v1
 
     - name: Prepare vcpkg
       uses: lukka/run-vcpkg@v2
