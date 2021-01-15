@@ -5,6 +5,7 @@
 [![x64](https://img.shields.io/badge/Windows-64_bit-0078d7.svg)](#)
 [![x86](https://img.shields.io/badge/Windows-32_bit-0078d7.svg)](#)
 [![v1.2](https://img.shields.io/badge/Version-1.2-ff5733.svg)](#)
+![Build](https://github.com/thewhiteninja/ntfstool/workflows/Build/badge.svg)
 
 <br />
 
