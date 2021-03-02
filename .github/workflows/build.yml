@@ -1,6 +1,11 @@
 name: Build
 
 on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'hello'
+        required: false
   push:
     branches: [ master ]
     paths:
