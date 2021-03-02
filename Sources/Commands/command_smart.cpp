@@ -121,7 +121,13 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 						for (unsigned int i = 0; i < nb_attributes; i++)
 						{
 							if (currAttribute->attributeIndex)
+
 							{
+								if (currAttribute->attributeIndex == SMART_ATTRIB_TEMPERATURE ||
+									currAttribute->attributeIndex == SMART_ATTRIB_TEMPERATURE_DIFF)
+								{
+									currAttribute->rawValue = currAttribute->rawValue & 0xff;
+								}
 								table->add_item_line(std::to_string(currAttribute->attributeIndex));
 								table->add_item_line(constants::disk::smart::attribute_name(currAttribute->attributeIndex));
 								table->add_item_line(std::to_string(currAttribute->rawValue));
