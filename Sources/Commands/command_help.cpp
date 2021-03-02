@@ -32,6 +32,7 @@ void usage(char* binname)
 	std::cerr << "    reparse    : parse and display reparse points" << std::endl;
 	std::cerr << "    undelete   : find deleted files" << std::endl;
 	std::cerr << "    shell      : start a mini-shell" << std::endl;
+	std::cerr << "    smart      : display S.M.A.R.T data" << std::endl;
 	std::cerr << "    help       : display this message or command help" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "Example:" << std::endl;
@@ -345,6 +346,21 @@ void print_help_image(char* name)
 	std::cerr << std::endl;
 }
 
+void print_help_smart(char* name)
+{
+	std::cerr << "SMART command" << std::endl;
+	std::cerr << "---------------" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    " << name << " smart [disk id]" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Description:" << std::endl;
+	std::cerr << "    Retrieve S.M.A.R.T data for the specified disk." << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Display S.M.A.R.T data from physical drive 2" << std::endl;
+	std::cerr << "    " << name << " smart disk=2" << std::endl;
+	std::cerr << std::endl;
+}
+
 namespace commands {
 
 	namespace help {
@@ -373,6 +389,7 @@ namespace commands {
 				if (opts->subcommand == "usn") { print_help_usn(name); return; }
 				if (opts->subcommand == "undelete") { print_help_undelete(name); return; }
 				if (opts->subcommand == "shell") { print_help_shell(name); return; }
+				if (opts->subcommand == "smart") { print_help_smart(name); return; }
 				usage(name);
 			}
 		}

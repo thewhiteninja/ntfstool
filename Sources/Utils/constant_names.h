@@ -11,6 +11,15 @@ namespace constants {
 
 	namespace disk
 	{
+		namespace smart
+		{
+			std::string attribute_name(DWORD index);
+
+			std::string devicemap_type(DWORD type);
+
+			std::string capabilities(DWORD cap);
+		}
+
 		namespace vss
 		{
 			std::string state(DWORD64 s);

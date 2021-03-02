@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
 
 			if (opts->command == "mbr")				commands::mbr::print_mbr(opts);
 			else if (opts->command == "shell")		commands::shell::go(opts);
+			else if (opts->command == "smart")		commands::smart::print_smart(opts);
 			else if (opts->command == "gpt")		commands::gpt::print_gpt(opts);
 			else if (opts->command == "usn")		commands::usn::print_usn_journal(opts);
 			else if (opts->command == "extract")	commands::extract::extract_file(opts);

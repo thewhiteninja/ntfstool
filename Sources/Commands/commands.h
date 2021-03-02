@@ -21,6 +21,11 @@ namespace commands {
 		int print_mbr(std::shared_ptr<Options> opts);
 	}
 
+	namespace smart
+	{
+		int print_smart(std::shared_ptr<Options> opts);
+	}
+
 	namespace gpt
 	{
 		int print_gpt(std::shared_ptr<Options> opts);

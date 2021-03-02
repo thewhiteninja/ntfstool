@@ -8,6 +8,156 @@
 #include <vss.h>
 
 
+
+std::string constants::disk::smart::attribute_name(DWORD index)
+{
+	const std::map<DWORD, const PCHAR> attribute_name_map = {
+		{0,    "Invalid"},
+		{ 1,   "Read Error Rate" },
+		{ 2,   "Throughput Performance" },
+		{ 3,   "Spin Up Time" },
+		{ 4,   "Start/Stop Count" },
+		{ 5,   "Reallocated Sector Count" },
+		{ 6,   "Read Channel Margin" },
+		{ 7,   "Seek Error Rate" },
+		{ 8,   "Seek Timer Performance" },
+		{ 9,   "Power-On Hours Count" },
+		{ 10,  "Spin Up Retry Count" },
+		{ 11,  "Calibration Retry Count" },
+		{ 12,  "Power Cycle Count" },
+		{ 13,  "Soft Read Error Rate" },
+		{ 22,  "Current Helium Level" },
+		{ 160, "Uncorrectable Sector Count Read Or Write" },
+		{ 161, "Remaining Spare Block Percentage" },
+		{ 164, "Total Erase Count" },
+		{ 165, "Maximum Erase Count" },
+		{ 166, "Minimum Erase Count" },
+		{ 167, "Average Erase Count" },
+		{ 168, "Max Nand Erase Count From Specification" },
+		{ 169, "Remaining Life Percentage" },
+		{ 170, "Available Reserved Space" },
+		{ 171, "Ssd Program Fail Count" },
+		{ 172, "Ssd Erase Fail Count" },
+		{ 173, "Ssd Wear Leveling Count" },
+		{ 174, "Unexpected Power Loss Count" },
+		{ 175, "Power Loss Protection Failure" },
+		{ 176, "Erase Fail Count" },
+		{ 177, "Wear Range Delta" },
+		{ 178, "Used Reserved Block Count (Chip)" },
+		{ 179, "Used Reserved Block Count (Total)" },
+		{ 180, "Unused Reserved Block Count Total" },
+		{ 181, "Program Fail Count Total Or Non 4k Aligned Access Count" },
+		{ 182, "Erase Fail Count" },
+		{ 183, "Sata Down Shift Error Count" },
+		{ 184, "End-To-End Error" },
+		{ 185, "Head Stability" },
+		{ 186, "Induced Op Vibration Detection" },
+		{ 187, "Reported Uncorrectable Errors" },
+		{ 188, "Command Timeout" },
+		{ 189, "High Fly Writes" },
+		{ 190, "Temperature Difference From 100" },
+		{ 191, "G-Sense Error Rate" },
+		{ 192, "Power-Off Retract Count" },
+		{ 193, "Load/Unload Cycle Count" },
+		{ 194, "Temperature" },
+		{ 195, "Hardware Ecc Recovered" },
+		{ 196, "Reallocation Count" },
+		{ 197, "Current Pending Sector Count" },
+		{ 198, "Off-Line Scan Uncorrectable Count" },
+		{ 199, "Udma Crc Error Rate" },
+		{ 200, "Write Error Rate" },
+		{ 201, "Soft Read Error Rate" },
+		{ 202, "Data Address Mark Errors" },
+		{ 203, "Run Out Cancel" },
+		{ 204, "Soft Ecc Correction" },
+		{ 205, "Thermal Asperity Rate (Tar)" },
+		{ 206, "Flying Height" },
+		{ 207, "Spin High Current" },
+		{ 208, "Spin Buzz" },
+		{ 209, "Off-Line Seek Performance" },
+		{ 211, "Vibration During Write" },
+		{ 212, "Shock During Write" },
+		{ 220, "Disk Shift" },
+		{ 221, "G-Sense Error Rate" },
+		{ 222, "Loaded Hours" },
+		{ 223, "Load/Unload Retry Count" },
+		{ 224, "Load Friction" },
+		{ 225, "Load/Unload Cycle Count" },
+		{ 226, "Load-In Time" },
+		{ 227, "Torque Amplification Count" },
+		{ 228, "Power-Off Retract Count" },
+		{ 230, "Life Curve Status" },
+		{ 231, "Ssd Life Left" },
+		{ 232, "Endurance Remaining" },
+		{ 233, "Media Wear Out Indicator" },
+		{ 234, "Average Erase Count And Maximum Erase Count" },
+		{ 235, "Good Block Count And System Free Block Count" },
+		{ 240, "Head Flying Hours" },
+		{ 241, "Lifetime Writes From Host Gib" },
+		{ 242, "Lifetime Reads From Host Gib" },
+		{ 243, "Total Lbas Written Expanded" },
+		{ 244, "Total Lbas Read Expanded" },
+		{ 249, "Nand Writes Gib" },
+		{ 250, "Read Error Retry Rate" },
+		{ 251, "Minimum Spares Remaining" },
+		{ 252, "Newly Added Bad Flash Block" },
+		{ 254, "Free Fall Protection" }
+	};
+
+	if (attribute_name_map.find(index) != attribute_name_map.end())
+	{
+		return attribute_name_map.find(index)->second;
+	}
+	else
+	{
+		return "Unknown";
+	}
+}
+
+std::string constants::disk::smart::devicemap_type(DWORD type)
+{
+	switch (type)
+	{
+	case 1 << 0:
+		return TEXT("SATA/IDE Master on primary channel");
+	case 1 << 1:
+		return TEXT("IDE Subordinate on primary channel");
+	case 1 << 2:
+		return TEXT("IDE Master on secondary channel");
+	case 1 << 3:
+		return TEXT("IDE Subordinate on secondary channel");
+	case 1 << 4:
+		return TEXT("ATAPI Master on primary channel");
+	case 1 << 5:
+		return TEXT("ATAPI Subordinate on primary channel");
+	case 1 << 6:
+		return TEXT("ATAPI Master on secondary channel");
+	case 1 << 7:
+		return TEXT("ATAPI Subordinate on secondary channel");
+	default:
+		return TEXT("UNKNOWN");
+	}
+}
+
+std::string constants::disk::smart::capabilities(DWORD cap)
+{
+	std::vector<std::string> ret;
+
+	const std::map<DWORD, const PCHAR> capabilities_map = {
+		{ CAP_ATA_ID_CMD, "ATA"},
+		{ CAP_ATAPI_ID_CMD, "ATAPI"},
+		{ CAP_SMART_CMD, "S.M.A.R.T"}
+	};
+
+	for (auto& c : capabilities_map)
+	{
+		if (cap & c.first) ret.push_back(c.second);
+	}
+
+	return utils::strings::join(ret, ", ");
+}
+
+
 std::string constants::disk::mft::file_record_filename_name_type(UCHAR t)
 {
 	switch (t)
@@ -128,7 +278,7 @@ std::string constants::disk::media_type(MEDIA_TYPE t)
 {
 	switch (t) {
 	case FixedMedia:
-		return TEXT("Fixed");
+		return "Fixed";
 	case RemovableMedia:
 		return TEXT("Removable");
 	case Unknown:
