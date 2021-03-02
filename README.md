@@ -893,11 +893,11 @@ the help command displays some examples for each command.
     |   187 | Reported Uncorrectable Errors     |              0 |              100 |         100 |         0 |     Ok |
     |   188 | Command Timeout                   |              0 |              100 |         100 |         0 |     Ok |
     |   189 | High Fly Writes                   |            134 |                1 |           1 |         0 |     Ok |
-    |   190 | Temperature Difference From 100   |      588972063 |               69 |          58 |        45 |     Ok |
+    |   190 | Temperature Difference From 100   |             31 |               69 |          58 |        45 |     Ok |
     |   191 | G-Sense Error Rate                |              0 |              100 |         100 |         0 |     Ok |
     |   192 | Power-Off Retract Count           |              0 |              100 |         100 |         0 |     Ok |
     |   193 | Load/Unload Cycle Count           |         216681 |                1 |           1 |         0 |     Ok |
-    |   194 | Temperature                       |    73014444063 |               31 |          42 |         0 |     Ok |
+    |   194 | Temperature                       |             31 |               31 |          42 |         0 |     Ok |
     |   197 | Current Pending Sector Count      |              0 |              100 |         100 |         0 |     Ok |
     |   198 | Off-Line Scan Uncorrectable Count |              0 |              100 |         100 |         0 |     Ok |
     |   199 | Udma Crc Error Rate               |              0 |              200 |         200 |         0 |     Ok |
