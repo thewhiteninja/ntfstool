@@ -148,7 +148,8 @@ namespace utils
 		}
 
 		DWORD utf8_string_size(const std::string& str) {
-			int c, i, ix, q;
+			int c, i, q;
+			size_t ix;
 			for (q = 0, i = 0, ix = str.length(); i < ix; i++, q++)
 			{
 				c = (unsigned char)str[i];
@@ -520,7 +521,7 @@ namespace utils
 			if (ads_sep != std::string::npos)
 			{
 				stream_name = p.filename().string().substr(ads_sep + 1);
-				size_t last_sep = str.find_last_of(":");
+				size_t last_sep = str.find_last_of(':');
 				str = str.substr(0, last_sep);
 			}
 
