@@ -58,7 +58,7 @@ the help command displays some examples for each command.
 | [usn](#usn)  | Dump $UsnJrnl file  in specified format: csv, json, raw. |
 | [shadow](#shadow)  | List volume shadow snapshots from selected disk and volume. |
 | [undelete](#undelete)  | Search and extract deleted files for a volume. |
-| [shell](#shell-1)  | Start a mini-shell |
+| [smart](#smart)  | Display S.M.A.R.T data |
 
 
 ## Limitations
@@ -863,6 +863,50 @@ the help command displays some examples for each command.
     HostUrl=https://www.7-zip.org/a/7z1900-x64.exe
 
     disk4:volume1:> exit
+    
+</td></tr>
+</table>
+
+
+### smart
+<table>
+<tr><td>smart disk=1</td></tr>
+<tr><td>
+
+    Version       : 1 revision 1
+    Type          : SATA/IDE Master on primary channel
+    Capabilities  : ATA, ATAPI, S.M.A.R.T
+
+    +------------------------------------------------------------------------------------------------------------------+
+    | Index | Name                              | Raw Value      | Normalized Value | Worst Value | Threshold | Status |
+    +------------------------------------------------------------------------------------------------------------------+
+    |     1 | Read Error Rate                   |      128404424 |              117 |          99 |         6 |     Ok |
+    |     3 | Spin Up Time                      |              0 |               96 |          96 |         0 |     Ok |
+    |     4 | Start/Stop Count                  |           5693 |               95 |          95 |        20 |     Ok |
+    |     5 | Reallocated Sector Count          |              0 |              100 |         100 |        10 |     Ok |
+    |     7 | Seek Error Rate                   |   236413958548 |               65 |          59 |        30 |     Ok |
+    |     9 | Power-On Hours Count              |          35979 |               59 |          59 |         0 |     Ok |
+    |    10 | Spin Up Retry Count               |              0 |              100 |         100 |        97 |     Ok |
+    |    12 | Power Cycle Count                 |            237 |              100 |         100 |        20 |     Ok |
+    |   183 | Sata Down Shift Error Count       |              0 |              100 |         100 |         0 |     Ok |
+    |   184 | End-To-End Error                  |              0 |              100 |         100 |        99 |     Ok |
+    |   187 | Reported Uncorrectable Errors     |              0 |              100 |         100 |         0 |     Ok |
+    |   188 | Command Timeout                   |              0 |              100 |         100 |         0 |     Ok |
+    |   189 | High Fly Writes                   |            134 |                1 |           1 |         0 |     Ok |
+    |   190 | Temperature Difference From 100   |      588972063 |               69 |          58 |        45 |     Ok |
+    |   191 | G-Sense Error Rate                |              0 |              100 |         100 |         0 |     Ok |
+    |   192 | Power-Off Retract Count           |              0 |              100 |         100 |         0 |     Ok |
+    |   193 | Load/Unload Cycle Count           |         216681 |                1 |           1 |         0 |     Ok |
+    |   194 | Temperature                       |    73014444063 |               31 |          42 |         0 |     Ok |
+    |   197 | Current Pending Sector Count      |              0 |              100 |         100 |         0 |     Ok |
+    |   198 | Off-Line Scan Uncorrectable Count |              0 |              100 |         100 |         0 |     Ok |
+    |   199 | Udma Crc Error Rate               |              0 |              200 |         200 |         0 |     Ok |
+    |   240 | Head Flying Hours                 | 34926674071383 |              100 |         253 |         0 |     Ok |
+    |   241 | Lifetime Writes From Host Gib     |   157072493748 |              100 |         253 |         0 |     Ok |
+    |   242 | Lifetime Reads From Host Gib      |  2261916999266 |              100 |         253 |         0 |     Ok |
+    |     2 | Throughput Performance            |              0 |                0 |           0 |         0 |     Ok |
+    |     4 | Start/Stop Count                  |              0 |                0 |           0 |         0 |     Ok |
+    +------------------------------------------------------------------------------------------------------------------+
     
 </td></tr>
 </table>
