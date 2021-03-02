@@ -163,11 +163,11 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 	std::vector<std::shared_ptr<IndexEntry>> ret;
 
 	std::string type = MFT_ATTRIBUTE_INDEX_FILENAME;
-	PMFT_RECORD_ATTRIBUTE_HEADER pAttr = attribute_header($INDEX_ROOT, type.c_str());
+	PMFT_RECORD_ATTRIBUTE_HEADER pAttr = attribute_header($INDEX_ROOT, type);
 	if (pAttr == nullptr)
 	{
 		type = MFT_ATTRIBUTE_INDEX_REPARSE;
-		pAttr = attribute_header($INDEX_ROOT, type.c_str());
+		pAttr = attribute_header($INDEX_ROOT, type);
 	}
 
 	if (pAttr != nullptr)
@@ -179,7 +179,7 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 
 		if (pAttrIndexRoot->Flags & MFT_ATTRIBUTE_INDEX_ROOT_FLAG_LARGE)
 		{
-			PMFT_RECORD_ATTRIBUTE_HEADER pAttrAllocation = attribute_header($INDEX_ALLOCATION, type.c_str());
+			PMFT_RECORD_ATTRIBUTE_HEADER pAttrAllocation = attribute_header($INDEX_ALLOCATION, type);
 			if (pAttrAllocation != nullptr)
 			{
 				indexBlocks = attribute_data<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>(pAttrAllocation);
