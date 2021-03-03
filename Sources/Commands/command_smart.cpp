@@ -39,9 +39,7 @@ bool isSmartEnabled(HANDLE hDevice, DWORD ucDriveIndex)
 bool read_smart_attributes(HANDLE hDevice, DWORD ucDriveIndex, std::shared_ptr<Buffer<PST_ATAOUTPARAM_ATTRIBUTES>> outputBuffer)
 {
 	SENDCMDINPARAMS stCIP = { 0 };
-	SENDCMDOUTPARAMS stCOP = { 0 };
 	DWORD dwRet = 0;
-	BOOL bRet = FALSE;
 
 	stCIP.cBufferSize = READ_ATTRIBUTE_BUFFER_SIZE;
 	stCIP.bDriveNumber = ucDriveIndex & 0xff;
@@ -59,9 +57,7 @@ bool read_smart_attributes(HANDLE hDevice, DWORD ucDriveIndex, std::shared_ptr<B
 bool read_smart_thresholds(HANDLE hDevice, DWORD ucDriveIndex, std::shared_ptr<Buffer<PST_ATAOUTPARAM_THRESHOLDS>> outputBuffer)
 {
 	SENDCMDINPARAMS stCIP = { 0 };
-	SENDCMDOUTPARAMS stCOP = { 0 };
 	DWORD dwRet = 0;
-	BOOL bRet = FALSE;
 
 	stCIP.cBufferSize = READ_THRESHOLD_BUFFER_SIZE;
 	stCIP.bDriveNumber = ucDriveIndex & 0xff;
@@ -79,9 +75,7 @@ bool read_smart_thresholds(HANDLE hDevice, DWORD ucDriveIndex, std::shared_ptr<B
 bool read_smart_status(HANDLE hDevice, DWORD ucDriveIndex, std::shared_ptr<Buffer<PST_ATAOUTPARAM_STATUS>> outputBuffer)
 {
 	SENDCMDINPARAMS stCIP = { 0 };
-	SENDCMDOUTPARAMS stCOP = { 0 };
 	DWORD dwRet = 0;
-	BOOL bRet = FALSE;
 
 	stCIP.cBufferSize = 512;
 	stCIP.bDriveNumber = ucDriveIndex & 0xff;

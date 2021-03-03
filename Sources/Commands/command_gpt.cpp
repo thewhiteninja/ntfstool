@@ -62,7 +62,7 @@ namespace commands {
 					partitions->add_header_line("Flags");
 
 					unsigned int n_partitions = 0;
-					for (GPT_PARTITION_ENTRY entry : gpt_entries) {
+					for (GPT_PARTITION_ENTRY& entry : gpt_entries) {
 						n_partitions++;
 						partitions->add_item_line(std::to_string(n_partitions));
 						partitions->add_item_line(utils::strings::to_utf8(entry.PartitionName));
