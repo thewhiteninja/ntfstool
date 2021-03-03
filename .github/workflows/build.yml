@@ -1,6 +1,11 @@
 name: Build
 
 on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'hello'
+        required: false
   push:
     branches: [ master ]
     paths:
@@ -27,7 +32,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1
 
     - name: Prepare vcpkg
-      uses: lukka/run-vcpkg@v2
+      uses: lukka/run-vcpkg@v7.1
       id: runvcpkg
       with:
         vcpkgArguments: openssl:x86-windows-static distorm:x86-windows-static cppcoro:x86-windows-static nlohmann-json:x86-windows-static openssl:x64-windows-static distorm:x64-windows-static cppcoro:x64-windows-static nlohmann-json:x64-windows-static

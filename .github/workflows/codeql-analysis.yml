@@ -48,7 +48,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1
 
     - name: Prepare vcpkg
-      uses: lukka/run-vcpkg@v2
+      uses: lukka/run-vcpkg@v7.1
       id: runvcpkg
       with:
         vcpkgArguments: openssl:x86-windows-static distorm:x86-windows-static cppcoro:x86-windows-static nlohmann-json:x86-windows-static
