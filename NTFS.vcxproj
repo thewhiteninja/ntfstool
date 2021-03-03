@@ -30,6 +30,7 @@
     <ClInclude Include="Sources\Drive\disk.h" />
     <ClInclude Include="Sources\Drive\mbr_gpt.h" />
     <ClInclude Include="Sources\Drive\reader.h" />
+    <ClInclude Include="Sources\Drive\smart.h" />
     <ClInclude Include="Sources\Drive\vbr.h" />
     <ClInclude Include="Sources\Drive\volume.h" />
     <ClInclude Include="Sources\NTFS\ntfs.h" />

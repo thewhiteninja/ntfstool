@@ -31,6 +31,8 @@ namespace utils
 
 	namespace strings
 	{
+		std::string upper(std::string& s);
+
 		std::string lower(std::string& s);
 
 		void ltrim(std::string& s);
@@ -69,6 +71,8 @@ namespace utils
 		std::string hex(ULONG32 value, bool suffix = false, bool swap = false);
 
 		std::string hex(DWORD value, bool suffix = false, bool swap = false);
+
+		std::string hex6(ULONG64 value, bool suffix = false, bool swap = false);
 
 		std::string hex(ULONG64 value, bool suffix = false, bool swap = false);
 
