@@ -168,6 +168,12 @@ namespace utils
 			return s;
 		}
 
+		std::string upper(std::string& s)
+		{
+			transform(s.begin(), s.end(), s.begin(), ::toupper);
+			return s;
+		}
+
 		void ltrim(std::string& s)
 		{
 			s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
@@ -372,6 +378,21 @@ namespace utils
 		std::string hex(DWORD value, bool suffix, bool swap)
 		{
 			return  hex((ULONG32)value, suffix, swap);
+		}
+
+		std::string hex6(ULONG64 value, bool suffix, bool swap)
+		{
+			if (swap)
+			{
+				value = _byteswap_uint64(value);
+			}
+			std::ostringstream os;
+			os << std::hex << std::setw(12) << std::setfill('0') << value << std::dec;
+			if (suffix)
+			{
+				os << "h";
+			}
+			return os.str();
 		}
 
 		std::string hex(ULONG64 value, bool suffix, bool swap)

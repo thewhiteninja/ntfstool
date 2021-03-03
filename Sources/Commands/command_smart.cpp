@@ -1,6 +1,7 @@
 
 #include "Utils/buffer.h"
 #include "Drive/disk.h"
+#include "Drive/smart.h"
 #include "Utils/table.h"
 #include "Utils/utils.h"
 #include "Utils/constant_names.h"
@@ -109,10 +110,9 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 
 						table->add_header_line("Index", utils::ui::TableAlign::RIGHT);
 						table->add_header_line("Name");
-						table->add_header_line("Raw Value", utils::ui::TableAlign::RIGHT);
-						table->add_header_line("Normalized Value", utils::ui::TableAlign::RIGHT);
-						table->add_header_line("Worst Value", utils::ui::TableAlign::RIGHT);
-						table->add_header_line("Threshold", utils::ui::TableAlign::RIGHT);
+						table->add_header_line("Flags");
+						table->add_header_line("Raw", utils::ui::TableAlign::RIGHT);
+						table->add_header_line("Value / Worst / Threshold", utils::ui::TableAlign::RIGHT);
 						table->add_header_line("Status", utils::ui::TableAlign::RIGHT);
 
 						unsigned int nb_attributes = attributeBuffer->data()->cBufferSize / 0xc;
@@ -120,20 +120,13 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 						PST_SMART_THRESHOLD currThreshold = &thresholdBuffer->data()->bBuffer[0];
 						for (unsigned int i = 0; i < nb_attributes; i++)
 						{
-							if (currAttribute->attributeIndex)
-
+							if (currAttribute->index)
 							{
-								if (currAttribute->attributeIndex == SMART_ATTRIB_TEMPERATURE ||
-									currAttribute->attributeIndex == SMART_ATTRIB_TEMPERATURE_DIFF)
-								{
-									currAttribute->rawValue = currAttribute->rawValue & 0xff;
-								}
-								table->add_item_line(std::to_string(currAttribute->attributeIndex));
-								table->add_item_line(constants::disk::smart::attribute_name(currAttribute->attributeIndex));
-								table->add_item_line(std::to_string(currAttribute->rawValue));
-								table->add_item_line(std::to_string(currAttribute->value));
-								table->add_item_line(std::to_string(currAttribute->worst));
-								table->add_item_line(std::to_string(currThreshold->threshold));
+								table->add_item_line(utils::strings::upper(utils::format::hex(currAttribute->index)) + "h");
+								table->add_item_line(constants::disk::smart::attribute_name(currAttribute->index));
+								table->add_item_line(utils::strings::upper(utils::format::hex(currAttribute->flags)) + "h");
+								table->add_item_line(utils::strings::upper(utils::format::hex6(currAttribute->rawValue6)) + "h");
+								table->add_item_line(std::to_string(currAttribute->value) + " / " + std::to_string(currAttribute->worst) + " / " + std::to_string(currThreshold->threshold));
 								table->add_item_line(currAttribute->value < currThreshold->threshold ? "Failure" : "Ok");
 								table->new_line();
 							}
