@@ -173,12 +173,12 @@ the help command displays some examples for each command.
     Partitions CRC32 : 0c9a0a25
 
     Partition table  : 2 entries
-    +----------------------------------------------------------------------------------------------------------------------------+
-    | Id | Name                         | GUID                                   | First sector | Last sector | Flags                |
-    +----------------------------------------------------------------------------------------------------------------------------+
-    | 1  | Microsoft reserved partition | {da0ac4a1-a78c-4053-bab5-36c70a71fe63} | 34           | 262177      | 0000000000000000     |
-    | 2  | Basic data partition         | {4b4ea4b3-64a1-4c6d-bd4b-1c2b0e4e706f} | 264192       | 3907028991  | 0000000000000000     |
-    +----------------------------------------------------------------------------------------------------------------------------+
+    +------------------------------------------------------------------------------------------------------------------------+
+    | Id | Name                         | GUID                                   | First sector | Last sector | Flags        |
+    +------------------------------------------------------------------------------------------------------------------------+
+    | 1  | Microsoft reserved partition | {da0ac4a1-a78c-4053-bab5-36c70a71fe63} | 34           | 262177      | 000000000000 |
+    | 2  | Basic data partition         | {4b4ea4b3-64a1-4c6d-bd4b-1c2b0e4e706f} | 264192       | 3907028991  | 000000000000 |
+    +------------------------------------------------------------------------------------------------------------------------+
 </td></tr>
 </table>
 
@@ -877,36 +877,36 @@ the help command displays some examples for each command.
     Type          : SATA/IDE Master on primary channel
     Capabilities  : ATA, ATAPI, S.M.A.R.T
 
-    +------------------------------------------------------------------------------------------------------------------+
-    | Index | Name                              | Raw Value      | Normalized Value | Worst Value | Threshold | Status |
-    +------------------------------------------------------------------------------------------------------------------+
-    |     1 | Read Error Rate                   |      128404424 |              117 |          99 |         6 |     Ok |
-    |     3 | Spin Up Time                      |              0 |               96 |          96 |         0 |     Ok |
-    |     4 | Start/Stop Count                  |           5693 |               95 |          95 |        20 |     Ok |
-    |     5 | Reallocated Sector Count          |              0 |              100 |         100 |        10 |     Ok |
-    |     7 | Seek Error Rate                   |   236413958548 |               65 |          59 |        30 |     Ok |
-    |     9 | Power-On Hours Count              |          35979 |               59 |          59 |         0 |     Ok |
-    |    10 | Spin Up Retry Count               |              0 |              100 |         100 |        97 |     Ok |
-    |    12 | Power Cycle Count                 |            237 |              100 |         100 |        20 |     Ok |
-    |   183 | Sata Down Shift Error Count       |              0 |              100 |         100 |         0 |     Ok |
-    |   184 | End-To-End Error                  |              0 |              100 |         100 |        99 |     Ok |
-    |   187 | Reported Uncorrectable Errors     |              0 |              100 |         100 |         0 |     Ok |
-    |   188 | Command Timeout                   |              0 |              100 |         100 |         0 |     Ok |
-    |   189 | High Fly Writes                   |            134 |                1 |           1 |         0 |     Ok |
-    |   190 | Temperature Difference From 100   |             31 |               69 |          58 |        45 |     Ok |
-    |   191 | G-Sense Error Rate                |              0 |              100 |         100 |         0 |     Ok |
-    |   192 | Power-Off Retract Count           |              0 |              100 |         100 |         0 |     Ok |
-    |   193 | Load/Unload Cycle Count           |         216681 |                1 |           1 |         0 |     Ok |
-    |   194 | Temperature                       |             31 |               31 |          42 |         0 |     Ok |
-    |   197 | Current Pending Sector Count      |              0 |              100 |         100 |         0 |     Ok |
-    |   198 | Off-Line Scan Uncorrectable Count |              0 |              100 |         100 |         0 |     Ok |
-    |   199 | Udma Crc Error Rate               |              0 |              200 |         200 |         0 |     Ok |
-    |   240 | Head Flying Hours                 | 34926674071383 |              100 |         253 |         0 |     Ok |
-    |   241 | Lifetime Writes From Host Gib     |   157072493748 |              100 |         253 |         0 |     Ok |
-    |   242 | Lifetime Reads From Host Gib      |  2261916999266 |              100 |         253 |         0 |     Ok |
-    |     2 | Throughput Performance            |              0 |                0 |           0 |         0 |     Ok |
-    |     4 | Start/Stop Count                  |              0 |                0 |           0 |         0 |     Ok |
-    +------------------------------------------------------------------------------------------------------------------+
+    +--------------------------------------------------------------------------------------------------------+
+    | Index | Name                              | Flags | Raw           | Value / Worst / Threshold | Status |
+    +--------------------------------------------------------------------------------------------------------+
+    |   01h | Read Error Rate                   | 000Fh | 0000085E3E08h |              117 / 99 / 6 |     Ok |
+    |   03h | Spin Up Time                      | 0003h | 000000000000h |               96 / 96 / 0 |     Ok |
+    |   04h | Start/Stop Count                  | 0032h | 00000000163Dh |              95 / 95 / 20 |     Ok |
+    |   05h | Reallocated Sector Count          | 0033h | 000000000000h |            100 / 100 / 10 |     Ok |
+    |   07h | Seek Error Rate                   | 000Fh | 00370B608808h |              65 / 59 / 30 |     Ok |
+    |   09h | Power-On Hours Count              | 0032h | 000000008C98h |               59 / 59 / 0 |     Ok |
+    |   0Ah | Spin Up Retry Count               | 0013h | 000000000000h |            100 / 100 / 97 |     Ok |
+    |   0Ch | Power Cycle Count                 | 0032h | 0000000000EDh |            100 / 100 / 20 |     Ok |
+    |   B7h | Sata Down Shift Error Count       | 0032h | 000000000000h |             100 / 100 / 0 |     Ok |
+    |   B8h | End-To-End Error                  | 0032h | 000000000000h |            100 / 100 / 99 |     Ok |
+    |   BBh | Reported Uncorrectable Errors     | 0032h | 000000000000h |             100 / 100 / 0 |     Ok |
+    |   BCh | Command Timeout                   | 0032h | 000000000000h |             100 / 100 / 0 |     Ok |
+    |   BDh | High Fly Writes                   | 003Ah | 000000000086h |                 1 / 1 / 0 |     Ok |
+    |   BEh | Temperature Difference From 100   | 0022h | 0000231B001Fh |              69 / 58 / 45 |     Ok |
+    |   BFh | G-Sense Error Rate                | 0032h | 000000000000h |             100 / 100 / 0 |     Ok |
+    |   C0h | Power-Off Retract Count           | 0032h | 000000000000h |             100 / 100 / 0 |     Ok |
+    |   C1h | Load/Unload Cycle Count           | 0032h | 000000034E6Ah |                 1 / 1 / 0 |     Ok |
+    |   C2h | Temperature                       | 0022h | 00110000001Fh |               31 / 42 / 0 |     Ok |
+    |   C5h | Current Pending Sector Count      | 0012h | 000000000000h |             100 / 100 / 0 |     Ok |
+    |   C6h | Off-Line Scan Uncorrectable Count | 0010h | 000000000000h |             100 / 100 / 0 |     Ok |
+    |   C7h | Udma Crc Error Rate               | 003Eh | 000000000000h |             200 / 200 / 0 |     Ok |
+    |   F0h | Head Flying Hours                 | 0000h | DD9B00004F63h |             100 / 253 / 0 |     Ok |
+    |   F1h | Lifetime Writes From Host Gib     | 0000h | 00249354A654h |             100 / 253 / 0 |     Ok |
+    |   F2h | Lifetime Reads From Host Gib      | 0000h | 020EA4DAFEEEh |             100 / 253 / 0 |     Ok |
+    |   02h | Throughput Performance            | 0000h | 000000000000h |                 0 / 0 / 0 |     Ok |
+    |   04h | Start/Stop Count                  | 0404h | 000000000000h |                 0 / 0 / 0 |     Ok |
+    +--------------------------------------------------------------------------------------------------------+
     
 </td></tr>
 </table>
