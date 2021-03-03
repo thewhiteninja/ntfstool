@@ -290,7 +290,7 @@ void Disk::_get_volumes(HANDLE h) {
 		if (has_protective_mbr())
 		{
 			auto entries = gpt_entries();
-			for (auto entry : entries)
+			for (auto& entry : entries)
 			{
 				PARTITION_INFORMATION_EX pex;
 				pex.PartitionStyle = PARTITION_STYLE_GPT;

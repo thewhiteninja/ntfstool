@@ -218,7 +218,7 @@ void utils::ui::Table::render(std::ostream& out)
 				out.width(column_size[i]);
 				if (lines_i < line[i].size())
 				{
-					int fix = (line[i][lines_i].length() - utils::strings::utf8_string_size(line[i][lines_i]));
+					size_t fix = (line[i][lines_i].length() - utils::strings::utf8_string_size(line[i][lines_i]));
 					out.width(column_size[i] + fix);
 
 					if (column_align[i] == TableAlign::LEFT) out << std::left << line[i][lines_i];
