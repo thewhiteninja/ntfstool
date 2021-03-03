@@ -99,15 +99,10 @@ enum class SmartAttributeID
 
 #define DRIVE_HEAD_REG				0xA0
 
-#pragma pack(push, 1)
+#define SMART_CYL_LOW_BAD			0xF4
+#define SMART_CYL_HI_BAD			0x2C
 
-typedef struct
-{
-	BYTE  bDriverError;
-	BYTE  bIDEStatus;
-	BYTE  bReserved[2];
-	DWORD dwReserved[2];
-} ST_DRIVERSTAT;
+#pragma pack(push, 1)
 
 typedef struct
 {
@@ -133,17 +128,24 @@ typedef struct
 typedef struct
 {
 	DWORD				cBufferSize;
-	ST_DRIVERSTAT		DriverStatus;
+	DRIVERSTATUS		DriverStatus;
 	BYTE				reserved[2];
-	ST_SMART_ATTRIBUTE	bBuffer[1];
+	ST_SMART_ATTRIBUTE	Attributes[1];
 } ST_ATAOUTPARAM_ATTRIBUTES, * PST_ATAOUTPARAM_ATTRIBUTES;
 
 typedef struct
 {
 	DWORD				cBufferSize;
-	ST_DRIVERSTAT		DriverStatus;
+	DRIVERSTATUS		DriverStatus;
+	IDEREGS				Status;
+} ST_ATAOUTPARAM_STATUS, * PST_ATAOUTPARAM_STATUS;
+
+typedef struct
+{
+	DWORD				cBufferSize;
+	DRIVERSTATUS		DriverStatus;
 	BYTE				reserved[2];
-	ST_SMART_THRESHOLD	bBuffer[1];
+	ST_SMART_THRESHOLD	Threshold[1];
 } ST_ATAOUTPARAM_THRESHOLDS, * PST_ATAOUTPARAM_THRESHOLDS;
 
 typedef struct
