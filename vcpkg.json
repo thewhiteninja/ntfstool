@@ -1,0 +1,24 @@
+{
+  "name": "ntfstool",
+  "version-string": "1.2",
+  "description": "NTFSTool is a forensic tool for hard disks and NTFS volumes.",
+  "homepage": "https://github.com/thewhiteninja/ntfstool",
+  "dependencies": [
+    {
+      "name": "nlohmann-json",
+      "platform": "windows"
+    },
+    {
+      "name": "cppcoro",
+      "platform": "windows"
+    },
+    {
+      "name": "openssl",
+      "platform": "windows"
+    },
+    {
+      "name": "distorm",
+      "platform": "windows"
+    }
+  ]
+}

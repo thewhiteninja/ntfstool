@@ -42,3 +42,4 @@ Docs\sources_private
 /.vs
 /NTFS.vcxproj.user
 /Docs/sources_private
+/vcpkg_installed
