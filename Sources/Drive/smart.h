@@ -102,51 +102,10 @@ enum class SmartAttributeID
 #define SMART_CYL_LOW_BAD			0xF4
 #define SMART_CYL_HI_BAD			0x2C
 
+#define READ_STATUS_BUFFER_SIZE		512
+#define READ_IDENTITY_BUFFER_SIZE	512
+
 #pragma pack(push, 1)
-
-typedef struct
-{
-	BYTE index;
-	WORD flags;
-	BYTE value;
-	BYTE worst;
-	union
-	{
-		DWORD64 rawValue : 32;
-		DWORD64 rawValue6 : 48;
-	};
-
-} ST_SMART_ATTRIBUTE, * PST_SMART_ATTRIBUTE;
-
-typedef struct
-{
-	BYTE attributeIndex;
-	BYTE threshold;
-	BYTE unused[10];
-} ST_SMART_THRESHOLD, * PST_SMART_THRESHOLD;
-
-typedef struct
-{
-	DWORD				cBufferSize;
-	DRIVERSTATUS		DriverStatus;
-	BYTE				reserved[2];
-	ST_SMART_ATTRIBUTE	Attributes[1];
-} ST_ATAOUTPARAM_ATTRIBUTES, * PST_ATAOUTPARAM_ATTRIBUTES;
-
-typedef struct
-{
-	DWORD				cBufferSize;
-	DRIVERSTATUS		DriverStatus;
-	IDEREGS				Status;
-} ST_ATAOUTPARAM_STATUS, * PST_ATAOUTPARAM_STATUS;
-
-typedef struct
-{
-	DWORD				cBufferSize;
-	DRIVERSTATUS		DriverStatus;
-	BYTE				reserved[2];
-	ST_SMART_THRESHOLD	Threshold[1];
-} ST_ATAOUTPARAM_THRESHOLDS, * PST_ATAOUTPARAM_THRESHOLDS;
 
 typedef struct
 {
@@ -163,7 +122,7 @@ typedef struct
 	WORD wBufferSize;
 	WORD wECCSize;
 	BYTE sFirmwareRev[8];
-	BYTE sModelNumber[39];
+	BYTE sModelNumber[40];
 	WORD wMoreVendorUnique;
 	WORD wDoubleWordIO;
 	WORD wCapabilities;
@@ -174,12 +133,67 @@ typedef struct
 	WORD wNumCurrentCyls;
 	WORD wNumCurrentHeads;
 	WORD wNumCurrentSectorsPerTrack;
-	WORD ulCurrentSectorCapacity;
+	DWORD ulCurrentSectorCapacity;
 	WORD wMultSectorStuff;
 	DWORD ulTotalAddressableSectors;
 	WORD wSingleWordDMA;
 	WORD wMultiWordDMA;
-	BYTE bReserved[127];
-} ST_IDSECTOR;
+	WORD wAdvPOIModes;
+	WORD wMinMultiWordDMACycle;
+	WORD wRecMultiWordDMACycle;
+	WORD wMinPIONoFlowCycle;
+	WORD wMinPOIFlowCycle;
+} SMART_IDENTITY, * PSMART_IDENTITY;
+
+typedef struct
+{
+	BYTE index;
+	WORD flags;
+	BYTE value;
+	BYTE worst;
+	union
+	{
+		DWORD64 rawValue : 32;
+		DWORD64 rawValue48 : 48;
+	};
+
+} SMART_ATTRIBUTE, * PSMART_ATTRIBUTE;
+
+typedef struct
+{
+	BYTE attributeIndex;
+	BYTE threshold;
+	BYTE unused[10];
+} SMART_THRESHOLD, * PSMART_THRESHOLD;
+
+typedef struct
+{
+	DWORD				cBufferSize;
+	DRIVERSTATUS		DriverStatus;
+	BYTE				reserved[2];
+	SMART_ATTRIBUTE		Attributes[1];
+} SMART_OUTPUT_ATTRIBUTES, * PSMART_OUTPUT_ATTRIBUTES;
+
+typedef struct
+{
+	DWORD				cBufferSize;
+	DRIVERSTATUS		DriverStatus;
+	BYTE				reserved[2];
+	SMART_THRESHOLD		Threshold[1];
+} SMART_OUTPUT_THRESHOLDS, * PSMART_OUTPUT_THRESHOLDS;
+
+typedef struct
+{
+	DWORD				cBufferSize;
+	DRIVERSTATUS		DriverStatus;
+	IDEREGS				Status;
+} SMART_OUTPUT_STATUS, * PSMART_OUTPUT_STATUS;
+
+typedef struct
+{
+	DWORD				cBufferSize;
+	DRIVERSTATUS		DriverStatus;
+	SMART_IDENTITY		Identity;
+} SMART_OUTPUT_IDENTITY, * PSMART_OUTPUT_IDENTITY;
 
 #pragma pack(pop)
