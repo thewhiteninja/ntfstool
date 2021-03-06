@@ -197,7 +197,7 @@ void utils::ui::Table::render(std::ostream& out)
 			out << std::endl;
 		}
 
-		for (i = 0; i < margin_left; i++) out << " ";
+		//for (i = 0; i < margin_left; i++) out << " ";
 
 		// Max cell height for the line
 		size_t cell_height = 0;
@@ -208,7 +208,7 @@ void utils::ui::Table::render(std::ostream& out)
 		// Print cells
 		for (unsigned int lines_i = 0; lines_i < cell_height; lines_i++)
 		{
-			//for (i = 0; i < margin_left; i++) out << "_";
+			for (i = 0; i < margin_left; i++) out << " ";
 			if (border_left)
 			{
 				out << "| ";
