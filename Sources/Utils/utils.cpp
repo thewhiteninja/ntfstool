@@ -1,5 +1,7 @@
 #include "Utils.h"
 
+#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
+
 #include <map>
 #include <iomanip>
 #include <iostream>
@@ -148,8 +150,8 @@ namespace utils
 		}
 
 		DWORD utf8_string_size(const std::string& str) {
-			int c, i, q;
-			size_t ix;
+			int c, q;
+			size_t i, ix;
 			for (q = 0, i = 0, ix = str.length(); i < ix; i++, q++)
 			{
 				c = (unsigned char)str[i];

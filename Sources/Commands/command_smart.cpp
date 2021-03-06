@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 #include <memory>
 #include <stdexcept> 
@@ -118,7 +119,7 @@ std::string read_string(PVOID buffer, DWORD len)
 		os << char_buffer[i - 1] << char_buffer[i];
 	}
 
-	auto ret = utils::strings::reverse(os.str());
+	std::string ret = utils::strings::reverse(os.str());
 
 	ret.erase(ret.begin(), std::find_if(ret.begin(), ret.end(), [](int ch) {
 		return !std::isspace(ch & 0xff) && (ch != 0);
@@ -139,7 +140,7 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 		bool ret = DeviceIoControl(hDisk, SMART_GET_VERSION, NULL, 0, &versionInfo, sizeof(GETVERSIONINPARAMS), &dwRet, NULL);
 		if (ret)
 		{
-			std::cout << "    S.M.A.R.T Version: " << std::to_string(versionInfo.bVersion) << " revision " << std::to_string(versionInfo.bRevision) << std::endl;
+			std::cout << "    Version          : " << std::to_string(versionInfo.bVersion) << " revision " << std::to_string(versionInfo.bRevision) << std::endl;
 			std::cout << "    Type             : " << constants::disk::smart::devicemap_type(versionInfo.bIDEDeviceMap) << std::endl;
 			std::cout << "    Capabilities     : " << constants::disk::smart::capabilities(versionInfo.fCapabilities) << std::endl;
 			std::cout << std::endl;
@@ -194,7 +195,7 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wBytesPerSector));
 						table->new_line();
 						table->add_item_line("Sectors Per Track");
-						table->add_item_line(std::to_string(idBuffer->data()->Identity.wSectorsPerTrack));
+						table->add_item_line(std::to_string(idBuffer->data()->Identity.wNumSectorsPerTrack));
 						table->new_line();
 						table->add_item_line("Vendor Unique");
 						table->add_item_line(read_string(idBuffer->data()->Identity.wVendorUnique, 6));
@@ -224,7 +225,19 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wDoubleWordIO));
 						table->new_line();
 						table->add_item_line("Capabilities");
-						table->add_item_line(std::to_string(idBuffer->data()->Identity.wCapabilities));
+						table->add_item_multiline(
+							{
+								std::string("Reserved                 : ") + utils::format::hex(idBuffer->data()->Identity.wCapabilities.Reserved, true),
+								std::string("DMA Support              : ") + (idBuffer->data()->Identity.wCapabilities.DMA ? "True" : "False"),
+								std::string("LBA Support              : ") + (idBuffer->data()->Identity.wCapabilities.LBA ? "True" : "False"),
+								std::string("DisIORDY                 : ") + (idBuffer->data()->Identity.wCapabilities.DisIORDY ? "True" : "False"),
+								std::string("IORDY                    : ") + (idBuffer->data()->Identity.wCapabilities.IORDY ? "True" : "False"),
+								std::string("Requires ATA soft start  : ") + (idBuffer->data()->Identity.wCapabilities.SoftReset ? "True" : "False"),
+								std::string("Overlap Operation support: ") + (idBuffer->data()->Identity.wCapabilities.Overlap ? "True" : "False"),
+								std::string("Command Queue Support    : ") + (idBuffer->data()->Identity.wCapabilities.Queue ? "True" : "False"),
+								std::string("Interleaved DMA Support  : ") + (idBuffer->data()->Identity.wCapabilities.InlDMA ? "True" : "False")
+							}
+						);
 						table->new_line();
 						table->add_item_line("Reserved1");
 						table->add_item_line(utils::format::hex(idBuffer->data()->Identity.wReserved1, true));
@@ -235,23 +248,20 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 						table->add_item_line("DMA Timing");
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wDMATiming));
 						table->new_line();
-						table->add_item_line("BS");
-						table->add_item_line(std::to_string(idBuffer->data()->Identity.wBS));
-						table->new_line();
 						table->add_item_line("Current numbers of cylinders");
-						table->add_item_line(std::to_string(idBuffer->data()->Identity.wNumCurrentCyls));
+						table->add_item_line(std::to_string(idBuffer->data()->Identity.wNumCurCyls));
 						table->new_line();
 						table->add_item_line("Current numbers of heads");
-						table->add_item_line(std::to_string(idBuffer->data()->Identity.wNumCurrentHeads));
+						table->add_item_line(std::to_string(idBuffer->data()->Identity.wNumCurHeads));
 						table->new_line();
 						table->add_item_line("Current numbers of sectors per track");
-						table->add_item_line(std::to_string(idBuffer->data()->Identity.wNumCurrentSectorsPerTrack));
+						table->add_item_line(std::to_string(idBuffer->data()->Identity.wNumCurSectorsPerTrack));
 						table->new_line();
 						table->add_item_line("Multiple Sector Setting");
-						table->add_item_line(std::to_string(idBuffer->data()->Identity.wMultSectorStuff));
+						table->add_item_line(std::to_string(idBuffer->data()->Identity.wCurSectors));
 						table->new_line();
 						table->add_item_line("Total Number of Sectors Addressable (LBA)");
-						table->add_item_line(std::to_string(idBuffer->data()->Identity.ulTotalAddressableSectors));
+						table->add_item_line(std::to_string(idBuffer->data()->Identity.dwTotalSectors));
 						table->new_line();
 						table->add_item_line("Singleword DMA Transfer");
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wSingleWordDMA));
@@ -260,10 +270,7 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wMultiWordDMA));
 						table->new_line();
 						table->add_item_line("Advanced PIO Modes");
-						table->add_item_line(utils::format::hex(idBuffer->data()->Identity.wMultiWordDMA, true));
-						table->new_line();
-						table->add_item_line("Multiword DMA Transfer");
-						table->add_item_line(std::to_string(idBuffer->data()->Identity.wMultiWordDMA));
+						table->add_item_line(utils::format::hex(idBuffer->data()->Identity.wPIOCapacity.AdvPOIModes, true));
 						table->new_line();
 						table->add_item_line("Minimum Multiword DMA Transfer Cycle Time per Word");
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wMinMultiWordDMACycle));
