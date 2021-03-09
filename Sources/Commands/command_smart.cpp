@@ -143,7 +143,6 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 			std::cout << "    Version          : " << std::to_string(versionInfo.bVersion) << " revision " << std::to_string(versionInfo.bRevision) << std::endl;
 			std::cout << "    Type             : " << constants::disk::smart::devicemap_type(versionInfo.bIDEDeviceMap) << std::endl;
 			std::cout << "    Capabilities     : " << constants::disk::smart::capabilities(versionInfo.fCapabilities) << std::endl;
-			std::cout << std::endl;
 
 			if ((versionInfo.fCapabilities & CAP_SMART_CMD) == CAP_SMART_CMD)
 			{
@@ -154,7 +153,7 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 
 					if (smart_read_status(hDisk, static_cast<BYTE>(disk->index()), statusBuffer))
 					{
-						std::cout << "    Status          : " <<
+						std::cout << "    Status           : " <<
 							((statusBuffer->data()->Status.bCylLowReg == SMART_CYL_LOW_BAD && statusBuffer->data()->Status.bCylHighReg == SMART_CYL_HI_BAD) ?
 								"Threshold Exceeded Condition!" :
 								"Passed") <<
@@ -169,7 +168,7 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 
 					if (smart_read_identity(hDisk, static_cast<BYTE>(disk->index()), idBuffer))
 					{
-						std::cout << "    -- Device ID" << std::endl << std::endl;
+						std::cout << "    -- Device ID" << std::endl;
 						std::shared_ptr<utils::ui::Table> table = std::make_shared<utils::ui::Table>();
 						table->set_margin_left(4);
 
@@ -248,6 +247,15 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 						table->add_item_line("DMA Timing");
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wDMATiming));
 						table->new_line();
+						table->add_item_line("Field Validity");
+						table->add_item_multiline(
+							{
+								std::string("CHS Number               : ") + (idBuffer->data()->Identity.wFieldValidity.CHSNumber ? "True" : "False"),
+								std::string("Cycle Number             : ") + (idBuffer->data()->Identity.wFieldValidity.CycleNumber ? "True" : "False"),
+								std::string("Ultra DMA                : ") + (idBuffer->data()->Identity.wFieldValidity.UltraDMA ? "True" : "False")
+							}
+						);
+						table->new_line();
 						table->add_item_line("Current numbers of cylinders");
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wNumCurCyls));
 						table->new_line();
@@ -263,11 +271,15 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 						table->add_item_line("Total Number of Sectors Addressable (LBA)");
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.dwTotalSectors));
 						table->new_line();
-						table->add_item_line("Singleword DMA Transfer");
+						table->add_item_line("Singleword DMA Transfer Support");
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wSingleWordDMA));
 						table->new_line();
-						table->add_item_line("Multiword DMA Transfer");
-						table->add_item_line(std::to_string(idBuffer->data()->Identity.wMultiWordDMA));
+						table->add_item_line("Multiword DMA Transfer Support");
+						std::vector<std::string> multiword_dma_modes;
+						if (idBuffer->data()->Identity.wMultiWordDMA.Mode0) multiword_dma_modes.push_back(std::string("Mode 0 (4.17Mb/s)") + (idBuffer->data()->Identity.wMultiWordDMA.Mode0Sel ? " (selected)" : ""));
+						if (idBuffer->data()->Identity.wMultiWordDMA.Mode1) multiword_dma_modes.push_back(std::string("Mode 1 (13.3Mb/s)") + (idBuffer->data()->Identity.wMultiWordDMA.Mode1Sel ? " (selected)" : ""));
+						if (idBuffer->data()->Identity.wMultiWordDMA.Mode2) multiword_dma_modes.push_back(std::string("Mode 2 (16.7Mb/s)") + (idBuffer->data()->Identity.wMultiWordDMA.Mode2Sel ? " (selected)" : ""));
+						table->add_item_multiline(multiword_dma_modes);
 						table->new_line();
 						table->add_item_line("Advanced PIO Modes");
 						table->add_item_line(utils::format::hex(idBuffer->data()->Identity.wPIOCapacity.AdvPOIModes, true));
@@ -278,11 +290,41 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 						table->add_item_line("Recommended Multiword DMA Transfer Cycle Time per Word");
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wRecMultiWordDMACycle));
 						table->new_line();
-						table->add_item_line("Minimum PIO Transfer Cycle Time");
+						table->add_item_line("Minimum PIO Transfer Cycle Time (No Flow Control)");
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wMinPIONoFlowCycle));
 						table->new_line();
-						table->add_item_line("Recommended PIO Transfer Cycle Time");
+						table->add_item_line("Minimum PIO Transfer Cycle Time (Flow Control)");
 						table->add_item_line(std::to_string(idBuffer->data()->Identity.wMinPOIFlowCycle));
+						table->new_line();
+						table->add_item_line("ATA Support");
+						std::vector<std::string> ata_support;
+						if (idBuffer->data()->Identity.wMajorVersion.ATA1) ata_support.push_back(std::string("ATA-1"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA2) ata_support.push_back(std::string("ATA-2"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA3) ata_support.push_back(std::string("ATA-3"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA4) ata_support.push_back(std::string("ATA-4"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA5) ata_support.push_back(std::string("ATA/ATAPI-5"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA6) ata_support.push_back(std::string("ATA/ATAPI-6"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA7) ata_support.push_back(std::string("ATA/ATAPI-7"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA8) ata_support.push_back(std::string("ATA/ATAPI-8"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA9) ata_support.push_back(std::string("ATA/ATAPI-9"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA10) ata_support.push_back(std::string("ATA/ATAPI-10"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA11) ata_support.push_back(std::string("ATA/ATAPI-11"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA12) ata_support.push_back(std::string("ATA/ATAPI-12"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA13) ata_support.push_back(std::string("ATA/ATAPI-13"));
+						if (idBuffer->data()->Identity.wMajorVersion.ATA14) ata_support.push_back(std::string("ATA/ATAPI-14"));
+						table->add_item_multiline(ata_support);
+						table->new_line();
+						table->add_item_line("Ultra DMA Transfer Support");
+						std::vector<std::string> ultra_dma_modes;
+						if (idBuffer->data()->Identity.wUltraDMA.Mode0) ultra_dma_modes.push_back(std::string("Mode 0 (16.7MB/s)") + (idBuffer->data()->Identity.wUltraDMA.Mode0Sel ? " (selected)" : ""));
+						if (idBuffer->data()->Identity.wUltraDMA.Mode1) ultra_dma_modes.push_back(std::string("Mode 1 (25.0MB/s)") + (idBuffer->data()->Identity.wUltraDMA.Mode1Sel ? " (selected)" : ""));
+						if (idBuffer->data()->Identity.wUltraDMA.Mode2) ultra_dma_modes.push_back(std::string("Mode 2 (33.3MB/s)") + (idBuffer->data()->Identity.wUltraDMA.Mode2Sel ? " (selected)" : ""));
+						if (idBuffer->data()->Identity.wUltraDMA.Mode3) ultra_dma_modes.push_back(std::string("Mode 3 (44.4MB/s)") + (idBuffer->data()->Identity.wUltraDMA.Mode3Sel ? " (selected)" : ""));
+						if (idBuffer->data()->Identity.wUltraDMA.Mode4) ultra_dma_modes.push_back(std::string("Mode 4 (66.7MB/s)") + (idBuffer->data()->Identity.wUltraDMA.Mode4Sel ? " (selected)" : ""));
+						if (idBuffer->data()->Identity.wUltraDMA.Mode5) ultra_dma_modes.push_back(std::string("Mode 5 (100.0MB/s)") + (idBuffer->data()->Identity.wUltraDMA.Mode5Sel ? " (selected)" : ""));
+						if (idBuffer->data()->Identity.wUltraDMA.Mode6) ultra_dma_modes.push_back(std::string("Mode 6 (133.0MB/s)") + (idBuffer->data()->Identity.wUltraDMA.Mode6Sel ? " (selected)" : ""));
+						if (idBuffer->data()->Identity.wUltraDMA.Mode7) ultra_dma_modes.push_back(std::string("Mode 7 (167.0MB/s)") + (idBuffer->data()->Identity.wUltraDMA.Mode7Sel ? " (selected)" : ""));
+						table->add_item_multiline(ultra_dma_modes);
 						table->new_line();
 
 						table->render(std::cout);
@@ -299,7 +341,7 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 					if (smart_read_attributes(hDisk, static_cast<BYTE>(disk->index()), attributeBuffer) &&
 						smart_read_thresholds(hDisk, static_cast<BYTE>(disk->index()), thresholdBuffer))
 					{
-						std::cout << "    -- Attributes" << std::endl << std::endl;
+						std::cout << "    -- Attributes" << std::endl;
 
 						std::shared_ptr<utils::ui::Table> table = std::make_shared<utils::ui::Table>();
 						table->set_margin_left(4);
