@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <memory>
 
-#define VERSION "1.2"
+#define VERSION "1.3"
 
 void usage(char* binname)
 {
