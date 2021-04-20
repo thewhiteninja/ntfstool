@@ -1,4 +1,3 @@
-
 #include "Utils/buffer.h"
 #include "Drive/disk.h"
 #include "Utils/table.h"
@@ -15,8 +14,7 @@
 #include <iostream>
 #include <iomanip>
 #include <memory>
-#include <stdexcept> 
-
+#include <stdexcept>
 
 void print_mbr(std::shared_ptr<Disk> disk)
 {
@@ -124,9 +122,7 @@ void print_mbr(std::shared_ptr<Disk> disk)
 }
 
 namespace commands {
-
 	namespace mbr {
-
 		int print_mbr(std::shared_ptr<Options> opts) {
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 

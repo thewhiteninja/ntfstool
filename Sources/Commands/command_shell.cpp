@@ -290,7 +290,6 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 							std::shared_ptr<MFTRecord> filetocat_record = explorer->mft()->record_from_number(entry->record_number());
 							if (!(filetocat_record->header()->flag & MFT_RECORD_IS_DIRECTORY))
 							{
-
 								found = true;
 								if (filetocat_record->datasize(from_file.second) <= 1 * 1024 * 1024)
 								{
@@ -362,9 +361,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 }
 
 namespace commands {
-
 	namespace shell {
-
 		int go(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
@@ -381,7 +378,5 @@ namespace commands {
 			std::cout.flags(flag_backup);
 			return 0;
 		}
-
 	}
-
 }

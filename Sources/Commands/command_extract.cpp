@@ -1,4 +1,3 @@
-
 #include "Drive/disk.h"
 #include "Utils/utils.h"
 #include "options.h"
@@ -16,7 +15,6 @@
 #include <sstream>
 #include <iomanip>
 #include <memory>
-
 
 int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
@@ -67,9 +65,7 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 }
 
 namespace commands {
-
 	namespace extract {
-
 		int extract_file(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
@@ -108,5 +104,4 @@ namespace commands {
 			return 0;
 		}
 	}
-
 }

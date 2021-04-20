@@ -8,7 +8,6 @@
 #include <memory>
 
 namespace commands {
-
 	namespace info
 	{
 		int print_disks(std::shared_ptr<Options> opts);

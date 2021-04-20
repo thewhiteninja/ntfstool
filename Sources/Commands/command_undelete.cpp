@@ -16,7 +16,6 @@
 #include "Utils/constant_names.h"
 #include "Utils/table.h"
 
-
 bool valid_record(PMFT_RECORD_HEADER ph)
 {
 	return (
@@ -48,7 +47,6 @@ std::string get_full_path(DWORD index, std::map<DWORD, std::string>& index_to_na
 				break;
 			}
 		}
-
 	}
 	return cur_path;
 }
@@ -93,11 +91,9 @@ bool check_dataruns_still_valid(ULONG64 datasize, ULONG64 clustersize, const std
 	}
 
 	return (datasize >= size_from_dataruns - clustersize) && (datasize <= size_from_dataruns);
-
 }
 
 int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts) {
-
 	if (vol->filesystem() != "NTFS" && vol->filesystem() != "Bitlocker")
 	{
 		std::cerr << "[!] NTFS/Bitlocker volume required" << std::endl;
@@ -327,4 +323,3 @@ namespace commands
 		}
 	}
 }
-

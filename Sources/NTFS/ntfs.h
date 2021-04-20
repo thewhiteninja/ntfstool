@@ -176,7 +176,6 @@ typedef struct {
 	snapshot snapshots[1];
 } VSS_CATALOG_HEADER, * PVSS_CATALOG_HEADER;
 
-
 typedef struct {
 	GUID vssid;
 	DWORD version;
@@ -443,7 +442,6 @@ typedef struct {
 	} DUMMYUNIONNAME;
 } MFT_RECORD_ATTRIBUTE_REPARSE_POINT, * PMFT_RECORD_ATTRIBUTE_REPARSE_POINT;
 
-
 typedef struct
 {
 	BYTE		Revision;
@@ -577,6 +575,5 @@ typedef struct
 	BYTE        bootCode[0x1aa];
 	BYTE		endMarker[2];
 } BOOT_SECTOR_NTFS, * PBOOT_SECTOR_NTFS;
-
 
 #pragma pack(pop)

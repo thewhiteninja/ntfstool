@@ -6,7 +6,6 @@
 
 #include <iostream>
 
-
 std::shared_ptr<Disk> try_add_disk(int i)
 {
 	wchar_t diskname[MAX_PATH];
@@ -102,7 +101,6 @@ void Disk::_get_mbr(HANDLE h)
 		_protective_mbr = (n_partitions == 1) && (_mbr.partition[0].partition_type == PARTITION_EDI_HEADER);
 		if (_protective_mbr) _partition_type = PARTITION_STYLE_GPT;
 
-
 		for (int i = 0; i < 4; i++) {
 			if ((_mbr.partition[i].partition_type == PARTITION_EXTENDED) || (_mbr.partition[i].partition_type == PARTITION_XINT13_EXTENDED))
 			{
@@ -150,7 +148,6 @@ void Disk::_get_mbr(HANDLE h)
 }
 
 void Disk::_get_gpt(HANDLE h) {
-
 	DWORD ior = 0;
 	LARGE_INTEGER pos;
 	LARGE_INTEGER result;
@@ -341,7 +338,6 @@ void Disk::_get_volumes(HANDLE h) {
 	}
 }
 
-
 Disk::Disk(HANDLE h, int index)
 {
 	_index = index;
@@ -396,4 +392,3 @@ HANDLE Disk::open()
 
 	return CreateFileW(diskname, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 }
-

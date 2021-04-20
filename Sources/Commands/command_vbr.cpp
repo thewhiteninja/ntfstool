@@ -1,4 +1,3 @@
-
 #include <algorithm>
 #include <cstdint>
 #include <string>
@@ -301,7 +300,6 @@ void print_bootsector_bitlocker(PBOOT_SECTOR_BITLOCKER pbs)
 }
 
 void print_bootsector(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
-
 	std::cout << std::setfill('0');
 	utils::ui::title("VBR from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
@@ -317,9 +315,7 @@ void print_bootsector(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
 }
 
 namespace commands {
-
 	namespace vbr {
-
 		int print_vbr(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
@@ -337,7 +333,5 @@ namespace commands {
 			std::cout.flags(flag_backup);
 			return 0;
 		}
-
 	}
-
 }

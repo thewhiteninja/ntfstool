@@ -4,7 +4,6 @@
 
 #include <iostream>
 
-
 IndexEntry::IndexEntry(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY e, std::string type)
 {
 	_type = type;

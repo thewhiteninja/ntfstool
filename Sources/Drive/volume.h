@@ -66,7 +66,6 @@ public:
 	PBYTE bootsector()						const { return _bootsector.data(); }
 };
 
-
 namespace core
 {
 	namespace win

@@ -1,4 +1,3 @@
-
 #include "Drive/disk.h"
 #include "Utils/utils.h"
 #include "options.h"
@@ -184,7 +183,6 @@ void print_help_bitdecrypt(char* name)
 	std::cerr << std::endl;
 }
 
-
 void print_help_fve(char* name)
 {
 	std::cerr << "FVE command" << std::endl;
@@ -223,7 +221,6 @@ void print_help_logfile(char* name)
 	std::cerr << "    " << name << " logfile disk=2 volume=4 output=log.csv format=csv" << std::endl;
 	std::cerr << std::endl;
 }
-
 
 void print_help_usn(char* name)
 {
@@ -264,7 +261,6 @@ void print_help_extract(char* name)
 	std::cerr << "    " << name << " extract disk=0 volume=1 --system output = \"d:\\system\"" << std::endl;
 	std::cerr << std::endl;
 }
-
 
 void print_help_undelete(char* name)
 {
@@ -362,9 +358,7 @@ void print_help_smart(char* name)
 }
 
 namespace commands {
-
 	namespace help {
-
 		void print_help(char* name, std::shared_ptr<Options> opts) {
 			if (opts->subcommand == "")
 			{
@@ -393,7 +387,5 @@ namespace commands {
 				usage(name);
 			}
 		}
-
 	}
-
 }

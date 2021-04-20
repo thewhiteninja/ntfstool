@@ -1,4 +1,3 @@
-
 #include "reader.h"
 
 Reader::Reader(std::wstring volume_name, DWORD64 volume_offset)
@@ -27,7 +26,6 @@ Reader::Reader(std::wstring volume_name, DWORD64 volume_offset)
 		}
 	}
 }
-
 
 Reader::Reader(const Reader& reader_copy)
 {

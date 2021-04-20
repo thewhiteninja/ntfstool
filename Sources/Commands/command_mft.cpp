@@ -12,7 +12,6 @@
 #include "Drive/disk.h"
 #include "Drive/volume.h"
 
-
 std::vector<std::string> print_attribute_standard(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION pAttribute)
 {
 	std::vector<std::string> ret;
@@ -547,7 +546,6 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 				len = pAttribute->Form.Nonresident.ValidDataLength & 0xffffffff;
 				attr_buf = record->attribute_data<PBYTE>(pAttribute);
 				pattr = (PMFT_RECORD_ATTRIBUTE)attr_buf->data();
-
 			};
 			fr_attributes->add_item_multiline(print_attribute_list(pattr, len));
 			break;

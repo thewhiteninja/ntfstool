@@ -8,9 +8,7 @@
 #include <iostream>
 #include <filesystem>
 
-
 int main(int argc, char** argv) {
-
 	install_crash_handler();
 
 	SetConsoleOutputCP(CP_UTF8);
@@ -27,7 +25,6 @@ int main(int argc, char** argv) {
 	if (opts->show_usage) commands::help::print_help(argv[0], opts);
 	else {
 		try {
-
 			if (opts->command == "mbr")				commands::mbr::print_mbr(opts);
 			else if (opts->command == "shell")		commands::shell::go(opts);
 			else if (opts->command == "smart")		commands::smart::print_smart(opts);

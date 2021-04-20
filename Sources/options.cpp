@@ -1,9 +1,7 @@
-
 #include "options.h"
 #include <iostream>
 #include <algorithm>
 #include <cstring>
-
 
 bool is_option(char* arg, const char* name) { return (strncmp(arg, name, strlen(name)) == 0) && (arg[strlen(name)] == '='); }
 
@@ -35,7 +33,6 @@ void read_option_string(char* arg, std::string& s)
 }
 
 std::shared_ptr<Options> parse_options(int argc, char** argv) {
-
 	std::shared_ptr<Options> ret = std::make_shared<Options>();
 
 	if (argc > 1)
@@ -66,7 +63,6 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 	return ret;
 }
 
-
 std::shared_ptr<Disk> get_disk(std::shared_ptr<Options> opts)
 {
 	std::shared_ptr<Disk> disk = nullptr;
@@ -88,7 +84,6 @@ std::shared_ptr<Disk> get_disk(std::shared_ptr<Options> opts)
 	}
 	return disk;
 }
-
 
 Options::Options()
 {

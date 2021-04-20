@@ -5,9 +5,7 @@
 
 namespace utils
 {
-
 	namespace ui {
-
 		enum class TableAlign
 		{
 			LEFT,
@@ -65,6 +63,5 @@ namespace utils
 
 			void render(std::ostream& out);
 		};
-
 	}
 }
