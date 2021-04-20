@@ -1,4 +1,3 @@
-
 #include "Drive/disk.h"
 #include "Utils/utils.h"
 #include "options.h"
@@ -17,7 +16,6 @@
 #include <iomanip>
 #include <memory>
 #include <iterator>
-
 
 void fixup_sequence(PRECORD_PAGE_HEADER prh)
 {
@@ -121,7 +119,6 @@ void print_record_log(HANDLE outputfile, PRECORD_LOG rl, const std::string& form
 }
 
 int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output) {
-
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
 		std::cerr << "[!] NTFS volume required" << std::endl;
@@ -308,11 +305,8 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 	return 0;
 }
 
-
 namespace commands {
-
 	namespace logfile {
-
 		int print_logfile(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());

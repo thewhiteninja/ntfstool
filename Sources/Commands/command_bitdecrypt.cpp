@@ -16,7 +16,6 @@
 #include "Utils/constant_names.h"
 #include "Utils/table.h"
 
-
 #include <NTFS\ntfs_reader.h>
 #include <Bitlocker\decryption.h>
 
@@ -135,9 +134,7 @@ int decrypt_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 }
 
 namespace commands {
-
 	namespace bitlocker {
-
 		int decrypt_volume(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
@@ -166,5 +163,4 @@ namespace commands {
 			return 0;
 		}
 	}
-
 }

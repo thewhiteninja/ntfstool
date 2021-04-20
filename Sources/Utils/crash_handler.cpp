@@ -61,7 +61,6 @@ public:
 		}
 		return false;
 	}
-
 };
 
 LONG WINAPI Filter(PEXCEPTION_POINTERS ep)

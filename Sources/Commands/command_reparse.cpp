@@ -1,4 +1,3 @@
-
 #include "Drive/disk.h"
 #include "Utils/utils.h"
 #include "options.h"
@@ -18,10 +17,7 @@
 #include <memory>
 #include <iterator>
 
-
-
 int print_reparse(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output) {
-
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
 		std::cerr << "[!] NTFS volume required" << std::endl;
@@ -118,11 +114,8 @@ int print_reparse(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const
 	return 0;
 }
 
-
 namespace commands {
-
 	namespace reparse {
-
 		int print_reparse(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());

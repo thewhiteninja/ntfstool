@@ -3,7 +3,6 @@
 #include <WinSock2.h>
 #include <Windows.h>
 
-
 typedef NTSTATUS(__stdcall* _RtlGetCompressionWorkSpaceSize)(
 	USHORT CompressionFormatAndEngine,
 	PULONG CompressBufferWorkSpaceSize,

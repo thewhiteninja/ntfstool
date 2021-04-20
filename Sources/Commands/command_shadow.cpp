@@ -1,4 +1,3 @@
-
 #include "Drive/disk.h"
 #include "Utils/utils.h"
 #include "options.h"
@@ -19,9 +18,7 @@
 
 #include <vss.h>
 
-
 int print_volumeshadow(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
-
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
 		std::cerr << "[!] NTFS volume required" << std::endl;

@@ -259,4 +259,3 @@ DWORD Volume::disk_index()
 {
 	if (_parent) return reinterpret_cast<Disk*>(_parent)->index(); else return 0;
 }
-

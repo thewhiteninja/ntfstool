@@ -1,4 +1,3 @@
-
 #include "Drive/disk.h"
 #include "Utils/utils.h"
 #include "Utils/table.h"
@@ -14,7 +13,6 @@
 #include <memory>
 
 void print_disks_short(std::vector<std::shared_ptr<Disk>> disks) {
-
 	std::shared_ptr<utils::ui::Table> disktable = std::make_shared<utils::ui::Table>();
 	disktable->set_margin_left(4);
 
@@ -78,7 +76,6 @@ void print_hardware_disk(std::shared_ptr<Disk> disk) {
 	partitions->add_header_line("Filesystem");
 	partitions->add_header_line("Offset");
 	partitions->add_header_line("Size");
-
 
 	for (std::shared_ptr<Volume> volume : disk->volumes()) {
 		partitions->add_item_line(std::to_string(volume->index()));
@@ -190,7 +187,6 @@ void print_image_disk(std::shared_ptr<Disk> disk) {
 	partitions->add_header_line("Offset");
 	partitions->add_header_line("Size");
 
-
 	for (std::shared_ptr<Volume> volume : disk->volumes()) {
 		partitions->add_item_line(std::to_string(volume->index()));
 
@@ -220,7 +216,6 @@ void print_image_disk(std::shared_ptr<Disk> disk) {
 	partitions->render(std::cout);
 	std::cout << std::endl;
 }
-
 
 void print_hardware_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
 	utils::ui::title("PhysicalDrive:" + std::to_string(disk->index()) + " > Volume:" + std::to_string(vol->index()));
@@ -292,9 +287,7 @@ void print_image_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 }
 
 namespace commands {
-
 	namespace info {
-
 		int print_disks(std::shared_ptr<Options> opts)
 		{
 			if ((opts->image == "") && (opts->disk == 0xffffffff))
@@ -336,7 +329,5 @@ namespace commands {
 			std::cout.flags(flag_backup);
 			return 0;
 		}
-
 	}
-
 }

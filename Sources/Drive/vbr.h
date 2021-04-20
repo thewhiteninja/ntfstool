@@ -105,5 +105,4 @@ typedef struct {
 	BYTE		endMarker[2];
 } BOOT_SECTOR_FAT32, * PBOOT_SECTOR_FAT32;
 
-
 #pragma pack(pop)

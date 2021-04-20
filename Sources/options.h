@@ -31,7 +31,6 @@ public:
 	bool system = false;
 
 	explicit Options();
-
 };
 
 std::shared_ptr<Options> parse_options(int argc, char** argv);

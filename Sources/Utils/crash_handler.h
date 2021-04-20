@@ -21,11 +21,9 @@
 
 #include "Utils/utils.h"
 
-
 void install_crash_handler();
 
 void uninstall_crash_handler();
-
 
 class Crash
 {

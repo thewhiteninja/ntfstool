@@ -63,7 +63,6 @@ typedef struct _FVE_ENTRY_UNICODE
 	WCHAR string[1];
 } FVE_ENTRY_UNICODE, * PFVE_ENTRY_UNICODE;
 
-
 typedef struct _FVE_ENTRY_STRETCH_KEY
 {
 	ULONG32		encryption_method;

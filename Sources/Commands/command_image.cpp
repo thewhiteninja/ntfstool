@@ -1,4 +1,3 @@
-
 #include "Drive/disk.h"
 #include "Utils/utils.h"
 #include "options.h"
@@ -50,7 +49,6 @@ int create_image(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const 
 
 	if (input != INVALID_HANDLE_VALUE)
 	{
-
 		DWORD64 read = 0;
 
 		std::cout << "[-] Size     : " << size << " (" << utils::format::size(size) << ")" << std::endl;
@@ -64,7 +62,6 @@ int create_image(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const 
 
 			std::future<void> consumer = std::async(std::launch::async,
 				[input, houtput, buffer, size, &read, &progress_bar]() {
-
 					DWORD readBlock = 0;
 					DWORD writeBlock = 0;
 
@@ -124,11 +121,8 @@ int create_image(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const 
 	return 0;
 }
 
-
 namespace commands {
-
 	namespace image {
-
 		int create_image(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());

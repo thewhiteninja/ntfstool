@@ -193,7 +193,6 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 		}
 
 		ret = parse_entries(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pAttrIndexRoot, pAttrIndexRoot->EntryOffset + 0x10), VCNToBlock, type);
-
 	}
 
 	return ret;
@@ -466,7 +465,6 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 
 						co_yield std::pair<PBYTE, DWORD>(buffer_decompressed.data(), Final);
 						writeSize += Final;
-
 					}
 				}
 			}
@@ -629,4 +627,3 @@ std::vector<std::string> MFTRecord::alternate_data_names()
 
 	return ret;
 }
-

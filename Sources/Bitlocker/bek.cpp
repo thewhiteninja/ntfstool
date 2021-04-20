@@ -34,7 +34,6 @@ void get_vmk_from_bek(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYT
 	}
 }
 
-
 std::shared_ptr<Buffer<PBYTE>> read_bek_file(std::wstring filename)
 {
 	std::shared_ptr<Buffer<PBYTE>> key = nullptr;

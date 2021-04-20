@@ -1,4 +1,3 @@
-
 #include "Drive/disk.h"
 #include "Utils/utils.h"
 #include "options.h"
@@ -18,7 +17,6 @@
 #include <memory>
 
 int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output) {
-
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
 		std::cerr << "[!] NTFS volume required" << std::endl;
@@ -142,7 +140,6 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 			}
 
 			memcpy(clusterBuf.data(), header, (size_t)filled_size);
-
 		}
 	}
 	else if (format == "json")
@@ -211,7 +208,6 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 			}
 
 			memcpy(clusterBuf.data(), header, (size_t)filled_size);
-
 		}
 
 		WriteFile(houtput, "{}]\n", 2, &written, NULL);

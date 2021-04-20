@@ -133,7 +133,6 @@ typedef struct
 		DWORD64 rawValue : 32;
 		DWORD64 rawValue48 : 48;
 	};
-
 } SMART_ATTRIBUTE, * PSMART_ATTRIBUTE;
 
 typedef struct

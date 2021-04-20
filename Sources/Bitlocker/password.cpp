@@ -16,7 +16,6 @@ void bitlocker_prepare_password(std::string password, unsigned char* password_ha
 	SHA256_Final(password_hash, &ctx);
 }
 
-
 bool test_bitlocker_password(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& password)
 {
 	unsigned char key_buffer[32] = { 0 };
@@ -31,7 +30,6 @@ bool test_bitlocker_password(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_va
 	bitlocker_decrypt_data(enc_vmk, enc_size, key_buffer, mac_val, nonce, vmk_buffer);
 	return bitlocker_mac_check(vmk_buffer, key_buffer, nonce, vmk_buffer + 16, enc_size);
 }
-
 
 void get_vmk_from_password(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& password, PBYTE vmk)
 {

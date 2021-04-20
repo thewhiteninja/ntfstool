@@ -1,4 +1,3 @@
-
 #include <algorithm>
 #include <cstdint>
 #include <string>
@@ -16,7 +15,6 @@
 #include "Utils/utils.h"
 #include "Utils/constant_names.h"
 #include "Utils/table.h"
-
 
 void print_bitlocker_fve_block_header(FVE_BLOCK_HEADER fve_bh, unsigned long block_id)
 {
@@ -38,7 +36,6 @@ void print_bitlocker_fve_block_header(FVE_BLOCK_HEADER fve_bh, unsigned long blo
 	std::cout << "Backup Sectors Offset : " << utils::format::hex(fve_bh.backup_sector_offset) << std::endl;
 	std::cout << std::endl;
 }
-
 
 void print_bitlocker_fve_header(FVE_HEADER fve_h)
 {
@@ -202,7 +199,6 @@ std::vector<std::string> get_fve_entry_values(PFVE_ENTRY entry, const std::strin
 }
 
 void print_bitlocker_vbr(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, unsigned long block_id) {
-
 	std::cout << std::setfill('0');
 	utils::ui::title("FVE Info from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
@@ -245,13 +241,10 @@ void print_bitlocker_vbr(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol
 	{
 		std::cout << "[!] Volume is not Bitlocked" << std::endl;
 	}
-
 }
 
 namespace commands {
-
 	namespace bitlocker {
-
 		int print_fve(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
@@ -274,7 +267,5 @@ namespace commands {
 			std::cout.flags(flag_backup);
 			return 0;
 		}
-
 	}
-
 }

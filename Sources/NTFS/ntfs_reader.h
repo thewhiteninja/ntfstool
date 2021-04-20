@@ -14,7 +14,6 @@ class NTFSReader : public Reader {
 	friend class MFTRecord;
 private:
 
-
 public:
 	explicit NTFSReader(std::wstring volume_name, DWORD64 volume_offset = 0);
 	~NTFSReader();

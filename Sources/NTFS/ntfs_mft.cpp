@@ -22,7 +22,6 @@ MFT::MFT(std::shared_ptr<NTFSReader> reader)
 		{
 			_dataruns = MFTRecord::read_dataruns(pAttributeData);
 		}
-
 	}
 	else
 	{
