@@ -1,6 +1,6 @@
 {
   "name": "ntfstool",
-  "version-string": "1.2",
+  "version-string": "1.3",
   "description": "NTFSTool is a forensic tool for hard disks and NTFS volumes.",
   "homepage": "https://github.com/thewhiteninja/ntfstool",
   "dependencies": [
