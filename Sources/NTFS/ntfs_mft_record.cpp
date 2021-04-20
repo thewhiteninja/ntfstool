@@ -66,12 +66,33 @@ ULONG64 MFTRecord::datasize(std::string stream_name)
 						attr_name.resize(pAttr->nameLength);
 						if (((pAttr->nameLength == 0) && (stream_name == "")) || ((pAttr->nameLength > 0) && (stream_name == utils::strings::to_utf8(attr_name))))
 						{
-							std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttr->recordNumber & 0xffffffffffff);
-							return extRecordHeader->datasize();
+							if (pAttr->recordNumber & 0xffffffffffff != header()->MFTRecordIndex & 0xffffffffffff)
+							{
+								std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttr->recordNumber & 0xffffffffffff);
+								if (extRecordHeader != nullptr)
+								{
+									return extRecordHeader->datasize();
+								}
+								else
+								{
+									break;
+								}
+							}
+							else
+							{
+								break;
+							}
 						}
 					}
 
-					offset += pAttr->recordLength;
+					if (pAttr->recordLength > 0)
+					{
+						offset += pAttr->recordLength;
+					}
+					else
+					{
+						break;
+					}
 				}
 			}
 		}
