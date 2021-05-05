@@ -2,12 +2,13 @@
 
 #include <memory>
 
+#include "Compression/definitions.h"
+
 #include "Utils/utils.h"
 #include "Utils/buffer.h"
 #include "NTFS/ntfs_mft.h"
 #include "NTFS/ntfs_reader.h"
 #include "NTFS/ntfs_index_entry.h"
-#include "Compression/definitions.h"
 #include "NTFS/ntfs_explorer.h"
 
 MFTRecord::MFTRecord(PMFT_RECORD_HEADER pRecordHeader, MFT* mft, std::shared_ptr<NTFSReader> reader)
@@ -66,7 +67,7 @@ ULONG64 MFTRecord::datasize(std::string stream_name)
 						attr_name.resize(pAttr->nameLength);
 						if (((pAttr->nameLength == 0) && (stream_name == "")) || ((pAttr->nameLength > 0) && (stream_name == utils::strings::to_utf8(attr_name))))
 						{
-							if (pAttr->recordNumber & 0xffffffffffff != header()->MFTRecordIndex & 0xffffffffffff)
+							if ((pAttr->recordNumber & 0xffffffffffff) != (header()->MFTRecordIndex & 0xffffffffffff))
 							{
 								std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttr->recordNumber & 0xffffffffffff);
 								if (extRecordHeader != nullptr)
@@ -108,7 +109,7 @@ std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> MFTRecord::parse_index_bloc
 	DWORD blockPos = 0;
 	while (blockPos < pIndexBlock->size())
 	{
-		if (RtlCompareMemory(&pIndexSubBlockData->Magic, "INDX", 4) == 4)
+		if (pIndexSubBlockData->Magic == MAGIC_INDX)
 		{
 			apply_fixups(pIndexSubBlockData, pIndexSubBlockData->OffsetOfUS, pIndexSubBlockData->SizeOfUS);
 			mapVCNToIndexBlock[pIndexSubBlockData->VCN] = pIndexSubBlockData;
@@ -124,29 +125,40 @@ std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> MFTRecord::parse_index_bloc
 std::vector<std::shared_ptr<IndexEntry>> parse_entries(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY pIndexEntry, std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> vcnToBlock, std::string type)
 {
 	std::vector<std::shared_ptr<IndexEntry>> ret;
-	while (TRUE)
+	if (pIndexEntry != nullptr)
 	{
-		std::shared_ptr<IndexEntry> e = std::make_shared<IndexEntry>(pIndexEntry, type);
-
-		if (pIndexEntry->Flags & MFT_ATTRIBUTE_INDEX_ENTRY_FLAG_SUBNODE)
+		while (TRUE)
 		{
-			PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK block = vcnToBlock[e->vcn()];
-			if ((block != nullptr) && (block->Magic == 0x58444e49))
+			std::shared_ptr<IndexEntry> e = std::make_shared<IndexEntry>(pIndexEntry, type);
+
+			if (pIndexEntry->Flags & MFT_ATTRIBUTE_INDEX_ENTRY_FLAG_SUBNODE)
 			{
-				PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY nextEntries = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, block, block->EntryOffset + 0x18);
-				std::vector<std::shared_ptr<IndexEntry>> subentries = parse_entries(nextEntries, vcnToBlock, type);
-				ret.insert(ret.end(), subentries.begin(), subentries.end());
+				PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK block = vcnToBlock[e->vcn()];
+				if ((block != nullptr) && (block->Magic == MAGIC_INDX))
+				{
+					PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY nextEntries = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, block, block->EntryOffset + 0x18);
+					std::vector<std::shared_ptr<IndexEntry>> subentries = parse_entries(nextEntries, vcnToBlock, type);
+					ret.insert(ret.end(), subentries.begin(), subentries.end());
+				}
+			}
+
+			if (pIndexEntry->Flags & MFT_ATTRIBUTE_INDEX_ENTRY_FLAG_LAST)
+			{
+				if (pIndexEntry->FileReference != 0) ret.push_back(e);
+				break;
+			}
+
+			ret.push_back(e);
+
+			if (pIndexEntry->Length > 0)
+			{
+				pIndexEntry = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pIndexEntry, pIndexEntry->Length);
+			}
+			else
+			{
+				break;
 			}
 		}
-
-		if (pIndexEntry->Flags & MFT_ATTRIBUTE_INDEX_ENTRY_FLAG_LAST)
-		{
-			if (pIndexEntry->FileReference != 0) ret.push_back(e);
-			break;
-		}
-
-		ret.push_back(e);
-		pIndexEntry = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pIndexEntry, pIndexEntry->Length);
 	}
 	return ret;
 }
@@ -618,7 +630,14 @@ std::shared_ptr<Buffer<PBYTE>> MFTRecord::data(std::string stream_name)
 						return extRecordHeader->data(stream_name);
 					}
 
-					offset += pAttrListI->recordLength;
+					if (pAttrListI->recordLength > 0)
+					{
+						offset += pAttrListI->recordLength;
+					}
+					else
+					{
+						break;
+					}
 				}
 			}
 		}
@@ -643,7 +662,16 @@ std::vector<std::string> MFTRecord::alternate_data_names()
 				ret.push_back(utils::strings::to_utf8(name));
 			}
 		}
-		pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, pAttribute, pAttribute->RecordLength);
+
+		if (pAttribute->RecordLength > 0)
+		{
+			pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, pAttribute, pAttribute->RecordLength);
+		}
+		else
+		{
+			break;
+		}
+
 	}
 
 	return ret;
