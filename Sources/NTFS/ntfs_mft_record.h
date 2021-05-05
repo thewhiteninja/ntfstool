@@ -10,16 +10,18 @@
 #include <functional>
 
 #include "ntfs.h"
-#include "Utils/buffer.h"
-
 #include "ntfs_index_entry.h"
-
 #include "ntfs_reader.h"
+
+#include "Utils/buffer.h"
 
 #include <cppcoro/generator.hpp>
 
 #include <memory>
 #include <functional>
+
+#define MAGIC_FILE 0x454C4946
+#define MAGIC_INDX 0x58444E49
 
 class MFTRecord
 {
