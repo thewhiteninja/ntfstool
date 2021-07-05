@@ -46,9 +46,11 @@ void decrypt_sector_aes_128(EVP_CIPHER_CTX* pctx, PBYTE sector, PBYTE key, DWORD
 	iv.sector = sector_offset;
 	EVP_EncryptInit(pctx, EVP_aes_128_ecb(), key, null_iv);
 	EVP_EncryptUpdate(pctx, iv.data, &len, iv.data, 16);
+	EVP_CIPHER_CTX_cleanup(pctx);
 
 	EVP_DecryptInit(pctx, EVP_aes_128_cbc(), key, iv.data);
 	EVP_DecryptUpdate(pctx, decrypted, &len, sector, sector_size);
+	EVP_CIPHER_CTX_cleanup(pctx);
 }
 
 void decrypt_sector_aes_128_diffuser(EVP_CIPHER_CTX* pctx, PBYTE sector, PBYTE key, DWORD64 sector_offset, DWORD sector_size, PBYTE decrypted)
@@ -67,6 +69,7 @@ void decrypt_sector_aes_128_diffuser(EVP_CIPHER_CTX* pctx, PBYTE sector, PBYTE k
 	EVP_EncryptUpdate(pctx, sector_key, &len, iv.data, 16);
 	iv.data[15] = 0x80;
 	EVP_EncryptUpdate(pctx, sector_key + 16, &len, iv.data, 16);
+	EVP_CIPHER_CTX_cleanup(pctx);
 
 	decrypt_sector_aes_128(pctx, sector, key, sector_offset, sector_size, decrypted);
 
@@ -87,9 +90,11 @@ void decrypt_sector_aes_256(EVP_CIPHER_CTX* pctx, PBYTE sector, PBYTE key, DWORD
 	iv.sector = sector_offset;
 	EVP_EncryptInit(pctx, EVP_aes_256_ecb(), key, null_iv);
 	EVP_EncryptUpdate(pctx, iv.data, &len, iv.data, 16);
+	EVP_CIPHER_CTX_cleanup(pctx);
 
 	EVP_DecryptInit(pctx, EVP_aes_256_cbc(), key, iv.data);
 	EVP_DecryptUpdate(pctx, decrypted, &len, sector, sector_size);
+	EVP_CIPHER_CTX_cleanup(pctx);
 }
 
 void decrypt_sector_aes_256_diffuser(EVP_CIPHER_CTX* pctx, PBYTE sector, PBYTE key, DWORD64 sector_offset, DWORD sector_size, PBYTE decrypted)
@@ -108,6 +113,7 @@ void decrypt_sector_aes_256_diffuser(EVP_CIPHER_CTX* pctx, PBYTE sector, PBYTE k
 	EVP_EncryptUpdate(pctx, sector_key, &len, iv.data, 16);
 	iv.data[15] = 0x80;
 	EVP_EncryptUpdate(pctx, sector_key + 16, &len, iv.data, 16);
+	EVP_CIPHER_CTX_cleanup(pctx);
 
 	decrypt_sector_aes_256(pctx, sector, key, sector_offset, sector_size, decrypted);
 
@@ -127,6 +133,7 @@ void decrypt_sector_xts_256(EVP_CIPHER_CTX* pctx, PBYTE sector, PBYTE key, DWORD
 	iv.sector = sector_offset / sector_size;
 	EVP_DecryptInit(pctx, EVP_aes_256_xts(), key, iv.data);
 	EVP_DecryptUpdate(pctx, decrypted, &len, sector, sector_size);
+	EVP_CIPHER_CTX_cleanup(pctx);
 }
 
 void decrypt_sector_xts_128(EVP_CIPHER_CTX* pctx, PBYTE sector, PBYTE key, DWORD64 sector_offset, DWORD sector_size, PBYTE decrypted)
@@ -139,4 +146,5 @@ void decrypt_sector_xts_128(EVP_CIPHER_CTX* pctx, PBYTE sector, PBYTE key, DWORD
 	iv.sector = sector_offset / sector_size;
 	EVP_DecryptInit(pctx, EVP_aes_128_xts(), key, iv.data);
 	EVP_DecryptUpdate(pctx, decrypted, &len, sector, sector_size);
+	EVP_CIPHER_CTX_cleanup(pctx);
 }
