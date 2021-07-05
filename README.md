@@ -63,15 +63,28 @@ the help command displays some examples for each command.
 
 ## Limitations
 
-- May contains bugs and unsupported cases.
+- May contains bugs and unsupported cases (feel free to open an issue)
 - No documentation :no_mouth:.
 
 ## Third-parties
 
-- [openssl](https://www.openssl.org/) (vcpkg): OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
-- [nlohmann-json](https://github.com/nlohmann/json) (vcpkg): JSON for Modern C++
-- [distorm](https://github.com/gdabah/distorm) (vcpkg): Powerful Disassembler Library For x86/AMD64
-- [cppcoro](https://github.com/lewissbaker/cppcoro) (vcpkg): A library of C++ coroutine abstractions for the coroutines TS.
+- [openssl](https://www.openssl.org/): OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
+- [nlohmann-json](https://github.com/nlohmann/json): JSON for Modern C++
+- [distorm](https://github.com/gdabah/distorm): Powerful Disassembler Library For x86/AMD64
+- [cppcoro](https://github.com/lewissbaker/cppcoro): A library of C++ coroutine abstractions for the coroutines TS.
+     
+Vcpkg is the best way to install and use them.
+
+Install vcpkg as described here: [vcpkg#getting-started](https://github.com/microsoft/vcpkg#getting-started)
+
+    git clone https://github.com/microsoft/vcpkg
+    .\vcpkg\bootstrap-vcpkg.bat
+
+Integrate it to your VisualStudio env:
+
+    vcpkg integrate install
+
+At build time, VisualStudio will detect the vcpkg.json file and install required packages automatically.
   
 
 [3]: https://www.osforensics.com/tools/mount-disk-images.html
