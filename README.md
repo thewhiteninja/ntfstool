@@ -63,7 +63,7 @@ the help command displays some examples for each command.
 
 ## Limitations
 
-- May contains bugs and unsupported cases.
+- May contains bugs and unsupported cases (feel free to open an issue)
 - No documentation :no_mouth:.
 
 ## Third-parties
@@ -84,8 +84,7 @@ Integrate it to your VisualStudio env:
 
     vcpkg integrate install
 
-Build the project!
-VisualStudio will detect the vcpkg.json file and install required packages automatically.
+At build time, VisualStudio will detect the vcpkg.json file and install required packages automatically.
   
 
 [3]: https://www.osforensics.com/tools/mount-disk-images.html
