@@ -15,6 +15,7 @@ void usage(char* binname)
 {
 	std::cerr << "Usage: " << binname << " command [options]" << std::endl;
 	std::cerr << std::endl;
+	std::cerr << "Version: " << VERSION << " (" << __DATE__ << ")" << std::endl << std::endl;
 	std::cerr << "Commands:" << std::endl;
 	std::cerr << "    info       : list and display physical disks and volumes" << std::endl;
 	std::cerr << "    mbr        : display master boot record" << std::endl;
@@ -37,8 +38,6 @@ void usage(char* binname)
 	std::cerr << "Example:" << std::endl;
 	std::cerr << "    help extract" << std::endl;
 	std::cerr << std::endl;
-
-	std::cerr << "Version: " << VERSION << " (" << __DATE__ << ")" << std::endl;
 }
 
 void print_help_help(char* name)
