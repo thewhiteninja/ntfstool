@@ -51,24 +51,30 @@ void utils::ui::Table::add_item_multiline(std::vector<std::string> list, unsigne
 	std::vector<std::string> s;
 	for (auto& i : list)
 	{
-		if (i.length() > max_size) {
+		auto i_len = utils::strings::utf8_string_size(i);
+		if (i_len > max_size) {
 			size_t sep = i.find(':');
-			if (sep != std::string::npos && sep < i.length() - 1 && i[sep + 1] == ' ')
+			if (sep != std::string::npos && sep < i_len - 1 && i[sep + 1] == ' ')
 			{
 				std::string key = i.substr(0, sep);
+				auto key_len = utils::strings::utf8_string_size(key);
 				std::string whitespace = "";
-				for (unsigned int n = 0; n < key.length(); n++) whitespace += " ";
+				for (unsigned int n = 0; n < key_len; n++) whitespace += " ";
 				std::string value = i.substr(sep + 2);
-
-				if (value.length() > max_size)
+				auto value_len = utils::strings::utf8_string_size(value);
+				auto offset = value.length() - value_len;
+				if (value_len > max_size)
 				{
-					s.push_back(key + ": " + value.substr(0, max_size));
-					value = value.substr(max_size);
-					while (value.length() > max_size) {
-						s.push_back(whitespace + "  " + value.substr(0, max_size));
-						value = value.substr(max_size);
+					s.push_back(key + ": " + value.substr(0, max_size + offset));
+					value = value.substr(max_size + offset);
+					value_len = utils::strings::utf8_string_size(value);
+					offset = value.length() - value_len;
+					while (value_len > max_size) {
+						s.push_back(whitespace + "  " + value.substr(0, max_size + offset));
+						value = value.substr(max_size + offset);
+						value_len = utils::strings::utf8_string_size(value);
 					}
-					if (value.length() > 0) {
+					if (value_len > 0) {
 						s.push_back(whitespace + "  " + value);
 					}
 				}
@@ -213,13 +219,14 @@ void utils::ui::Table::render(std::ostream& out)
 			{
 				out << "| ";
 			}
+			size_t fix = 0;
 			for (i = 0; i < line.size() - 1; i++)
 			{
 				out.width(column_size[i]);
 				if (lines_i < line[i].size())
 				{
-					size_t fix = (line[i][lines_i].length() - utils::strings::utf8_string_size(line[i][lines_i]));
-					out.width(column_size[i] + fix);
+					fix = (line[i][lines_i].length() - utils::strings::utf8_string_size(line[i][lines_i]));
+					out.width(column_size[i]);
 
 					if (column_align[i] == TableAlign::LEFT) out << std::left << line[i][lines_i];
 					else  out << std::right << line[i][lines_i];
@@ -227,13 +234,18 @@ void utils::ui::Table::render(std::ostream& out)
 				else out << std::left << " ";
 				out << " | ";
 			}
-			out.width(column_size[i]);
+
 			if (lines_i < line[i].size())
 			{
+				fix = (line[i][lines_i].length() - utils::strings::utf8_string_size(line[i][lines_i]));
+				out.width(column_size[i] + fix);
 				if (column_align[i] == TableAlign::LEFT) out << std::left << line[i][lines_i];
 				else out << std::right << line[i][lines_i];
 			}
-			else out << std::left << " ";
+			else {
+				out.width(column_size[i]);
+				out << std::left << " ";
+			}
 			if (border_right)
 			{
 				out << " |";
