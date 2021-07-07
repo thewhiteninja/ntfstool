@@ -11,6 +11,12 @@ bool is_number(const std::string& s)
 		s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
 }
 
+bool is_hexnum(const std::string& s)
+{
+	return !s.empty() && std::find_if(s.begin(),
+		s.end(), [](unsigned char c) { return !std::isxdigit(c); }) == s.end();
+}
+
 void read_option_ulong(char* arg, unsigned long* pul)
 {
 	char* pos = strchr(arg, '=');
@@ -20,9 +26,25 @@ void read_option_ulong(char* arg, unsigned long* pul)
 	}
 	else
 	{
-		if (pos != NULL) *pos = '\0';
-		std::cerr << "[!] Invalid number for \"" << std::string(arg) << "\" argument" << std::endl;
-		exit(1);
+		if ((pos[1] == '0') && (pos[2] == 'x'))
+		{
+			if (is_hexnum(pos + 3))
+			{
+				*pul = std::strtoul(pos + 3, NULL, 16);
+			}
+			else
+			{
+				if (pos != NULL) *pos = '\0';
+				std::cerr << "[!] Invalid hex number for \"" << std::string(arg) << "\" argument" << std::endl;
+				exit(1);
+			}
+		}
+		else
+		{
+			if (pos != NULL) *pos = '\0';
+			std::cerr << "[!] Invalid number for \"" << std::string(arg) << "\" argument" << std::endl;
+			exit(1);
+		}
 	}
 }
 
