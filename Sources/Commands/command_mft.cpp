@@ -499,11 +499,14 @@ int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DW
 	fr_index->render(std::cout);
 	std::cout << std::endl;
 
-	utils::ui::title("B-tree index:");
+	if (idx_details->is_large())
+	{
+		utils::ui::title("B-tree index:");
 
-	idx_details->VCNtree()->print();
+		idx_details->VCNtree()->print();
 
-	std::cout << std::endl;
+		std::cout << std::endl;
+	}
 
 	return 0;
 }
