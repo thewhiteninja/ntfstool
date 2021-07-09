@@ -135,6 +135,12 @@
     <ClInclude Include="Sources\Drive\smart.h">
       <Filter>Header Files\Drive</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Utils\index_details.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\btree.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -247,6 +253,12 @@
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_smart.cpp">
       <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\index_details.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\btree.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

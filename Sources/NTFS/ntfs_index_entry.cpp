@@ -17,6 +17,8 @@ IndexEntry::IndexEntry(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY e, std::string type)
 		_name.resize(e->FileName.NameLength);
 
 		_name_type = e->FileName.NameType;
+
+		_flags = e->Flags;
 	}
 	if (_type == MFT_ATTRIBUTE_INDEX_REPARSE)
 	{

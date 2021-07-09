@@ -11,6 +11,7 @@
 #include "options.h"
 #include "Drive/disk.h"
 #include "Drive/volume.h"
+#include <Utils/index_details.h>
 
 std::vector<std::string> print_attribute_standard(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION pAttribute)
 {
@@ -62,6 +63,7 @@ std::vector<std::string> print_attribute_index_root(PMFT_RECORD_ATTRIBUTE_INDEX_
 
 		if (pAttribute->Flags == MFT_ATTRIBUTE_INDEX_ROOT_FLAG_SMALL)
 		{
+			ret.push_back(" ");
 			ret.push_back("Index");
 			for (auto& entry : entries)
 			{
@@ -315,19 +317,26 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 	return ret;
 }
 
-std::vector<std::string> print_attribute_index_allocation(std::vector<std::shared_ptr<IndexEntry>> entries)
+std::vector<std::string> print_attribute_index_allocation(PMFT_RECORD_ATTRIBUTE_HEADER pIndexAttrHeader, std::vector<std::shared_ptr<IndexEntry>> entries, bool full = false)
 {
 	std::vector<std::string> ret;
-	ret.push_back("Index");
-	for (auto& entry : entries)
+	ret.push_back("First VCN               : 0x" + utils::format::hex6(pIndexAttrHeader->Form.Nonresident.LowestVcn));
+	ret.push_back("Last VCN                : 0x" + utils::format::hex6(pIndexAttrHeader->Form.Nonresident.HighestVcn));
+
+	if (full)
 	{
-		if (entry->type() == MFT_ATTRIBUTE_INDEX_FILENAME)
+		ret.push_back(" ");
+		ret.push_back("Index");
+		for (auto& entry : entries)
 		{
-			ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + utils::strings::to_utf8(entry->name()));
-		}
-		if (entry->type() == MFT_ATTRIBUTE_INDEX_REPARSE)
-		{
-			ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + constants::disk::mft::file_record_reparse_point_type(entry->tag()));
+			if (entry->type() == MFT_ATTRIBUTE_INDEX_FILENAME)
+			{
+				ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + utils::strings::to_utf8(entry->name()));
+			}
+			if (entry->type() == MFT_ATTRIBUTE_INDEX_REPARSE)
+			{
+				ret.push_back("       " + utils::format::hex(entry->record_number()) + " : " + constants::disk::mft::file_record_reparse_point_type(entry->tag()));
+			}
 		}
 	}
 	return ret;
@@ -361,6 +370,144 @@ std::vector<std::string> print_attribute_list(PMFT_RECORD_ATTRIBUTE pAttribute, 
 
 	return ret;
 }
+
+
+int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWORD inode)
+{
+	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
+	{
+		std::cerr << "[!] NTFS volume required" << std::endl;
+		return 1;
+	}
+
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_number(inode);
+	PMFT_RECORD_HEADER record_header = record->header();
+
+	utils::ui::title("B-tree index (inode:" + std::to_string(inode) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+
+	std::shared_ptr<utils::ui::Table> fr_attributes = std::make_shared<utils::ui::Table>();
+	fr_attributes->set_interline(true);
+
+	fr_attributes->add_header_line("Id");
+	fr_attributes->add_header_line("Type");
+	fr_attributes->add_header_line("Non-resident");
+	fr_attributes->add_header_line("Length");
+	fr_attributes->add_header_line("Overview");
+
+	int n = 1;
+	PMFT_RECORD_ATTRIBUTE_HEADER pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, record_header, record_header->attributeOffset);
+	while (pAttribute->TypeCode != $END)
+	{
+		if (pAttribute->TypeCode == $INDEX_ROOT || pAttribute->TypeCode == $INDEX_ALLOCATION)
+		{
+			fr_attributes->add_item_line(std::to_string(n++));
+			fr_attributes->add_item_line(constants::disk::mft::file_record_attribute_type(pAttribute->TypeCode));
+			fr_attributes->add_item_line((pAttribute->FormCode == NON_RESIDENT_FORM ? "True" : "False"));
+			if (pAttribute->FormCode == NON_RESIDENT_FORM)
+			{
+				fr_attributes->add_item_line(std::to_string(pAttribute->Form.Nonresident.ValidDataLength));
+			}
+			else
+			{
+				fr_attributes->add_item_line(std::to_string(pAttribute->Form.Resident.ValueLength));
+			}
+			switch (pAttribute->TypeCode)
+			{
+			case $INDEX_ROOT:
+			{
+				PMFT_RECORD_ATTRIBUTE_INDEX_ROOT pattr = nullptr;
+				if (pAttribute->FormCode == RESIDENT_FORM)
+				{
+					pattr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ROOT, pAttribute, pAttribute->Form.Resident.ValueOffset);
+				}
+				else
+				{
+					wprintf(L"Non-resident $INDEX_ROOT is not supported");
+				};
+				fr_attributes->add_item_multiline(print_attribute_index_root(pattr, record->index()));
+				break;
+			}
+			case $INDEX_ALLOCATION:
+			{
+				fr_attributes->add_item_multiline(print_attribute_index_allocation(pAttribute, record->index()));
+				break;
+			}
+			default:
+				break;
+			}
+			fr_attributes->new_line();
+		}
+
+		pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, pAttribute, pAttribute->RecordLength);
+	}
+	utils::ui::title("Attributes:");
+	fr_attributes->render(std::cout);
+	std::cout << std::endl;
+
+
+	std::shared_ptr<IndexDetails> idx_details = std::make_shared<IndexDetails>(record, explorer->reader()->sizes.cluster_size);
+	std::shared_ptr<utils::ui::Table> fr_index = std::make_shared<utils::ui::Table>();
+
+	if (idx_details->is_large())
+	{
+		utils::ui::title("$INDEX_ALLOCATION entries:");
+	}
+	else
+	{
+		utils::ui::title("$INDEX_ROOT entries:");
+	}
+
+	fr_index->set_interline(true);
+
+	fr_index->add_header_line("VCN");
+	fr_index->add_header_line("Raw address");
+	fr_index->add_header_line("Size");
+	fr_index->add_header_line("Entries");
+
+	for (const auto& v : idx_details->VCN_info())
+	{
+		std::vector<std::string> lines;
+		if (idx_details->is_large())
+		{
+			fr_index->add_item_line(utils::format::hex6(v.first, true));
+			fr_index->add_item_line(utils::format::hex6(std::get<0>(v.second), true));
+		}
+		else
+		{
+			fr_index->add_item_line("Resident");
+			fr_index->add_item_multiline(
+				{
+					"Record          : " + utils::format::hex6(record->raw_address(), true),
+					"Offset to Index : " + utils::format::hex6(std::get<0>(v.second), true)
+				}
+			);
+		}
+
+		lines.clear();
+
+		fr_index->add_item_line(utils::format::hex6(std::get<1>(v.second), true));
+		for (auto& e : std::get<2>(v.second))
+		{
+			lines.push_back(utils::format::hex6(std::get<0>(e)) + ": " + utils::strings::to_utf8(std::get<1>(e)));
+		}
+		fr_index->add_item_multiline(lines);
+
+		fr_index->new_line();
+	}
+
+	fr_index->render(std::cout);
+	std::cout << std::endl;
+
+	utils::ui::title("B-tree index:");
+
+	idx_details->VCNtree()->print();
+
+	std::cout << std::endl;
+
+	return 0;
+}
+
 
 int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWORD inode)
 {
@@ -509,7 +656,7 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 
 		case $INDEX_ALLOCATION:
 		{
-			fr_attributes->add_item_multiline(print_attribute_index_allocation(record->index()));
+			fr_attributes->add_item_multiline(print_attribute_index_allocation(pAttribute, record->index(), true));
 			break;
 		}
 		case $DATA:
@@ -579,6 +726,23 @@ namespace commands
 				if (volume != nullptr)
 				{
 					print_mft_info(disk, volume, opts->inode);
+				}
+			}
+			std::cout.flags(flag_backup);
+			return 0;
+		}
+
+		int print_btree(std::shared_ptr<Options> opts)
+		{
+			std::ios_base::fmtflags flag_backup(std::cout.flags());
+
+			std::shared_ptr<Disk> disk = get_disk(opts);
+			if (disk != nullptr)
+			{
+				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+				if (volume != nullptr)
+				{
+					print_btree_info(disk, volume, opts->inode);
 				}
 			}
 			std::cout.flags(flag_backup);

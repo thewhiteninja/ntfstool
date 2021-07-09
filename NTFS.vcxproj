@@ -43,8 +43,10 @@
     <ClInclude Include="Sources\Utils\buffer.h" />
     <ClInclude Include="Sources\Utils\constant_names.h" />
     <ClInclude Include="Sources\Utils\crash_handler.h" />
+    <ClInclude Include="Sources\Utils\index_details.h" />
     <ClInclude Include="Sources\Utils\progress_bar.h" />
     <ClInclude Include="Sources\Utils\table.h" />
+    <ClInclude Include="Sources\Utils\btree.h" />
     <ClInclude Include="Sources\Utils\utils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -83,7 +85,9 @@
     <ClCompile Include="Sources\options.cpp" />
     <ClCompile Include="Sources\Utils\constant_names.cpp" />
     <ClCompile Include="Sources\Utils\crash_handler.cpp" />
+    <ClCompile Include="Sources\Utils\index_details.cpp" />
     <ClCompile Include="Sources\Utils\table.cpp" />
+    <ClCompile Include="Sources\Utils\btree.cpp" />
     <ClCompile Include="Sources\Utils\utils.cpp" />
   </ItemGroup>
   <ItemGroup>

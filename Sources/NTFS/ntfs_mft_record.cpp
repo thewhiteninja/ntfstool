@@ -30,6 +30,11 @@ MFTRecord::~MFTRecord()
 	_record = nullptr;
 }
 
+uint64_t MFTRecord::raw_address()
+{
+	return _reader->boot_record()->MFTCluster * _reader->sizes.cluster_size + (_record->data()->MFTRecordIndex * _reader->sizes.record_size);
+}
+
 ULONG64 MFTRecord::datasize(std::string stream_name)
 {
 	if (_record->data()->flag & FILE_RECORD_FLAG_DIR)
@@ -101,7 +106,7 @@ ULONG64 MFTRecord::datasize(std::string stream_name)
 	return 0;
 }
 
-std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> MFTRecord::parse_index_block(std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>> pIndexBlock, DWORD blocksize, DWORD sectorsize)
+std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> MFTRecord::parse_index_block(std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>> pIndexBlock)
 {
 	std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> mapVCNToIndexBlock;
 
@@ -217,7 +222,7 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 			{
 				indexBlocks = attribute_data<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>(pAttrAllocation);
 
-				VCNToBlock = parse_index_block(indexBlocks, _reader->sizes.block_size, _reader->boot_record()->bytePerSector);
+				VCNToBlock = parse_index_block(indexBlocks);
 			}
 			else
 			{

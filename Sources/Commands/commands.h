@@ -71,6 +71,8 @@ namespace commands {
 	namespace mft
 	{
 		int print_mft(std::shared_ptr<Options> opts);
+
+		int print_btree(std::shared_ptr<Options> opts);
 	}
 
 	namespace bitlocker
@@ -78,8 +80,6 @@ namespace commands {
 		int print_fve(std::shared_ptr<Options> opts);
 
 		int print_bitlocker(std::shared_ptr<Options> opts);
-
-		int list_guid(std::shared_ptr<Options> opts);
 
 		int test_password(std::shared_ptr<Options> opts);
 

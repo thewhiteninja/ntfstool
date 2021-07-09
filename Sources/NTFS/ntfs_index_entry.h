@@ -16,6 +16,7 @@ private:
 	DWORD64		_vcn;
 	UCHAR		_name_type;
 	DWORD       _tag;
+	USHORT		_flags;
 
 	std::string _type;
 
@@ -28,6 +29,7 @@ public:
 
 	DWORD64	vcn() const { return _vcn; }
 	DWORD	tag() const { return _tag; }
+	USHORT	flags() const { return _flags; }
 
 	DWORD64 record_number() const { return _reference & 0xffffffffffff; }
 

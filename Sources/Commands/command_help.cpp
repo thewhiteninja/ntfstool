@@ -22,6 +22,7 @@ void usage(char* binname)
 	std::cerr << "    gpt        : display guid partition table" << std::endl;
 	std::cerr << "    vbr        : display volume boot record" << std::endl;
 	std::cerr << "    mft        : display master file table" << std::endl;
+	std::cerr << "    btree      : display index btree" << std::endl;
 	std::cerr << "    extract    : extract a file" << std::endl;
 	std::cerr << "    bitlocker  : display bitlocker guid/status and test password, recovery or bek file" << std::endl;
 	std::cerr << "    bitdecrypt : decrypt volume to an image file" << std::endl;
@@ -138,6 +139,22 @@ void print_help_mft(char* name)
 	std::cerr << std::endl;
 	std::cerr << "    Example: File record for disk 0, volume 2 and inode 5" << std::endl;
 	std::cerr << "    " << name << " mft disk=0 volume=2 inode=5" << std::endl;
+	std::cerr << std::endl;
+}
+
+void print_help_btree(char* name)
+{
+	std::cerr << "Btree command" << std::endl;
+	std::cerr << "-----------" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    " << name << " btree [disk id] [volume id] (inode)" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Description:" << std::endl;
+	std::cerr << "    Display index B-tree nodes and detailed attributes for selected disk, volume and inode." << std::endl;
+	std::cerr << "    Default inode: 5 (Root)." << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Index B-tree for disk 0, volume 2 and inode 5" << std::endl;
+	std::cerr << "    " << name << " btree disk=0 volume=2 inode=5" << std::endl;
 	std::cerr << std::endl;
 }
 
@@ -371,6 +388,7 @@ namespace commands {
 				if (opts->subcommand == "gpt") { print_help_gpt(name); return; }
 				if (opts->subcommand == "vbr") { print_help_vbr(name); return; }
 				if (opts->subcommand == "mft") { print_help_mft(name); return; }
+				if (opts->subcommand == "btree") { print_help_btree(name); return; }
 				if (opts->subcommand == "extract") { print_help_extract(name); return; }
 				if (opts->subcommand == "bitlocker") { print_help_bitlocker(name); return; }
 				if (opts->subcommand == "bitdecrypt") { print_help_bitdecrypt(name); return; }
