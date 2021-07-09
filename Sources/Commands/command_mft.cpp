@@ -382,6 +382,10 @@ int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DW
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_number(inode);
+
+	if (record == nullptr)
+		return 2;
+
 	PMFT_RECORD_HEADER record_header = record->header();
 
 	utils::ui::title("B-tree index (inode:" + std::to_string(inode) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));

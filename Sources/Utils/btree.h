@@ -23,7 +23,9 @@ public:
 		_items.push_back(std::tuple<std::shared_ptr<IndexEntry>, std::shared_ptr<node>>(inode, subnodes));
 	}
 
-	void print(int level = 0);
+	void print(int level);
+
+	void print();
 
 	uint64_t vcn() { return _vcn; }
 
