@@ -38,6 +38,7 @@ There is a limited shell with few commands (exit, cd, ls , cat , pwd, cp).
 ## Help & Examples
 
 the help command displays some examples for each command.
+Options can be entered as decimal or hex number with "0x" prefix.
 
     ntfstool help [command]
     
@@ -50,6 +51,7 @@ the help command displays some examples for each command.
 | [extract](#extract)  | Extract a file from a volume. |
 | [image](#image)  | Create an image file of a disk or volume. |
 | [mft](#mft)  | Display FILE record details for a specified MFT inode. Almost all attribute types supported |
+| [btree](#btree)  | Display VCN content and Btree index for an inode |
 | [bitlocker](#bitlocker)  | Display detailed information and hash ($bitlocker$) for all VMK. It is possible to test a password or recovery key. If it is correct, the decrypted VMK and FVEK is displayed. |
 | [bitdecrypt](#bitdecrypt)  | Decrypt a volume to a file using password, recovery key or bek. |
 | [fve](#fve)  | Display information for the specified FVE block (0, 1, 2) |
@@ -413,6 +415,120 @@ At build time, VisualStudio will detect the vcpkg.json file and install required
     +------------------------------------------------------------------------------------------------------------------+
     | 6  | $BITMAP                | False        | 8      | Index Node Used         : 2                                |
     +------------------------------------------------------------------------------------------------------------------+
+</td></tr>
+</table>
+
+### Btree
+<table>
+<tr><td>btree disk=0 volume=1 inode=5 (root folder)</td></tr>
+<tr><td>
+
+	B-tree index (inode:5) from \\.\PhysicalDrive0 > Volume:1
+	---------------------------------------------------------
+
+	Attributes:
+	-----------
+
+	+-------------------------------------------------------------------------------------------+
+	| Id | Type              | Non-resident | Length | Overview                                 |
+	+-------------------------------------------------------------------------------------------+
+	| 1  | $INDEX_ROOT       | False        | 56     | Attribute Type          : Filename       |
+	|    |                   |              |        | Collation Rule          : 1              |
+	|    |                   |              |        | Index Alloc Entry Size  : 4096           |
+	|    |                   |              |        | Cluster/Index Record    : 1              |
+	|    |                   |              |        | -----                                    |
+	|    |                   |              |        | First Entry Offset      : 16             |
+	|    |                   |              |        | Index Entries Size      : 40             |
+	|    |                   |              |        | Index Entries Allocated : 40             |
+	|    |                   |              |        | Flags                   : Large Index    |
+	+-------------------------------------------------------------------------------------------+
+	| 2  | $INDEX_ALLOCATION | True         | 16384  | First VCN               : 0x000000000000 |
+	|    |                   |              |        | Last VCN                : 0x000000000003 |
+	+-------------------------------------------------------------------------------------------+
+
+	$INDEX_ALLOCATION entries:
+	--------------------------
+
+	+--------------------------------------------------------------------------------------------+
+	| VCN           | Raw address   | Size          | Entries                                    |
+	+--------------------------------------------------------------------------------------------+
+	| 000000000000h | 000000024000h | 000000001000h | 000000000004: $AttrDef                     |
+	|               |               |               | 000000000008: $BadClus                     |
+	|               |               |               | 000000000006: $Bitmap                      |
+	|               |               |               | 000000000007: $Boot                        |
+	|               |               |               | 00000000000b: $Extend                      |
+	|               |               |               | 000000000002: $LogFile                     |
+	|               |               |               | 000000000000: $MFT                         |
+	|               |               |               | 000000000001: $MFTMirr                     |
+	|               |               |               | 000000000028: $RECYCLE.BIN                 |
+	|               |               |               | 000000000009: $Secure                      |
+	|               |               |               | 00000000000a: $UpCase                      |
+	|               |               |               | 000000000003: $Volume                      |
+	+--------------------------------------------------------------------------------------------+
+	| 000000000001h | 000000025000h | 000000001000h | 000000000098: randomfile - Copie (5).accdb |
+	|               |               |               | 000000000097: randomfile - Copie (5).bat   |
+	|               |               |               | 000000000095: randomfile - Copie (5).psd   |
+                                              ....
+	|               |               |               | 000000000084: randomfile.psd               |
+	|               |               |               | 000000000081: randomfile.txt               |
+	|               |               |               | 000000000024: System Volume Information    |
+	+--------------------------------------------------------------------------------------------+
+	| 000000000002h | 0000007d6000h | 000000001000h | 000000000027: random folder                |
+	|               |               |               | 00000000008c: randomfile - Copie (2).accdb |
+	|               |               |               | 00000000008b: randomfile - Copie (2).bat   |
+                                              ....
+	|               |               |               | 000000000093: randomfile - Copie (4).bat   |
+	|               |               |               | 000000000091: randomfile - Copie (4).psd   |
+	+--------------------------------------------------------------------------------------------+
+	| 000000000003h | 0000007d7000h | 000000001000h | 000000000005: .                            |
+	|               |               |               | 000000000092: randomfile - Copie (4).txt   |
+	+--------------------------------------------------------------------------------------------+
+
+	B-tree index:
+	-------------
+
+	VCN: 0
+	+ 000000000000:
+	|---- VCN: 3
+	|     + 000000000005: .
+	|     |---- VCN: 0
+	|     |     + 000000000004: $AttrDef
+	|     |     + 000000000008: $BadClus
+	|     |     + 000000000006: $Bitmap
+	|     |     + 000000000007: $Boot
+	|     |     + 00000000000b: $Extend
+	|     |     + 000000000002: $LogFile
+	|     |     + 000000000000: $MFT
+	|     |     + 000000000001: $MFTMirr
+	|     |     + 000000000028: $RECYCLE.BIN
+	|     |     + 000000000009: $Secure
+	|     |     + 00000000000a: $UpCase
+	|     |     + 000000000003: $Volume
+	|     + 000000000092: randomfile - Copie (4).txt
+	|     |---- VCN: 2
+	|     |     + 000000000027: random folder
+	|     |     + 00000000008c: randomfile - Copie (2).accdb
+	|     |     + 00000000008b: randomfile - Copie (2).bat
+	|     |     + 000000000089: randomfile - Copie (2).psd
+                                    ....
+	|     |     + 000000000094: randomfile - Copie (4).accdb
+	|     |     + 000000000093: randomfile - Copie (4).bat
+	|     |     + 000000000091: randomfile - Copie (4).psd
+	|     |---- VCN: 1
+	|     |     + 000000000098: randomfile - Copie (5).accdb
+	|     |     + 000000000097: randomfile - Copie (5).bat
+	|     |     + 000000000095: randomfile - Copie (5).psd
+	|     |     + 000000000096: randomfile - Copie (5).txt
+	|     |     + 00000000009b: randomfile - Copie (6).accdb
+                                    ....
+	|     |     + 000000000085: randomfile - Copie.psd
+	|     |     + 000000000086: randomfile - Copie.txt
+	|     |     + 000000000083: randomfile.accdb
+	|     |     + 000000000082: randomfile.bat
+	|     |     + 000000000084: randomfile.psd
+	|     |     + 000000000081: randomfile.txt
+	|     |     + 000000000024: System Volume Information
+    
 </td></tr>
 </table>
 
