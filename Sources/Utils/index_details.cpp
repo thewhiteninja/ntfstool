@@ -49,8 +49,9 @@ IndexDetails::IndexDetails(std::shared_ptr<MFTRecord> pMFT, uint64_t cluster_siz
 					if (pIndexSubBlockData->Magic == MAGIC_INDX)
 					{
 						pMFT->apply_fixups(pIndexSubBlockData, pIndexSubBlockData->OffsetOfUS, pIndexSubBlockData->SizeOfUS);
-						auto entries = parse_entries_block(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pIndexSubBlockData, pIndexSubBlockData->EntryOffset + 0x18), type);
 						vcnToBlock[pIndexSubBlockData->VCN] = pIndexSubBlockData;
+
+						auto entries = parse_entries_block(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pIndexSubBlockData, pIndexSubBlockData->EntryOffset + 0x18), type);
 						auto offset = reinterpret_cast<uint64_t>(vcnToBlock[pIndexSubBlockData->VCN]) - reinterpret_cast<uint64_t>(vcnToBlock[0]);
 
 						_VCNinfo[pIndexSubBlockData->VCN] = std::tuple<uint64_t, DWORD, std::vector<std::tuple<uint64_t, std::wstring>>>(_get_raw_address(offset), pIndexSubBlockData->AllocEntrySize + 0x18, entries);
