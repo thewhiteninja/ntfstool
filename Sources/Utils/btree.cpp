@@ -18,7 +18,7 @@ void space(int level = 0, bool leaf = true)
 void node::print(int level)
 {
 	space(level, true);
-	std::cout << "|---- " << "VCN: " << _vcn << std::endl;
+	std::cout << "\\____ " << "VCN: " << _vcn << std::endl;
 	for (auto& item : _items)
 	{
 		auto subnode = std::get<1>(item);
