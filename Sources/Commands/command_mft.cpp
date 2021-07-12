@@ -403,10 +403,26 @@ int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DW
 	PMFT_RECORD_ATTRIBUTE_HEADER pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, record_header, record_header->attributeOffset);
 	while (pAttribute->TypeCode != $END)
 	{
+		uint64_t raw_address = 0;
+		auto raw_offset = reinterpret_cast<uint64_t>(pAttribute) - reinterpret_cast<uint64_t>(record_header);
+		if (pAttribute->FormCode == NON_RESIDENT_FORM)
+		{
+			raw_address = record->raw_address() + raw_offset + pAttribute->Form.Nonresident.MappingPairsOffset;
+		}
+		else
+		{
+			raw_address = record->raw_address() + raw_offset + pAttribute->Form.Resident.ValueOffset;
+		}
+
 		if (pAttribute->TypeCode == $INDEX_ROOT || pAttribute->TypeCode == $INDEX_ALLOCATION)
 		{
 			fr_attributes->add_item_line(std::to_string(n++));
-			fr_attributes->add_item_line(constants::disk::mft::file_record_attribute_type(pAttribute->TypeCode));
+			fr_attributes->add_item_multiline(
+				{
+					constants::disk::mft::file_record_attribute_type(pAttribute->TypeCode),
+					"Raw address: " + utils::format::hex6(raw_address, true),
+				}
+			);
 			fr_attributes->add_item_line((pAttribute->FormCode == NON_RESIDENT_FORM ? "True" : "False"));
 			if (pAttribute->FormCode == NON_RESIDENT_FORM)
 			{
@@ -450,7 +466,7 @@ int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DW
 	std::cout << std::endl;
 
 
-	std::shared_ptr<IndexDetails> idx_details = std::make_shared<IndexDetails>(record, explorer->reader()->sizes.cluster_size);
+	std::shared_ptr<IndexDetails> idx_details = std::make_shared<IndexDetails>(record);
 	std::shared_ptr<utils::ui::Table> fr_index = std::make_shared<utils::ui::Table>();
 
 	if (idx_details->is_large())
@@ -563,8 +579,24 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 	PMFT_RECORD_ATTRIBUTE_HEADER pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, record_header, record_header->attributeOffset);
 	while (pAttribute->TypeCode != $END)
 	{
+		uint64_t raw_address = 0;
+		auto raw_offset = reinterpret_cast<uint64_t>(pAttribute) - reinterpret_cast<uint64_t>(record_header);
+		if (pAttribute->FormCode == NON_RESIDENT_FORM)
+		{
+			raw_address = record->raw_address() + raw_offset + pAttribute->Form.Nonresident.MappingPairsOffset;
+		}
+		else
+		{
+			raw_address = record->raw_address() + raw_offset + pAttribute->Form.Resident.ValueOffset;
+		}
+
 		fr_attributes->add_item_line(std::to_string(n++));
-		fr_attributes->add_item_line(constants::disk::mft::file_record_attribute_type(pAttribute->TypeCode));
+		fr_attributes->add_item_multiline(
+			{
+				constants::disk::mft::file_record_attribute_type(pAttribute->TypeCode),
+				"Raw address: " + utils::format::hex6(raw_address, true),
+			}
+		);
 		fr_attributes->add_item_line((pAttribute->FormCode == NON_RESIDENT_FORM ? "True" : "False"));
 		if (pAttribute->FormCode == NON_RESIDENT_FORM)
 		{
