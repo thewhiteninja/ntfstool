@@ -41,13 +41,15 @@ public:
 
 	uint64_t raw_address();
 
+	uint64_t raw_address(PMFT_RECORD_ATTRIBUTE_HEADER pAttr, uint64_t offset);
+
 	PMFT_RECORD_HEADER header() { return _record->data(); }
 
 	void apply_fixups(PVOID buffer, WORD updateOffset, WORD updateSize);
 
 	PMFT_RECORD_ATTRIBUTE_HEADER attribute_header(DWORD type, std::string name = "", int index = 0);
 
-	template < typename T >
+	template<typename T>
 	std::shared_ptr<Buffer<T>> attribute_data(PMFT_RECORD_ATTRIBUTE_HEADER attr);
 
 	std::wstring filename();

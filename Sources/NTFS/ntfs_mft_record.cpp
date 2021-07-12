@@ -35,6 +35,22 @@ uint64_t MFTRecord::raw_address()
 	return _reader->boot_record()->MFTCluster * _reader->sizes.cluster_size + (_record->data()->MFTRecordIndex * _reader->sizes.record_size);
 }
 
+uint64_t MFTRecord::raw_address(PMFT_RECORD_ATTRIBUTE_HEADER pAttr, uint64_t offset)
+{
+	for (auto& dt : read_dataruns(pAttr))
+	{
+		if (offset > (dt.length * _reader->sizes.cluster_size))
+		{
+			offset -= (dt.length * _reader->sizes.cluster_size);
+		}
+		else
+		{
+			return (dt.offset * _reader->sizes.cluster_size) + offset;
+		}
+	}
+	return 0;
+}
+
 ULONG64 MFTRecord::datasize(std::string stream_name)
 {
 	if (_record->data()->flag & FILE_RECORD_FLAG_DIR)

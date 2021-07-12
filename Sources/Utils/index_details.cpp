@@ -7,10 +7,9 @@
 
 
 
-IndexDetails::IndexDetails(std::shared_ptr<MFTRecord> pMFT, uint64_t cluster_size)
+IndexDetails::IndexDetails(std::shared_ptr<MFTRecord> pMFT)
 {
 	_record = pMFT;
-	_cluster_size = cluster_size;
 
 	if (pMFT == nullptr)
 	{
@@ -40,7 +39,6 @@ IndexDetails::IndexDetails(std::shared_ptr<MFTRecord> pMFT, uint64_t cluster_siz
 			if (pAttrAllocation != nullptr)
 			{
 				indexBlocks = pMFT->attribute_data<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>(pAttrAllocation);
-				_blockDataruns = pMFT->read_dataruns(pAttrAllocation);
 
 				PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK pIndexSubBlockData = indexBlocks->data();
 				DWORD blockPos = 0;
@@ -51,17 +49,17 @@ IndexDetails::IndexDetails(std::shared_ptr<MFTRecord> pMFT, uint64_t cluster_siz
 						pMFT->apply_fixups(pIndexSubBlockData, pIndexSubBlockData->OffsetOfUS, pIndexSubBlockData->SizeOfUS);
 						vcnToBlock[pIndexSubBlockData->VCN] = pIndexSubBlockData;
 
-						auto entries = parse_entries_block(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pIndexSubBlockData, pIndexSubBlockData->EntryOffset + 0x18), type);
+						auto entries = _parse_entries_block(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pIndexSubBlockData, pIndexSubBlockData->EntryOffset + 0x18), type);
 						auto offset = reinterpret_cast<uint64_t>(vcnToBlock[pIndexSubBlockData->VCN]) - reinterpret_cast<uint64_t>(vcnToBlock[0]);
 
-						_VCNinfo[pIndexSubBlockData->VCN] = std::tuple<uint64_t, DWORD, std::vector<std::tuple<uint64_t, std::wstring>>>(_get_raw_address(offset), pIndexSubBlockData->AllocEntrySize + 0x18, entries);
+						_VCNinfo[pIndexSubBlockData->VCN] = std::tuple<uint64_t, DWORD, std::vector<std::tuple<uint64_t, std::wstring>>>(pMFT->raw_address(pAttrAllocation, offset), pIndexSubBlockData->AllocEntrySize + 0x18, entries);
 					}
 
 					blockPos += pIndexSubBlockData->AllocEntrySize + 0x18;
 					pIndexSubBlockData = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK, pIndexSubBlockData, pIndexSubBlockData->AllocEntrySize + 0x18);
 				}
 
-				_VCNtree = parse_entries_tree(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pAttrIndexRoot, pAttrIndexRoot->EntryOffset + 0x10), vcnToBlock, 0, type);
+				_VCNtree = _parse_entries_tree(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pAttrIndexRoot, pAttrIndexRoot->EntryOffset + 0x10), vcnToBlock, 0, type);
 
 			}
 			else
@@ -73,30 +71,14 @@ IndexDetails::IndexDetails(std::shared_ptr<MFTRecord> pMFT, uint64_t cluster_siz
 		{
 			_index_large = false;
 			uint64_t index_offset = reinterpret_cast<uint64_t>(pAttrIndexRoot) - reinterpret_cast<uint64_t>(pMFT->header()) + pAttrIndexRoot->EntryOffset + 0x10;
-			auto entries = parse_entries_block(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pAttrIndexRoot, pAttrIndexRoot->EntryOffset + 0x10), type);
+			auto entries = _parse_entries_block(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pAttrIndexRoot, pAttrIndexRoot->EntryOffset + 0x10), type);
 
 			_VCNinfo[0] = std::tuple<uint64_t, DWORD, std::vector<std::tuple<uint64_t, std::wstring>>>(index_offset, pAttrIndexRoot->AllocEntrySize + 0x18, entries);
 		}
 	}
 }
 
-uint64_t IndexDetails::_get_raw_address(uint64_t offset)
-{
-	for (auto& dt : _blockDataruns)
-	{
-		if (offset > (dt.length * _cluster_size))
-		{
-			offset -= (dt.length * _cluster_size);
-		}
-		else
-		{
-			return (dt.offset * _cluster_size) + offset;
-		}
-	}
-	return 0;
-}
-
-std::vector<std::tuple<uint64_t, std::wstring>> IndexDetails::parse_entries_block(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY pIndexEntry, std::string type)
+std::vector<std::tuple<uint64_t, std::wstring>> IndexDetails::_parse_entries_block(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY pIndexEntry, std::string type)
 {
 	std::vector<std::tuple<uint64_t, std::wstring>> ret;
 	if (pIndexEntry != nullptr)
@@ -132,7 +114,7 @@ std::vector<std::tuple<uint64_t, std::wstring>> IndexDetails::parse_entries_bloc
 	return ret;
 }
 
-std::shared_ptr<node> IndexDetails::parse_entries_tree(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY pIndexEntry, std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> vcnToBlock, uint64_t vcn, std::string type)
+std::shared_ptr<node> IndexDetails::_parse_entries_tree(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY pIndexEntry, std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> vcnToBlock, uint64_t vcn, std::string type)
 {
 	std::shared_ptr<node> ret = std::make_shared<node>(vcn);
 
@@ -149,7 +131,7 @@ std::shared_ptr<node> IndexDetails::parse_entries_tree(PMFT_RECORD_ATTRIBUTE_IND
 				if ((block != nullptr) && (block->Magic == MAGIC_INDX))
 				{
 					PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY nextEntries = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, block, block->EntryOffset + 0x18);
-					subnodes = parse_entries_tree(nextEntries, vcnToBlock, e->vcn(), type);
+					subnodes = _parse_entries_tree(nextEntries, vcnToBlock, e->vcn(), type);
 				}
 			}
 
