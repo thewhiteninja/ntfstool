@@ -39,7 +39,7 @@ uint64_t MFTRecord::raw_address(PMFT_RECORD_ATTRIBUTE_HEADER pAttr, uint64_t off
 {
 	for (auto& dt : read_dataruns(pAttr))
 	{
-		if (offset > (dt.length * _reader->sizes.cluster_size))
+		if (offset >= (dt.length * _reader->sizes.cluster_size))
 		{
 			offset -= (dt.length * _reader->sizes.cluster_size);
 		}

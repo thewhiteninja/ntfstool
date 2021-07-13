@@ -317,11 +317,34 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 	return ret;
 }
 
-std::vector<std::string> print_attribute_index_allocation(PMFT_RECORD_ATTRIBUTE_HEADER pIndexAttrHeader, std::vector<std::shared_ptr<IndexEntry>> entries, bool full = false)
+std::vector<std::string> print_attribute_index_allocation(PMFT_RECORD_ATTRIBUTE_HEADER pIndexAttrHeader, std::shared_ptr<MFTRecord> record, ULONG32 cluster_size, std::vector<std::shared_ptr<IndexEntry>> entries, bool full = false)
 {
 	std::vector<std::string> ret;
-	ret.push_back("First VCN               : 0x" + utils::format::hex6(pIndexAttrHeader->Form.Nonresident.LowestVcn));
-	ret.push_back("Last VCN                : 0x" + utils::format::hex6(pIndexAttrHeader->Form.Nonresident.HighestVcn));
+
+	if (pIndexAttrHeader->FormCode == NON_RESIDENT_FORM)
+	{
+		ret.push_back("First VCN               : 0x" + utils::format::hex6(pIndexAttrHeader->Form.Nonresident.LowestVcn));
+		ret.push_back("Last VCN                : 0x" + utils::format::hex6(pIndexAttrHeader->Form.Nonresident.HighestVcn));
+		ret.push_back("");
+
+		auto dataruns = record->read_dataruns(pIndexAttrHeader);
+		if (!dataruns.empty())
+		{
+			ret.push_back("Dataruns                : ");
+			LONGLONG last = 0;
+			ULONGLONG size_on_disk = 0;
+			for (const auto& run : dataruns)
+			{
+				if (last != run.offset)
+				{
+					size_on_disk += (run.length * cluster_size);
+				}
+				ret.push_back("    Length: " + utils::format::hex(static_cast<DWORD>(run.length)) + " Offset: " + utils::format::hex(static_cast<DWORD>(run.offset)) + (last == run.offset ? " (S)" : ""));
+				last = run.offset;
+			}
+			ret.push_back("Size on disk            : " + std::to_string(size_on_disk) + " (" + utils::format::size(size_on_disk) + ")");
+		}
+	}
 
 	if (full)
 	{
@@ -450,7 +473,7 @@ int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DW
 			}
 			case $INDEX_ALLOCATION:
 			{
-				fr_attributes->add_item_multiline(print_attribute_index_allocation(pAttribute, record->index()));
+				fr_attributes->add_item_multiline(print_attribute_index_allocation(pAttribute, record, explorer->reader()->sizes.cluster_size, record->index()));
 				break;
 			}
 			default:
@@ -490,7 +513,7 @@ int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DW
 		std::vector<std::string> lines;
 		if (idx_details->is_large())
 		{
-			fr_index->add_item_line(utils::format::hex6(v.first, true));
+			fr_index->add_item_line("0x" + utils::format::hex6(v.first));
 			fr_index->add_item_line(utils::format::hex6(std::get<0>(v.second), true));
 		}
 		else
@@ -695,7 +718,7 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 
 		case $INDEX_ALLOCATION:
 		{
-			fr_attributes->add_item_multiline(print_attribute_index_allocation(pAttribute, record->index(), true));
+			fr_attributes->add_item_multiline(print_attribute_index_allocation(pAttribute, record, explorer->reader()->sizes.cluster_size, record->index(), true));
 			break;
 		}
 		case $DATA:
