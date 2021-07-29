@@ -554,20 +554,9 @@ int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DW
 	return 0;
 }
 
-
-int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWORD inode)
+int commands::mft::print_mft_info_details(std::shared_ptr<MFTRecord> record, ULONG32 cluster_size)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
-
-	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
-	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_number(inode);
 	PMFT_RECORD_HEADER record_header = record->header();
-
-	utils::ui::title("MFT (inode:" + std::to_string(inode) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::string signature = std::string((PCHAR)record_header->signature);
 	std::cout << "Signature         : " << signature.substr(0, 4) << std::endl;
@@ -718,12 +707,12 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 
 		case $INDEX_ALLOCATION:
 		{
-			fr_attributes->add_item_multiline(print_attribute_index_allocation(pAttribute, record, explorer->reader()->sizes.cluster_size, record->index(), true));
+			fr_attributes->add_item_multiline(print_attribute_index_allocation(pAttribute, record, cluster_size, record->index(), true));
 			break;
 		}
 		case $DATA:
 		{
-			fr_attributes->add_item_multiline(print_attribute_data(record, pAttribute, explorer->reader()->sizes.cluster_size), 46);
+			fr_attributes->add_item_multiline(print_attribute_data(record, pAttribute, cluster_size), 46);
 			break;
 		}
 		case $LOGGED_UTILITY_STREAM:
@@ -769,6 +758,25 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 	utils::ui::title("Attributes:");
 	fr_attributes->render(std::cout);
 	std::cout << std::endl;
+
+	return 0;
+}
+
+
+int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWORD inode)
+{
+	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
+	{
+		std::cerr << "[!] NTFS volume required" << std::endl;
+		return 1;
+	}
+
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_number(inode);
+
+	utils::ui::title("MFT (inode:" + std::to_string(inode) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+
+	commands::mft::print_mft_info_details(record, explorer->reader()->sizes.cluster_size);
 
 	return 0;
 }

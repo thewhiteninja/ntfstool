@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "Utils/utils.h"
+#include "NTFS/ntfs_mft_record.h"
 #include "options.h"
 
 #include <memory>
@@ -73,6 +74,8 @@ namespace commands {
 		int print_mft(std::shared_ptr<Options> opts);
 
 		int print_btree(std::shared_ptr<Options> opts);
+
+		int print_mft_info_details(std::shared_ptr<MFTRecord> record, ULONG32 cluster_size);
 	}
 
 	namespace bitlocker
