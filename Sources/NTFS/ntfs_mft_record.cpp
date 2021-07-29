@@ -223,6 +223,36 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 		type = MFT_ATTRIBUTE_INDEX_REPARSE;
 		pAttr = attribute_header($INDEX_ROOT, type);
 	}
+	if (pAttr == nullptr)
+	{
+		PMFT_RECORD_ATTRIBUTE_HEADER pAttributeList = attribute_header($ATTRIBUTE_LIST);
+		if (pAttributeList != NULL)
+		{
+			std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE>> attribute_list_data = attribute_data<PMFT_RECORD_ATTRIBUTE>(pAttributeList);
+			if (attribute_list_data != nullptr)
+			{
+				DWORD offset = 0;
+				while (offset + sizeof(MFT_RECORD_ATTRIBUTE_HEADER) <= attribute_list_data->size())
+				{
+					PMFT_RECORD_ATTRIBUTE pAttrListI = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, attribute_list_data->data(), offset);
+					if (pAttrListI->typeID == $INDEX_ROOT)
+					{
+						std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttrListI->recordNumber & 0xffffffffffff);
+						return extRecordHeader->index();
+					}
+
+					if (pAttrListI->recordLength > 0)
+					{
+						offset += pAttrListI->recordLength;
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+		}
+	}
 
 	if (pAttr != nullptr)
 	{
