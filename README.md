@@ -60,7 +60,7 @@ Options can be entered as decimal or hex number with "0x" prefix.
 | [usn](#usn)  | Dump $UsnJrnl file  in specified format: csv, json, raw. |
 | [shadow](#shadow)  | List volume shadow snapshots from selected disk and volume. |
 | [undelete](#undelete)  | Search and extract deleted files for a volume. |
-| [shell](#shell)   | Start a mini Unix-like shell |
+| [shell](#shell-1)   | Start a mini Unix-like shell |
 | [smart](#smart)  | Display S.M.A.R.T data |
 
 
