@@ -4,7 +4,7 @@
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-brightgreen.svg?tyle=flat-square)](#)
 [![x64](https://img.shields.io/badge/Windows-64_bit-0078d7.svg)](#)
 [![x86](https://img.shields.io/badge/Windows-32_bit-0078d7.svg)](#)
-[![v1.2](https://img.shields.io/badge/Version-1.3-ff5733.svg)](#)
+[![v1.3](https://img.shields.io/badge/Version-1.3-ff5733.svg)](#)
 ![Build](https://github.com/thewhiteninja/ntfstool/workflows/Build/badge.svg)
 
 <br />
@@ -60,6 +60,7 @@ Options can be entered as decimal or hex number with "0x" prefix.
 | [usn](#usn)  | Dump $UsnJrnl file  in specified format: csv, json, raw. |
 | [shadow](#shadow)  | List volume shadow snapshots from selected disk and volume. |
 | [undelete](#undelete)  | Search and extract deleted files for a volume. |
+| [shell](#shell)   | Start a mini Unix-like shell |
 | [smart](#smart)  | Display S.M.A.R.T data |
 
 
