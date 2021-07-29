@@ -52,6 +52,7 @@ const std::map<std::string, std::string> help_strings = {
 	{"ls","List directory content"},
 	{"pwd","Print current working directory"},
 	{"quit","Quit program"},
+	{"rec","Print MFT record details"},
 	{"help","This command"} };
 
 void help(std::string cmd)
@@ -273,6 +274,37 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 					tab->render(std::cout);
 					std::cout << std::endl;
 				}
+				continue;
+			}
+			if (cmds[0] == "rec" && cmds.size() == 2)
+			{
+				if (cmds[1] != "")
+				{
+					auto from_file = utils::files::split_file_and_stream(cmds[1]);
+
+					bool found = false;
+					std::vector<std::shared_ptr<IndexEntry>> index = current_dir_record->index();
+					for (std::shared_ptr<IndexEntry>& entry : index)
+					{
+						if (_strcmpi(utils::strings::to_utf8(entry->name()).c_str(), from_file.first.c_str()) == 0)
+						{
+							found = true;
+							std::shared_ptr<MFTRecord> target_record = explorer->mft()->record_from_number(entry->record_number());
+							commands::mft::print_mft_info_details(target_record, explorer->reader()->sizes.cluster_size);
+							break;
+						}
+					}
+					if (!found)
+					{
+						std::cout << cmds[1] << ": File not found" << std::endl;
+					}
+				}
+				continue;
+			}
+
+			if (cmds[0] == "rec" && cmds.size() == 1)
+			{
+				commands::mft::print_mft_info_details(current_dir_record, explorer->reader()->sizes.cluster_size);
 				continue;
 			}
 			if (cmds[0] == "cat" && cmds.size() == 2)
