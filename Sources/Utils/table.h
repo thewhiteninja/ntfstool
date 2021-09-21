@@ -39,7 +39,7 @@ namespace utils
 
 			void add_item_multiline(std::initializer_list<std::string> list);
 
-			void add_item_multiline(std::vector<std::string> list, unsigned int max_size = 32);
+			void add_item_multiline(std::vector<std::string> list, unsigned int max_size = 38);
 
 			void set_margin_left(uint32_t margin_left);
 
