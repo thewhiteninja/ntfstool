@@ -59,7 +59,7 @@ Options can be entered as decimal or hex number with "0x" prefix.
 | [logfile](#logfile)  | Dump $LogFile file in specified format: csv, json, raw. |
 | [usn](#usn)  | Dump $UsnJrnl file  in specified format: csv, json, raw. |
 | [shadow](#shadow)  | List volume shadow snapshots from selected disk and volume. |
-| [streams(#streams)   | Display Alternate Data Streams |
+| [streams](#streams)   | Display Alternate Data Streams |
 | [undelete](#undelete)  | Search and extract deleted files for a volume. |
 | [shell](#shell-1)   | Start a mini Unix-like shell |
 | [smart](#smart)  | Display S.M.A.R.T data |
