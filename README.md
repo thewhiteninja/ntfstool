@@ -59,6 +59,7 @@ Options can be entered as decimal or hex number with "0x" prefix.
 | [logfile](#logfile)  | Dump $LogFile file in specified format: csv, json, raw. |
 | [usn](#usn)  | Dump $UsnJrnl file  in specified format: csv, json, raw. |
 | [shadow](#shadow)  | List volume shadow snapshots from selected disk and volume. |
+| [streams(#streams)   | Display Alternate Data Streams |
 | [undelete](#undelete)  | Search and extract deleted files for a volume. |
 | [shell](#shell-1)   | Start a mini Unix-like shell |
 | [smart](#smart)  | Display S.M.A.R.T data |
@@ -899,6 +900,26 @@ At build time, VisualStudio will detect the vcpkg.json file and install required
     |                                        |       |                     |                    - Differential      |
     |                                        |       |                     |                    - Auto Recover      |
     +---------------------------------------------------------------------------------------------------------------+
+</td></tr>
+</table>
+
+### streams
+<table>
+<tr><td>streams disk=0 volume=4 from=c:\test.pdf</td></tr>
+<tr><td>
+  
+    Listing streams from \\.\PhysicalDrive0 > Volume:4
+    --------------------------------------------------
+
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [-] Source      : c:\test.pdf
+    [-] Record Num  : 13525 (000034d5h)
+    [+] Alternate data stream(s):
+        +-----------------------------+
+        | Id | Name            | Size |
+        +-----------------------------+
+        |  0 | Zone.Identifier |   27 |
+        +-----------------------------+
 </td></tr>
 </table>
 
