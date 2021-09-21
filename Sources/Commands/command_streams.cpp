@@ -61,10 +61,24 @@ int list_streams(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 	if (ads_names.size() > 0)
 	{
 		std::cout << "[+] Alternate data stream(s):" << std::endl;
-		for (auto& ads : record->alternate_data_names())
+
+		std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
+		tab->set_margin_left(4);
+		tab->set_interline(false);
+		tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
+		tab->add_header_line("Name");
+		tab->add_header_line("Size", utils::ui::TableAlign::RIGHT);
+
+		int i = 0;
+		for (auto& ads : ads_names)
 		{
-			std::cout << "    " + ads << std::endl;
+			tab->add_item_line(std::to_string(i++));
+			tab->add_item_line(ads);
+			tab->add_item_line(std::to_string(record->datasize(ads)));
+			tab->new_line();
 		}
+
+		tab->render(std::cout);
 	}
 	else
 	{
