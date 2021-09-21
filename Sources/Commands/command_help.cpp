@@ -11,7 +11,7 @@
 
 #define VERSION "1.3"
 
-void usage(char* binname)
+void usage(const char* binname)
 {
 	std::cerr << "Usage: " << binname << " command [options]" << std::endl;
 	std::cerr << std::endl;
@@ -41,7 +41,7 @@ void usage(char* binname)
 	std::cerr << std::endl;
 }
 
-void print_help_help(char* name)
+void print_help_help(const char* name)
 {
 	std::cerr << "Help command" << std::endl;
 	std::cerr << "------------" << std::endl;
@@ -56,7 +56,7 @@ void print_help_help(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_info(char* name)
+void print_help_info(const char* name)
 {
 	std::cerr << "Info command" << std::endl;
 	std::cerr << "------------" << std::endl;
@@ -77,7 +77,7 @@ void print_help_info(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_mbr(char* name)
+void print_help_mbr(const char* name)
 {
 	std::cerr << "MBR command" << std::endl;
 	std::cerr << "-----------" << std::endl;
@@ -92,7 +92,7 @@ void print_help_mbr(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_gpt(char* name)
+void print_help_gpt(const char* name)
 {
 	std::cerr << "GPT command" << std::endl;
 	std::cerr << "-----------" << std::endl;
@@ -107,7 +107,7 @@ void print_help_gpt(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_vbr(char* name)
+void print_help_vbr(const char* name)
 {
 	std::cerr << "VBR command" << std::endl;
 	std::cerr << "-----------" << std::endl;
@@ -123,7 +123,7 @@ void print_help_vbr(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_mft(char* name)
+void print_help_mft(const char* name)
 {
 	std::cerr << "MFT command" << std::endl;
 	std::cerr << "-----------" << std::endl;
@@ -142,7 +142,7 @@ void print_help_mft(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_btree(char* name)
+void print_help_btree(const char* name)
 {
 	std::cerr << "Btree command" << std::endl;
 	std::cerr << "-----------" << std::endl;
@@ -158,7 +158,7 @@ void print_help_btree(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_bitlocker(char* name)
+void print_help_bitlocker(const char* name)
 {
 	std::cerr << "Bitlocker command" << std::endl;
 	std::cerr << "-----------------" << std::endl;
@@ -183,7 +183,7 @@ void print_help_bitlocker(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_bitdecrypt(char* name)
+void print_help_bitdecrypt(const char* name)
 {
 	std::cerr << "Bitdecrypt command" << std::endl;
 	std::cerr << "------------------" << std::endl;
@@ -199,7 +199,7 @@ void print_help_bitdecrypt(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_fve(char* name)
+void print_help_fve(const char* name)
 {
 	std::cerr << "FVE command" << std::endl;
 	std::cerr << "-----------" << std::endl;
@@ -219,7 +219,7 @@ void print_help_fve(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_logfile(char* name)
+void print_help_logfile(const char* name)
 {
 	std::cerr << "Logfile command" << std::endl;
 	std::cerr << "---------------" << std::endl;
@@ -238,7 +238,7 @@ void print_help_logfile(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_usn(char* name)
+void print_help_usn(const char* name)
 {
 	std::cerr << "USN command" << std::endl;
 	std::cerr << "-----------" << std::endl;
@@ -257,7 +257,7 @@ void print_help_usn(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_extract(char* name)
+void print_help_extract(const char* name)
 {
 	std::cerr << "Extract command" << std::endl;
 	std::cerr << "---------------" << std::endl;
@@ -278,7 +278,22 @@ void print_help_extract(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_undelete(char* name)
+void print_help_streams(const char* name)
+{
+	std::cerr << "Streams command" << std::endl;
+	std::cerr << "---------------" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    " << name << " streams [disk id] [volume id] [from/inode]" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Description:" << std::endl;
+	std::cerr << "    List alternate data streams of a file from its path or inode." << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: List ADS for c:\\random_file" << std::endl;
+	std::cerr << "    " << name << " streams disk=0 volume=1 from=\"c:\\random_file\"" << std::endl;
+	std::cerr << std::endl;
+}
+
+void print_help_undelete(const char* name)
 {
 	std::cerr << "Undelete command" << std::endl;
 	std::cerr << "----------------" << std::endl;
@@ -297,7 +312,7 @@ void print_help_undelete(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_shell(char* name)
+void print_help_shell(const char* name)
 {
 	std::cerr << "Shell command" << std::endl;
 	std::cerr << "-------------" << std::endl;
@@ -313,7 +328,7 @@ void print_help_shell(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_shadow(char* name)
+void print_help_shadow(const char* name)
 {
 	std::cerr << "Shadow command" << std::endl;
 	std::cerr << "---------------" << std::endl;
@@ -328,7 +343,7 @@ void print_help_shadow(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_reparse(char* name)
+void print_help_reparse(const char* name)
 {
 	std::cerr << "Reparse command" << std::endl;
 	std::cerr << "---------------" << std::endl;
@@ -343,7 +358,7 @@ void print_help_reparse(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_image(char* name)
+void print_help_image(const char* name)
 {
 	std::cerr << "Image command" << std::endl;
 	std::cerr << "---------------" << std::endl;
@@ -358,7 +373,7 @@ void print_help_image(char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_smart(char* name)
+void print_help_smart(const char* name)
 {
 	std::cerr << "SMART command" << std::endl;
 	std::cerr << "---------------" << std::endl;
@@ -375,7 +390,7 @@ void print_help_smart(char* name)
 
 namespace commands {
 	namespace help {
-		void print_help(char* name, std::shared_ptr<Options> opts) {
+		void print_help(const char* name, std::shared_ptr<Options> opts) {
 			if (opts->subcommand == "")
 			{
 				usage(name);
@@ -401,6 +416,7 @@ namespace commands {
 				if (opts->subcommand == "undelete") { print_help_undelete(name); return; }
 				if (opts->subcommand == "shell") { print_help_shell(name); return; }
 				if (opts->subcommand == "smart") { print_help_smart(name); return; }
+				if (opts->subcommand == "streams") { print_help_streams(name); return; }
 				usage(name);
 			}
 		}
