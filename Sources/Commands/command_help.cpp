@@ -128,10 +128,10 @@ void print_help_mft(const char* name)
 	std::cerr << "MFT command" << std::endl;
 	std::cerr << "-----------" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "    " << name << " mft [disk id] [volume id] (inode)" << std::endl;
+	std::cerr << "    " << name << " mft [disk id] [volume id] (inode/from)" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Provides MFT file record information and detailed attributes for selected disk, volume and inode." << std::endl;
+	std::cerr << "    Provides MFT file record information and detailed attributes for selected disk, volume and inode/path." << std::endl;
 	std::cerr << "    Default inode: 0 (MFT)." << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: MFT file record for disk 0, volume 2" << std::endl;
@@ -140,6 +140,9 @@ void print_help_mft(const char* name)
 	std::cerr << "    Example: File record for disk 0, volume 2 and inode 5" << std::endl;
 	std::cerr << "    " << name << " mft disk=0 volume=2 inode=5" << std::endl;
 	std::cerr << std::endl;
+	std::cerr << "    Example: File record for disk 0, volume 2 and from \"c:\\file.bin\"" << std::endl;
+	std::cerr << "    " << name << " mft disk=0 volume=2 from=\"c:\\file.bin\"" << std::endl;
+	std::cerr << std::endl;
 }
 
 void print_help_btree(const char* name)
@@ -147,14 +150,16 @@ void print_help_btree(const char* name)
 	std::cerr << "Btree command" << std::endl;
 	std::cerr << "-----------" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "    " << name << " btree [disk id] [volume id] (inode)" << std::endl;
+	std::cerr << "    " << name << " btree [disk id] [volume id] (inode/from)" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Display index B-tree nodes and detailed attributes for selected disk, volume and inode." << std::endl;
+	std::cerr << "    Display index B-tree nodes and detailed attributes for selected disk, volume and inode/path." << std::endl;
 	std::cerr << "    Default inode: 5 (Root)." << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Index B-tree for disk 0, volume 2 and inode 5" << std::endl;
 	std::cerr << "    " << name << " btree disk=0 volume=2 inode=5" << std::endl;
+	std::cerr << "    Example: Index B-tree for disk 0, volume 2 and from \"c:\\file.bin\"" << std::endl;
+	std::cerr << "    " << name << " btree disk=0 volume=2 from \"c:\\file.bin\"" << std::endl;
 	std::cerr << std::endl;
 }
 
