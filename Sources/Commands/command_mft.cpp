@@ -395,7 +395,7 @@ std::vector<std::string> print_attribute_list(PMFT_RECORD_ATTRIBUTE pAttribute, 
 }
 
 
-int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWORD inode)
+int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
@@ -404,14 +404,32 @@ int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DW
 	}
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
-	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_number(inode);
+
+	std::shared_ptr<MFTRecord> record = nullptr;
+
+	auto [filepath, stream_name] = utils::files::split_file_and_stream(opts->from);
+
+	if (opts->from != "")
+	{
+		record = explorer->mft()->record_from_path(filepath);
+	}
+	else
+	{
+		record = explorer->mft()->record_from_number(opts->inode);
+	}
 
 	if (record == nullptr)
 		return 2;
 
 	PMFT_RECORD_HEADER record_header = record->header();
 
-	utils::ui::title("B-tree index (inode:" + std::to_string(inode) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	if (!(record_header->flag & MFT_RECORD_IS_DIRECTORY))
+	{
+		std::cout << "[!] Inode " << std::to_string(record->header()->MFTRecordIndex) << " is not a directory" << std::endl;
+		return 3;
+	}
+
+	utils::ui::title("B-tree index (inode:" + std::to_string(record->header()->MFTRecordIndex) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::shared_ptr<utils::ui::Table> fr_attributes = std::make_shared<utils::ui::Table>();
 	fr_attributes->set_interline(true);
@@ -763,7 +781,7 @@ int commands::mft::print_mft_info_details(std::shared_ptr<MFTRecord> record, ULO
 }
 
 
-int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWORD inode)
+int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
@@ -772,9 +790,21 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, DWOR
 	}
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
-	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_number(inode);
 
-	utils::ui::title("MFT (inode:" + std::to_string(inode) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	std::shared_ptr<MFTRecord> record = nullptr;
+
+	auto [filepath, stream_name] = utils::files::split_file_and_stream(opts->from);
+
+	if (opts->from != "")
+	{
+		record = explorer->mft()->record_from_path(filepath);
+	}
+	else
+	{
+		record = explorer->mft()->record_from_number(opts->inode);
+	}
+
+	utils::ui::title("MFT (inode:" + std::to_string(record->header()->MFTRecordIndex) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	commands::mft::print_mft_info_details(record, explorer->reader()->sizes.cluster_size);
 
@@ -795,7 +825,7 @@ namespace commands
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					print_mft_info(disk, volume, opts->inode);
+					print_mft_info(disk, volume, opts);
 				}
 			}
 			std::cout.flags(flag_backup);
@@ -812,7 +842,7 @@ namespace commands
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					print_btree_info(disk, volume, opts->inode);
+					print_btree_info(disk, volume, opts);
 				}
 			}
 			std::cout.flags(flag_backup);
