@@ -18,7 +18,7 @@
 
 #include "buffer.h"
 
-#define POINTER_ADD(t, p, v)	((t)((reinterpret_cast<uint64_t>(p) + v)))
+#define POINTER_ADD(t, p, v)	(reinterpret_cast<t>(reinterpret_cast<uint64_t>(p) + v))
 
 namespace utils
 {
