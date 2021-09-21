@@ -66,6 +66,7 @@
     <ClCompile Include="Sources\Commands\command_fve.cpp" />
     <ClCompile Include="Sources\Commands\command_mft.cpp" />
     <ClCompile Include="Sources\Commands\command_smart.cpp" />
+    <ClCompile Include="Sources\Commands\command_streams.cpp" />
     <ClCompile Include="Sources\Commands\command_undelete.cpp" />
     <ClCompile Include="Sources\Commands\command_usn.cpp" />
     <ClCompile Include="Sources\Commands\command_vbr.cpp" />

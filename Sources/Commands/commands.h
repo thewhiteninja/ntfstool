@@ -91,7 +91,12 @@ namespace commands {
 
 	namespace help
 	{
-		void print_help(char* name, std::shared_ptr<Options> opts);
+		void print_help(const char* name, std::shared_ptr<Options> opts);
+	}
+
+	namespace streams
+	{
+		int list(std::shared_ptr<Options> opts);
 	}
 
 	namespace undelete
