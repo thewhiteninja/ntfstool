@@ -282,7 +282,6 @@ void Disk::_get_volumes(HANDLE h) {
 	else
 	{
 		PMBR pmbr = mbr();
-		PGPT_HEADER pgpt = gpt();
 		int partition_index = 0;
 		if (has_protective_mbr())
 		{

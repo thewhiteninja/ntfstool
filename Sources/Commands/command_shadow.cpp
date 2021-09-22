@@ -46,7 +46,6 @@ int print_volumeshadow(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) 
 			std::shared_ptr<utils::ui::Table> df_table = std::make_shared<utils::ui::Table>();
 			df_table->set_interline(true);
 
-			int n = 0;
 			df_table->add_header_line("SetID/ID");
 			df_table->add_header_line("Count");
 			df_table->add_header_line("Date");
