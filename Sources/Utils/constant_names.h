@@ -50,6 +50,8 @@ namespace constants {
 			std::string file_record_reparse_point_type(ULONG32 t);
 
 			std::string file_record_filename_name_type(UCHAR t);
+
+			std::string efs_type(ULONG32);
 		}
 
 		namespace usn

@@ -80,6 +80,9 @@
 
 #define MFT_ATTRIBUTE_DATA_USN_NAME				("$J")
 
+#define MFT_ATTRIBUTE_EFS_CONTAINER				(1)
+#define MFT_ATTRIBUTE_EFS_CERTIFICATE			(3)
+
 #define	MFT_ATTRIBUTE_INDEX_ENTRY_FLAG_SUBNODE	(0x01)
 #define	MFT_ATTRIBUTE_INDEX_ENTRY_FLAG_LAST		(0x02)
 
@@ -482,6 +485,60 @@ typedef struct
 	BYTE		NotLeaf;
 	BYTE		Padding[3];
 } MFT_RECORD_ATTRIBUTE_INDEX_BLOCK, * PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK;
+
+typedef struct
+{
+	DWORD		AttributeLength;
+	DWORD		State;
+	DWORD		Version;
+	DWORD		CryptoAPIVersion;
+	BYTE		Checksum[16];
+	BYTE		ChecksumDDF[16];
+	BYTE		ChecksumDRF[16];
+	DWORD		OffsetToDDF;
+	DWORD		OffsetToDRF;
+} MFT_RECORD_ATTRIBUTE_EFS_HEADER, * PMFT_RECORD_ATTRIBUTE_EFS_HEADER;
+
+typedef struct {
+	DWORD		Count;
+} MFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER, * PMFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER;
+
+
+typedef struct {
+	DWORD		Length;
+	DWORD		CredentialHeaderOffset;
+	DWORD		FEKSize;
+	DWORD		FEKOffset;
+} MFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY_HEADER, * PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY_HEADER;
+
+typedef struct {
+	DWORD		Length;
+	DWORD		SIDOffset;
+	DWORD		Type;
+	union {
+		/* CryptoAPI container. */
+		struct {
+			DWORD container_name_offset;
+			DWORD provider_name_offset;
+			DWORD public_key_blob_offset;
+			DWORD public_key_blob_size;
+		};
+		/* Certificate thumbprint. */
+		struct {
+			DWORD cert_thumbprint_header_size;
+			DWORD cert_thumbprint_header_offset;
+
+		};
+	};
+} MFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY, * PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY;
+
+typedef struct {
+	DWORD thumbprint_offset;
+	DWORD thumbprint_size;
+	DWORD container_name_offset;
+	DWORD provider_name_offset;
+	DWORD user_name_offset;
+} MFT_RECORD_ATTRIBUTE_EFS_DF_CERTIFICATE_THUMBPRINT_HEADER, * PMFT_RECORD_ATTRIBUTE_EFS_DF_CERTIFICATE_THUMBPRINT_HEADER;
 
 typedef struct
 {
