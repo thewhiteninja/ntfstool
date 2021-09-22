@@ -65,6 +65,11 @@ void utils::ui::Table::add_item_multiline(std::vector<std::string> list, unsigne
 				auto offset = value.length() - value_len;
 				if (value_len > max_size)
 				{
+					auto tmp_max_size = max_size;
+					if (value_len > 2 * max_size)
+					{
+						max_size = 32;
+					}
 					s.push_back(key + ": " + value.substr(0, max_size + offset));
 					value = value.substr(max_size + offset);
 					value_len = utils::strings::utf8_string_size(value);
@@ -77,6 +82,7 @@ void utils::ui::Table::add_item_multiline(std::vector<std::string> list, unsigne
 					if (value_len > 0) {
 						s.push_back(whitespace + "  " + value);
 					}
+					max_size = tmp_max_size;
 				}
 				else
 				{
@@ -86,6 +92,7 @@ void utils::ui::Table::add_item_multiline(std::vector<std::string> list, unsigne
 			else
 			{
 				std::string value = i;
+
 				while (value.length() > max_size) {
 					s.push_back(value.substr(0, max_size));
 					value = value.substr(max_size);
