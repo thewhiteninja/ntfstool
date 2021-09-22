@@ -327,6 +327,27 @@ std::vector<std::string> print_attribute_logged_utility(std::shared_ptr<MFTRecor
 			ret.push_back("");
 
 		}
+		else if (name == L"$TXF_DATA")
+		{
+			auto txf_buffer = record->attribute_data<PBYTE>(pAttribute);
+			PMFT_RECORD_ATTRIBUTE_TXF txf_header = reinterpret_cast<PMFT_RECORD_ATTRIBUTE_TXF>(txf_buffer->data());
+			if (txf_buffer->size() == sizeof(MFT_RECORD_ATTRIBUTE_TXF))
+			{
+				ret.push_back("");
+				ret.push_back("Root File Record Number : " + std::to_string(txf_header->RootRecordNumber.FileRecordNumber));
+				ret.push_back("Root Sequence Number    : " + std::to_string(txf_header->RootRecordNumber.SequenceNumber));
+				ret.push_back("Flags                   : " + utils::format::hex6(txf_header->Flags, true));
+				ret.push_back("Txf File ID             : " + std::to_string(txf_header->TxfFileId));
+				ret.push_back("LSN NTFS Metadata       : " + utils::format::hex6(txf_header->LsnNtfsMetadata, true));
+				ret.push_back("LSN User Data           : " + utils::format::hex6(txf_header->LsnUserData, true));
+				ret.push_back("LSN Directory Index     : " + utils::format::hex6(txf_header->LsnDirectoryIndex, true));
+				ret.push_back("USN Index               : " + utils::format::hex6(txf_header->UsnIndex, true));
+			}
+			else
+			{
+				ret.push_back("Data                    : " + utils::convert::to_hex(txf_buffer->data(), txf_buffer->size()));
+			}
+		}
 	}
 	return ret;
 }
