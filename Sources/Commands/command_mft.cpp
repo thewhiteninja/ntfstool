@@ -241,12 +241,12 @@ void print_efs_entry(std::vector<std::string>& ret, PMFT_RECORD_ATTRIBUTE_EFS_AR
 		ret.push_back("");
 		PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY entry = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY, entry_header, entry_header->CredentialHeaderOffset);
 
-		PDWORD psid = POINTER_ADD(PDWORD, entry, entry->SIDOffset);
+		PDWORD psid = POINTER_ADD(PDWORD, entry, 12 + entry->SIDOffset);
 		std::string sid = "S-1-5-21-";
-		sid += std::to_string(((DWORD*)&sid)[0]) + "-";
-		sid += std::to_string(((DWORD*)&sid)[1]) + "-";
-		sid += std::to_string(((DWORD*)&sid)[2]) + "-";
-		sid += std::to_string(((DWORD*)&sid)[3]);
+		sid += std::to_string(psid[0]) + "-";
+		sid += std::to_string(psid[1]) + "-";
+		sid += std::to_string(psid[2]) + "-";
+		sid += std::to_string(psid[3]);
 
 		ret.push_back("Type                    : " + constants::disk::mft::efs_type(entry->Type));
 		ret.push_back("SID                     : " + sid);
