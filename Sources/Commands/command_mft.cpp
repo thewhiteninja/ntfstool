@@ -232,10 +232,102 @@ std::vector<std::string> print_attribute_filename(PMFT_RECORD_ATTRIBUTE_FILENAME
 	return ret;
 }
 
-std::vector<std::string> print_attribute_logged_utility()
+void print_efs_entry(std::vector<std::string>& ret, PMFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER efs_arr_header)
+{
+	uint32_t i = 0;
+	PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY_HEADER entry_header = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY_HEADER, efs_arr_header, 4);
+	while (i < efs_arr_header->Count)
+	{
+		ret.push_back("");
+		PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY entry = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY, entry_header, entry_header->CredentialHeaderOffset);
+
+		PDWORD psid = POINTER_ADD(PDWORD, entry, entry->SIDOffset);
+		std::string sid = "S-1-5-21-";
+		sid += std::to_string(((DWORD*)&sid)[0]) + "-";
+		sid += std::to_string(((DWORD*)&sid)[1]) + "-";
+		sid += std::to_string(((DWORD*)&sid)[2]) + "-";
+		sid += std::to_string(((DWORD*)&sid)[3]);
+
+		ret.push_back("Type                    : " + constants::disk::mft::efs_type(entry->Type));
+		ret.push_back("SID                     : " + sid);
+
+		ret.push_back("Encrypted FEK " + std::to_string(entry_header->FEKSize * 8) + "bits  : " + utils::convert::to_hex(POINTER_ADD(PBYTE, entry_header, entry_header->FEKOffset), entry_header->FEKSize));
+
+		if (entry->Type == MFT_ATTRIBUTE_EFS_CONTAINER)
+		{
+
+		}
+		else if (entry->Type == MFT_ATTRIBUTE_EFS_CERTIFICATE)
+		{
+			PMFT_RECORD_ATTRIBUTE_EFS_DF_CERTIFICATE_THUMBPRINT_HEADER thumprint_header = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_DF_CERTIFICATE_THUMBPRINT_HEADER, entry, entry->cert_thumbprint_header_offset);
+			ret.push_back("Certificate Fingerprint : " + utils::convert::to_hex(POINTER_ADD(PBYTE, thumprint_header, thumprint_header->thumbprint_offset), thumprint_header->thumbprint_size));
+
+			if (thumprint_header->container_name_offset) ret.push_back("Container               : " + utils::strings::to_utf8(POINTER_ADD(PWCHAR, thumprint_header, thumprint_header->container_name_offset)));
+			if (thumprint_header->provider_name_offset) ret.push_back("Cryptographic Provider  : " + utils::strings::to_utf8(POINTER_ADD(PWCHAR, thumprint_header, thumprint_header->provider_name_offset)));
+			if (thumprint_header->user_name_offset) ret.push_back("Username                : " + utils::strings::to_utf8(POINTER_ADD(PWCHAR, thumprint_header, thumprint_header->user_name_offset)));
+		}
+
+		entry_header = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY_HEADER, entry_header, entry_header->Length);
+		i++;
+	}
+}
+
+std::vector<std::string> print_attribute_logged_utility(std::shared_ptr<MFTRecord> record, PMFT_RECORD_ATTRIBUTE_HEADER pAttribute)
 {
 	std::vector<std::string> ret;
-	ret.push_back("Binary data");
+	if (pAttribute != nullptr)
+	{
+		std::wstring name = std::wstring(POINTER_ADD(PWCHAR, pAttribute, pAttribute->NameOffset));
+		name.resize(pAttribute->NameLength);
+
+		if (pAttribute->NameLength > 0)
+		{
+			ret.push_back("Name                    : " + utils::strings::to_utf8(name));
+		}
+
+		ret.push_back("Non Resident            : " + std::string(pAttribute->FormCode == NON_RESIDENT_FORM ? "True" : "False"));
+
+		if (name == L"$EFS")
+		{
+			auto efs_buffer = record->attribute_data<PBYTE>(pAttribute);
+			PMFT_RECORD_ATTRIBUTE_EFS_HEADER efs_header = reinterpret_cast<PMFT_RECORD_ATTRIBUTE_EFS_HEADER>(efs_buffer->data());
+
+			ret.push_back("State                   : " + std::to_string(efs_header->State));
+			ret.push_back("EFS Version             : " + std::to_string(efs_header->Version));
+			ret.push_back("Crypto API Version      : " + std::to_string(efs_header->CryptoAPIVersion));
+			ret.push_back("");
+			ret.push_back("FEK MD5 hash            : " + utils::convert::to_hex(efs_header->Checksum, 16));
+			ret.push_back("DDF MD5 hash            : " + utils::convert::to_hex(efs_header->ChecksumDDF, 16));
+			ret.push_back("DRF MD5 hash            : " + utils::convert::to_hex(efs_header->ChecksumDRF, 16));
+			ret.push_back("");
+
+			PMFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER efs_arr_header = nullptr;
+			if (efs_header->OffsetToDDF != 0)
+			{
+				efs_arr_header = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER, efs_header, efs_header->OffsetToDDF);
+				ret.push_back("Data Decryption Fields  : " + std::to_string(efs_arr_header->Count));
+				print_efs_entry(ret, efs_arr_header);
+			}
+			else
+			{
+				ret.push_back("Data Decryption Field   : 0");
+			}
+			ret.push_back("");
+
+			if (efs_header->OffsetToDRF != 0)
+			{
+				efs_arr_header = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER, efs_header, efs_header->OffsetToDRF);
+				ret.push_back("Data Recovery Fields    : " + std::to_string(efs_arr_header->Count));
+				print_efs_entry(ret, efs_arr_header);
+			}
+			else
+			{
+				ret.push_back("Data Recovery Fields    : 0");
+			}
+			ret.push_back("");
+
+		}
+	}
 	return ret;
 }
 
@@ -735,7 +827,7 @@ int commands::mft::print_mft_info_details(std::shared_ptr<MFTRecord> record, ULO
 		}
 		case $LOGGED_UTILITY_STREAM:
 		{
-			fr_attributes->add_item_multiline(print_attribute_logged_utility());
+			fr_attributes->add_item_multiline(print_attribute_logged_utility(record, pAttribute));
 			break;
 		}
 		case $BITMAP:

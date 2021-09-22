@@ -175,6 +175,16 @@ std::string constants::disk::mft::file_record_filename_name_type(UCHAR t)
 	}
 }
 
+std::string constants::disk::mft::efs_type(ULONG32 t)
+{
+	switch (t)
+	{
+	case 1: return "CryptoAPI Container";
+	case 3: return "Certificate Fingerprint";
+	default: return "Unknown type";
+	}
+}
+
 
 std::string constants::disk::partition_type(DWORD t)
 {
