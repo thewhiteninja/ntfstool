@@ -499,6 +499,20 @@ typedef struct
 	DWORD		OffsetToDRF;
 } MFT_RECORD_ATTRIBUTE_EFS_HEADER, * PMFT_RECORD_ATTRIBUTE_EFS_HEADER;
 
+typedef struct
+{
+	struct {
+		ULONGLONG FileRecordNumber : 48;
+		ULONGLONG SequenceNumber : 16;
+	} RootRecordNumber;
+	DWORD64		Flags;
+	DWORD64		TxfFileId;
+	DWORD64		LsnUserData;
+	DWORD64		LsnNtfsMetadata;
+	DWORD64		LsnDirectoryIndex;
+	DWORD64		UsnIndex;
+} MFT_RECORD_ATTRIBUTE_TXF, * PMFT_RECORD_ATTRIBUTE_TXF;
+
 typedef struct {
 	DWORD		Count;
 } MFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER, * PMFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER;
