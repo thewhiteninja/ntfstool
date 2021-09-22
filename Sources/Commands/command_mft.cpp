@@ -274,6 +274,7 @@ void print_efs_entry(std::vector<std::string>& ret, PMFT_RECORD_ATTRIBUTE_EFS_AR
 
 std::vector<std::string> print_attribute_logged_utility(std::shared_ptr<MFTRecord> record, PMFT_RECORD_ATTRIBUTE_HEADER pAttribute)
 {
+	char zero_buffer[16] = { 0 };
 	std::vector<std::string> ret;
 	if (pAttribute != nullptr)
 	{
@@ -297,8 +298,14 @@ std::vector<std::string> print_attribute_logged_utility(std::shared_ptr<MFTRecor
 			ret.push_back("Crypto API Version      : " + std::to_string(efs_header->CryptoAPIVersion));
 			ret.push_back("");
 			ret.push_back("FEK MD5 hash            : " + utils::convert::to_hex(efs_header->Checksum, 16));
-			ret.push_back("DDF MD5 hash            : " + utils::convert::to_hex(efs_header->ChecksumDDF, 16));
-			ret.push_back("DRF MD5 hash            : " + utils::convert::to_hex(efs_header->ChecksumDRF, 16));
+			if (memcmp(zero_buffer, efs_header->ChecksumDDF, 16) == 16)
+			{
+				ret.push_back("DDF MD5 hash            : " + utils::convert::to_hex(efs_header->ChecksumDDF, 16));
+			}
+			if (memcmp(zero_buffer, efs_header->ChecksumDRF, 16) == 16)
+			{
+				ret.push_back("DRF MD5 hash            : " + utils::convert::to_hex(efs_header->ChecksumDRF, 16));
+			}
 			ret.push_back("");
 
 			PMFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER efs_arr_header = nullptr;
