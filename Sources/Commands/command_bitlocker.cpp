@@ -510,7 +510,6 @@ void list_guid_for_all_disks(std::vector<std::shared_ptr<Disk>> disks)
 	table->add_header_line("Volume Id:Label");
 	table->add_header_line("GUID");
 
-	unsigned int n = 0;
 	for (std::shared_ptr<Disk> disk : core::win::disks::list()) {
 		for (std::shared_ptr<Volume> volume : disk->volumes()) {
 			if (volume->filesystem() == "Bitlocker")
