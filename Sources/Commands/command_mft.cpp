@@ -7,6 +7,7 @@
 #include "NTFS/ntfs_explorer.h"
 #include "Utils/constant_names.h"
 #include "Utils/table.h"
+#include "Utils/utils.h"
 
 #include "options.h"
 #include "Drive/disk.h"
@@ -232,7 +233,7 @@ std::vector<std::string> print_attribute_filename(PMFT_RECORD_ATTRIBUTE_FILENAME
 	return ret;
 }
 
-void print_efs_entry(std::vector<std::string>& ret, PMFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER efs_arr_header)
+void print_efs_entry(std::vector<std::string>& ret, PMFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER efs_arr_header, bool ddf = true)
 {
 	uint32_t i = 0;
 	PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY_HEADER entry_header = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY_HEADER, efs_arr_header, 4);
@@ -248,11 +249,18 @@ void print_efs_entry(std::vector<std::string>& ret, PMFT_RECORD_ATTRIBUTE_EFS_AR
 		sid += std::to_string(psid[2]) + "-";
 		sid += std::to_string(psid[3]);
 
+		auto username = utils::id::username_from_sid(sid);
+
 		ret.push_back("Type                    : " + constants::disk::mft::efs_type(entry->Type));
-		ret.push_back("SID                     : " + sid);
-
+		ret.push_back("");
+		if (ddf)
+		{
+			ret.push_back("User                    : " + username);
+			ret.push_back("SID                     : " + sid);
+			ret.push_back("");
+		}
 		ret.push_back("Encrypted FEK " + std::to_string(entry_header->FEKSize * 8) + "bits  : " + utils::convert::to_hex(POINTER_ADD(PBYTE, entry_header, entry_header->FEKOffset), entry_header->FEKSize));
-
+		ret.push_back("");
 		if (entry->Type == MFT_ATTRIBUTE_EFS_CONTAINER)
 		{
 
@@ -266,6 +274,8 @@ void print_efs_entry(std::vector<std::string>& ret, PMFT_RECORD_ATTRIBUTE_EFS_AR
 			if (thumprint_header->provider_name_offset) ret.push_back("Cryptographic Provider  : " + utils::strings::to_utf8(POINTER_ADD(PWCHAR, thumprint_header, thumprint_header->provider_name_offset)));
 			if (thumprint_header->user_name_offset) ret.push_back("Username                : " + utils::strings::to_utf8(POINTER_ADD(PWCHAR, thumprint_header, thumprint_header->user_name_offset)));
 		}
+		ret.push_back("");
+		ret.push_back(TABLE_SEPARATOR);
 
 		entry_header = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY_HEADER, entry_header, entry_header->Length);
 		i++;
@@ -313,7 +323,7 @@ std::vector<std::string> print_attribute_logged_utility(std::shared_ptr<MFTRecor
 			{
 				efs_arr_header = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER, efs_header, efs_header->OffsetToDDF);
 				ret.push_back("Data Decryption Fields  : " + std::to_string(efs_arr_header->Count));
-				print_efs_entry(ret, efs_arr_header);
+				print_efs_entry(ret, efs_arr_header, true);
 			}
 			else
 			{
@@ -325,7 +335,7 @@ std::vector<std::string> print_attribute_logged_utility(std::shared_ptr<MFTRecor
 			{
 				efs_arr_header = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_ARRAY_HEADER, efs_header, efs_header->OffsetToDRF);
 				ret.push_back("Data Recovery Fields    : " + std::to_string(efs_arr_header->Count));
-				print_efs_entry(ret, efs_arr_header);
+				print_efs_entry(ret, efs_arr_header, false);
 			}
 			else
 			{

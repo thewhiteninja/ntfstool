@@ -578,6 +578,31 @@ namespace utils
 				return "Converting SID failed";
 			}
 		}
+
+		std::string username_from_sid(std::string sid)
+		{
+			char oname[512] = { 0 };
+			char doname[512] = { 0 };
+			DWORD namelen = 512;
+			DWORD domainnamelen = 512;
+
+			SID_NAME_USE peUse;
+
+			PSID psid = nullptr;
+			std::string username = "";
+			if (ConvertStringSidToSidA(sid.c_str(), &psid))
+			{
+				if (LookupAccountSidA(NULL, psid, oname, &namelen, doname, &domainnamelen, &peUse))
+				{
+					if (strnlen_s(oname, 512) > 0 && strnlen_s(doname, 512) > 0)
+					{
+						username = std::string(doname, domainnamelen) + "/" + std::string(oname, namelen);
+					}
+				}
+				FreeSid(psid);
+			}
+			return username;
+		}
 	}
 
 	namespace ui

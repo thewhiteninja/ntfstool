@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#define TABLE_SEPARATOR "-----"
+
 namespace utils
 {
 	namespace ui {
