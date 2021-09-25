@@ -79,7 +79,8 @@ void utils::ui::Table::add_item_multiline(std::vector<std::string> list, unsigne
 						value = value.substr(max_size + offset);
 						value_len = utils::strings::utf8_string_size(value);
 					}
-					if (value_len > 0) {
+					if (value_len > 0)
+					{
 						s.push_back(whitespace + "  " + value);
 					}
 					max_size = tmp_max_size;
@@ -98,11 +99,24 @@ void utils::ui::Table::add_item_multiline(std::vector<std::string> list, unsigne
 					value = value.substr(max_size);
 				}
 				if (value.length() > 0) {
-					s.push_back(value);
+					if (value == TABLE_SEPARATOR)
+					{
+						std::string padded_sep = "";
+						for (int i = 0; i < (max_size - strlen(TABLE_SEPARATOR)) / 2; i++)
+						{
+							padded_sep.append(" ");
+						}
+						s.push_back(padded_sep + value);
+					}
+					else
+					{
+						s.push_back(value);
+					}
 				}
 			}
 		}
-		else {
+		else
+		{
 			s.push_back(i);
 		}
 	}

@@ -121,6 +121,8 @@ namespace utils
 		std::string guid_to_string(GUID id);
 
 		std::string sid_to_string(PSID id);
+
+		std::string username_from_sid(std::string sid);
 	}
 
 	namespace os
