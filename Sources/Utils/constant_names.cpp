@@ -454,9 +454,10 @@ std::string constants::disk::mft::file_record_flags(ULONG32 f)
 {
 	switch (f)
 	{
-	case MFT_RECORD_IN_USE: return "In_use";
+	case 0: return "Not in use";
+	case MFT_RECORD_IN_USE: return "In use";
 	case MFT_RECORD_IS_DIRECTORY: return "Directory";
-	case MFT_RECORD_IN_USE | MFT_RECORD_IS_DIRECTORY: return "In_use | Directory";
+	case MFT_RECORD_IN_USE | MFT_RECORD_IS_DIRECTORY: return "Directory in use";
 	default:
 		return "Unknown (" + utils::format::hex(f) + ")";
 	}
