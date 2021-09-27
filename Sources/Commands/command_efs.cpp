@@ -29,16 +29,18 @@ int show_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 	auto masterkey_file_record = explorer->mft()->record_from_number(opts->inode);
 	if (masterkey_file_record == nullptr)
 	{
-		std::cerr << "[!] Err: Unable to read record: " << opts->inode << std::endl;
+		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
 		return 2;
 	}
 	else
 	{
 		auto data = masterkey_file_record->data();
 		std::shared_ptr<MasterKeyFile> masterkey_file = std::make_shared<MasterKeyFile>(data->data(), data->size());
-
-		PEFS_PREFERRED_FILE pref = reinterpret_cast<PEFS_PREFERRED_FILE>(data->data());
-		int i = 0;
+		if (!masterkey_file->is_loaded())
+		{
+			std::cerr << "[!] Err: Failed to parse masterkey file from record: " << opts->inode << std::endl;
+			return 3;
+		}
 
 		std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
 		tab->set_margin_left(4);
@@ -57,6 +59,7 @@ int show_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 			date = utils::times::display_systemtime(st);
 		}
 
+		int i = 0;
 		tab->add_item_line(std::to_string(i++));
 		tab->add_item_line("File");
 		tab->add_item_multiline(
@@ -233,38 +236,44 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 				{
 					key_count++;
 					std::shared_ptr<MasterKeyFile> mkf = std::make_shared<MasterKeyFile>(data->data(), data->size());
-
-					auto master_key = mkf->master_key();
-					if (master_key)
+					if (mkf->is_loaded())
 					{
-						cell.push_back("MasterKey ");
-						cell.push_back("    Version : " + std::to_string(master_key->header()->Version));
-						cell.push_back("    Algo    : " + constants::efs::hash_algorithm(master_key->header()->Hash_algorithm) + " - " + constants::efs::enc_algorithm(master_key->header()->Enc_algorithm));
-						cell.push_back("    Salt    : " + utils::convert::to_hex(master_key->header()->Salt, 16));
-						cell.push_back("    Rounds  : " + std::to_string(master_key->header()->Rounds));
+						auto master_key = mkf->master_key();
+						if (master_key)
+						{
+							cell.push_back("MasterKey ");
+							cell.push_back("    Version : " + std::to_string(master_key->header()->Version));
+							cell.push_back("    Algo    : " + constants::efs::hash_algorithm(master_key->header()->Hash_algorithm) + " - " + constants::efs::enc_algorithm(master_key->header()->Enc_algorithm));
+							cell.push_back("    Salt    : " + utils::convert::to_hex(master_key->header()->Salt, 16));
+							cell.push_back("    Rounds  : " + std::to_string(master_key->header()->Rounds));
+						}
+						auto backup_key = mkf->backup_key();
+						if (backup_key)
+						{
+							cell.push_back("BackupKey ");
+							cell.push_back("    Version : " + std::to_string(backup_key->header()->Version));
+							cell.push_back("    Algo    : " + constants::efs::hash_algorithm(backup_key->header()->Hash_algorithm) + " - " + constants::efs::enc_algorithm(backup_key->header()->Enc_algorithm));
+							cell.push_back("    Salt    : " + utils::convert::to_hex(backup_key->header()->Salt, 16));
+							cell.push_back("    Rounds  : " + std::to_string(backup_key->header()->Rounds));
+						}
+						auto cred_hist = mkf->credential_history();
+						if (cred_hist)
+						{
+							cell.push_back("CredHist");
+							cell.push_back("    Version : " + std::to_string(cred_hist->header()->Version));
+							cell.push_back("    GUID    : " + utils::id::guid_to_string(cred_hist->header()->Guid));
+						}
+						auto domain_key = mkf->domain_key();
+						if (domain_key)
+						{
+							cell.push_back("DomainKey");
+							cell.push_back("    Version : " + std::to_string(domain_key->header()->Version));
+							cell.push_back("    GUID    : " + utils::id::guid_to_string(domain_key->header()->Guid));
+						}
 					}
-					auto backup_key = mkf->backup_key();
-					if (backup_key)
+					else
 					{
-						cell.push_back("BackupKey ");
-						cell.push_back("    Version : " + std::to_string(backup_key->header()->Version));
-						cell.push_back("    Algo    : " + constants::efs::hash_algorithm(backup_key->header()->Hash_algorithm) + " - " + constants::efs::enc_algorithm(backup_key->header()->Enc_algorithm));
-						cell.push_back("    Salt    : " + utils::convert::to_hex(backup_key->header()->Salt, 16));
-						cell.push_back("    Rounds  : " + std::to_string(backup_key->header()->Rounds));
-					}
-					auto cred_hist = mkf->credential_history();
-					if (cred_hist)
-					{
-						cell.push_back("CredHist");
-						cell.push_back("    Version : " + std::to_string(cred_hist->header()->Version));
-						cell.push_back("    GUID    : " + utils::id::guid_to_string(cred_hist->header()->Guid));
-					}
-					auto domain_key = mkf->domain_key();
-					if (domain_key)
-					{
-						cell.push_back("DomainKey");
-						cell.push_back("    Version : " + std::to_string(domain_key->header()->Version));
-						cell.push_back("    GUID    : " + utils::id::guid_to_string(domain_key->header()->Guid));
+						cell.push_back("Invalid MasterKey File");
 					}
 				}
 				tab->add_item_multiline(cell);
