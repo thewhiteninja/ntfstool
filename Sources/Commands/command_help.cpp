@@ -276,6 +276,9 @@ void print_help_efs(const char* name)
 	std::cerr << "    Example: List masterkeys for disk 1, volume 2" << std::endl;
 	std::cerr << "    " << name << " efs masterkey disk=1 volume=2" << std::endl;
 	std::cerr << std::endl;
+	std::cerr << "    Example: Display a masterkey for disk 1, volume 2 and inode 0x1337" << std::endl;
+	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337" << std::endl;
+	std::cerr << std::endl;
 }
 
 void print_help_extract(const char* name)

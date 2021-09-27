@@ -4,6 +4,164 @@
 #include <Utils/table.h>
 #include <Utils/constant_names.h>
 
+
+int decrypt_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
+{
+	return 0;
+}
+
+int show_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
+{
+	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
+	{
+		std::cerr << "[!] NTFS volume required" << std::endl;
+		return 1;
+	}
+
+	std::cout << std::setfill('0');
+	utils::ui::title("Display masterkey from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+
+	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
+
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+
+	std::cout << "[+] Reading masterkey file record: " << opts->inode << std::endl;
+	auto masterkey_file_record = explorer->mft()->record_from_number(opts->inode);
+	if (masterkey_file_record == nullptr)
+	{
+		std::cerr << "[!] Err: Unable to read record: " << opts->inode << std::endl;
+		return 2;
+	}
+	else
+	{
+		auto data = masterkey_file_record->data();
+		std::shared_ptr<MasterKeyFile> masterkey_file = std::make_shared<MasterKeyFile>(data->data(), data->size());
+
+		PEFS_PREFERRED_FILE pref = reinterpret_cast<PEFS_PREFERRED_FILE>(data->data());
+		int i = 0;
+
+		std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
+		tab->set_margin_left(4);
+		tab->set_interline(true);
+		tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
+		tab->add_header_line("Property");
+		tab->add_header_line("Value");
+
+		std::string date;
+		PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = masterkey_file_record->attribute_header($STANDARD_INFORMATION);
+		if (stdinfo_att)
+		{
+			PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION, stdinfo_att, stdinfo_att->Form.Resident.ValueOffset);
+			SYSTEMTIME st = { 0 };
+			utils::times::ull_to_local_systemtime(stdinfo->CreateTime, &st);
+			date = utils::times::display_systemtime(st);
+		}
+
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("File");
+		tab->add_item_multiline(
+			{
+				"Creation : " + date,
+				"Size     : " + utils::format::size(data->size())
+			}
+		);
+
+		tab->new_line();
+
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("Version");
+		tab->add_item_line(std::to_string(masterkey_file->version()));
+
+		tab->new_line();
+
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("GUID");
+		tab->add_item_line(masterkey_file->guid());
+
+		tab->new_line();
+
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("Policy");
+		tab->add_item_line(utils::format::hex(masterkey_file->policy(), true));
+
+		tab->new_line();
+
+		auto master_key = masterkey_file->master_key();
+		if (master_key)
+		{
+			tab->add_item_line(std::to_string(i++));
+			tab->add_item_line("MasterKey");
+			tab->add_item_multiline(
+				{
+					"Version  : " + std::to_string(master_key->header()->Version),
+					"Salt     : " + utils::convert::to_hex(master_key->header()->Salt, 16),
+					"Rounds   : " + std::to_string(master_key->header()->Rounds),
+					"Hash Alg : " + constants::efs::hash_algorithm(master_key->header()->Hash_algorithm),
+					"Enc Alg  : " + constants::efs::enc_algorithm(master_key->header()->Enc_algorithm),
+					"Enc Key  : " + utils::convert::to_hex(master_key->key()->data(), master_key->key()->size())
+				}
+			);
+
+			tab->new_line();
+		}
+
+		auto backup_key = masterkey_file->backup_key();
+		if (backup_key)
+		{
+			tab->add_item_line(std::to_string(i++));
+			tab->add_item_line("BackupKey");
+			tab->add_item_multiline(
+				{
+					"Version  : " + std::to_string(backup_key->header()->Version),
+					"Salt     : " + utils::convert::to_hex(backup_key->header()->Salt, 16),
+					"Rounds   : " + std::to_string(backup_key->header()->Rounds),
+					"Hash Alg : " + constants::efs::hash_algorithm(backup_key->header()->Hash_algorithm),
+					"Enc Alg  : " + constants::efs::enc_algorithm(backup_key->header()->Enc_algorithm),
+					"Enc Key  : " + utils::convert::to_hex(backup_key->key()->data(), backup_key->key()->size())
+				}
+			);
+
+			tab->new_line();
+		}
+
+		auto domain_key = masterkey_file->domain_key();
+		if (domain_key)
+		{
+			tab->add_item_line(std::to_string(i++));
+			tab->add_item_line("DomainKey");
+			tab->add_item_multiline(
+				{
+					"Version     : " + std::to_string(domain_key->header()->Version),
+					"GUID        : " + utils::id::guid_to_string(domain_key->header()->Guid),
+					"Secret      : " + utils::convert::to_hex(domain_key->secret()->data(), domain_key->secret()->size()),
+					"AccessCheck : " + utils::convert::to_hex(domain_key->access_check()->data(), domain_key->access_check()->size())
+				}
+			);
+
+			tab->new_line();
+		}
+
+		auto credhist = masterkey_file->credential_history();
+		if (credhist)
+		{
+			tab->add_item_line(std::to_string(i++));
+			tab->add_item_line("CredHist");
+			tab->add_item_multiline(
+				{
+					"Version  : " + std::to_string(credhist->header()->Version),
+					"GUID     : " + utils::id::guid_to_string(credhist->header()->Guid)
+				}
+			);
+
+			tab->new_line();
+		}
+
+		std::cout << "[+] MasterKey" << std::endl;
+		tab->render(std::cout);
+	}
+	return 0;
+}
+
 int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
@@ -30,7 +188,7 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 
 	std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
 	tab->set_margin_left(4);
-	tab->set_interline(false);
+	tab->set_interline(true);
 	tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
 	tab->add_header_line("User");
 	tab->add_header_line("Keyfile");
@@ -42,19 +200,25 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 		auto sid_dirs = explorer->mft()->list(utils::strings::to_utf8(L"C:\\Users\\" + std::get<0>(user_dir) + L"\\AppData\\Roaming\\Microsoft\\Protect"), true, false);
 		for (auto sid_dir : sid_dirs)
 		{
-			auto key_dirs = explorer->mft()->list(utils::strings::to_utf8(L"C:\\Users\\" + std::get<0>(user_dir) + L"\\AppData\\Roaming\\Microsoft\\Protect\\" + std::get<0>(sid_dir)), false, true);
-			for (auto key_dir : key_dirs)
+			auto key_files = explorer->mft()->list(utils::strings::to_utf8(L"C:\\Users\\" + std::get<0>(user_dir) + L"\\AppData\\Roaming\\Microsoft\\Protect\\" + std::get<0>(sid_dir)), false, true);
+			for (auto key_file : key_files)
 			{
+				auto record_keyfile = explorer->mft()->record_from_number(std::get<1>(key_file));
+				auto data = record_keyfile->data();
+
 				tab->add_item_line(std::to_string(key_count + preferred_count));
 				tab->add_item_line(utils::strings::to_utf8(std::get<0>(user_dir)));
-				tab->add_item_line(utils::strings::to_utf8(std::get<0>(key_dir)));
+				tab->add_item_multiline(
+					{
+						"Name   : " + utils::strings::to_utf8(std::get<0>(key_file)),
+						"Record : " + utils::format::hex6(record_keyfile->header()->MFTRecordIndex, true),
+						"Size   : " + utils::format::size(data->size())
+					}
+				);
 
-				auto record_keyfile = explorer->mft()->record_from_number(std::get<1>(key_dir));
-
-				auto data = record_keyfile->data();
 				std::vector<std::string> cell;
 
-				if (std::get<0>(key_dir) == L"Preferred")
+				if (std::get<0>(key_file) == L"Preferred")
 				{
 					preferred_count++;
 					PEFS_PREFERRED_FILE pref = reinterpret_cast<PEFS_PREFERRED_FILE>(data->data());
@@ -153,7 +317,21 @@ namespace commands
 				{
 					if (opts->subcommand == "masterkey")
 					{
-						list_masterkeys(disk, volume, opts);
+						if (opts->inode != 0)
+						{
+							if (opts->password != "")
+							{
+								decrypt_masterkey(disk, volume, opts);
+							}
+							else
+							{
+								show_masterkey(disk, volume, opts);
+							}
+						}
+						else
+						{
+							list_masterkeys(disk, volume, opts);
+						}
 					}
 					else
 					{
