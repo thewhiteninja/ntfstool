@@ -7,8 +7,72 @@
 
 int decrypt_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	return 0;
+	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
+	{
+		std::cerr << "[!] NTFS volume required" << std::endl;
+		return 1;
+	}
+
+	std::cout << std::setfill('0');
+	utils::ui::title("Decrypt masterkey from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+
+	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
+
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+
+	std::cout << "[+] Reading masterkey file record: " << opts->inode << std::endl;
+	auto masterkey_file_record = explorer->mft()->record_from_number(opts->inode);
+	if (masterkey_file_record == nullptr)
+	{
+		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
+		return 2;
+	}
+	else
+	{
+		auto data = masterkey_file_record->data();
+		std::shared_ptr<MasterKeyFile> masterkey_file = std::make_shared<MasterKeyFile>(data->data(), data->size());
+		if (!masterkey_file->is_loaded())
+		{
+			std::cerr << "[!] Err: Failed to parse masterkey file from record: " << opts->inode << std::endl;
+			return 3;
+		}
+
+		auto master_key = masterkey_file->master_key();
+		if (master_key)
+		{
+			std::cout << "[-] Masterkey" << std::endl;
+			std::cout << "    Encryption Algorithm : " << constants::efs::enc_algorithm(master_key->header()->Enc_algorithm) << std::endl;
+			std::cout << "    Hash Algorithm       : " << constants::efs::hash_algorithm(master_key->header()->Hash_algorithm) << std::endl;
+			std::cout << "    Rounds               : " << std::to_string(master_key->header()->Rounds) << std::endl;
+			std::cout << "    Salt                 : " << utils::convert::to_hex(master_key->header()->Salt, 16) << std::endl;
+
+			std::cout << "[+] Decrypting masterkey" << std::endl;
+			auto res = master_key->decrypt_with_password(opts->sid, opts->password);
+			if (res == nullptr)
+			{
+				std::cout << "[!] Failed to decrypt. Check SID or password." << std::endl;
+			}
+			else
+			{
+				std::cout << "[+] Clear masterkey (" << res->size() * 4 << "bits):" << std::endl;
+
+				int i, size = res->size();
+				for (i = 0; i < size; i += 32)
+				{
+					std::cout << "    " << utils::convert::to_hex(res->data() + i, min(32, size - i)) << std::endl;
+				}
+			}
+		}
+		else
+		{
+			std::cerr << "[!] Err: No masterkey in specified file." << std::endl;
+			return 3;
+		}
+
+		return 0;
+	}
 }
+
 
 int show_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
@@ -328,7 +392,7 @@ namespace commands
 					{
 						if (opts->inode != 0)
 						{
-							if (opts->password != "")
+							if (opts->password != "" && opts->sid != "")
 							{
 								decrypt_masterkey(disk, volume, opts);
 							}
