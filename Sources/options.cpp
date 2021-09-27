@@ -71,6 +71,7 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 		if (is_option(argv[i], "inode")) { read_option_ulong(argv[i], &ret->inode); continue; }
 		if (is_option(argv[i], "fve_block")) { read_option_ulong(argv[i], &ret->fve_block); continue; }
 		if (is_option(argv[i], "password")) { read_option_string(argv[i], ret->password); continue; }
+		if (is_option(argv[i], "sid")) { read_option_string(argv[i], ret->sid); continue; }
 		if (is_option(argv[i], "recovery")) { read_option_string(argv[i], ret->recovery); continue; }
 		if (is_option(argv[i], "image")) { read_option_string(argv[i], ret->image); continue; }
 		if (is_option(argv[i], "bek")) { read_option_string(argv[i], ret->bek); continue; }
