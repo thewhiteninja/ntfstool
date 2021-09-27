@@ -645,6 +645,7 @@ At build time, VisualStudio will detect the vcpkg.json file and install required
 <table>
 <tr><td>efs masterkey disk=0 volume=4</td></tr>
 <tr><td>
+	
     List masterkeys from \\.\PhysicalDrive0 > Volume:4
     --------------------------------------------------
 
@@ -685,6 +686,7 @@ At build time, VisualStudio will detect the vcpkg.json file and install required
 </td></tr>
 <tr><td>efs masterkey disk=0 volume=4 inode=0x80544</td></tr>
 <tr><td>
+	
     Display masterkey from \\.\PhysicalDrive0 > Volume:4
     ----------------------------------------------------
 
@@ -735,8 +737,9 @@ At build time, VisualStudio will detect the vcpkg.json file and install required
         |    |           | GUID     : {20e0b482-797f-429e-b4a0-30020731ef0a} |
         +--------------------------------------------------------------------+
 </td></tr>
-<tr><td> efs masterkey disk=0 volume=4 inode=0x80544 sid="S-1-5-21-1521398434-2415347828-2753175218-1001" password="ntfst00lisc00l"</td></tr>
+<tr><td> efs masterkey disk=0 volume=4 inode=0x80544 sid="S-1-5-21-1521398...3175218-1001" password="ntfst00l"</td></tr>
 <tr><td>
+	
     Decrypt masterkey from \\.\PhysicalDrive0 > Volume:4
     ----------------------------------------------------
 
