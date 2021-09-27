@@ -19,11 +19,14 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
+	std::cout << "[+] Listing user directories" << std::endl;
 	auto user_dirs = explorer->mft()->list("C:\\Users", true, false);
-	std::cout << "[+] Searching for keys in user directories" << std::endl;
+	std::cout << "    " << user_dirs.size() << " directories found" << std::endl;
+
+	std::cout << "[+] Searching for keys" << std::endl;
 
 	int key_count = 0;
-
+	int preferred_count = 0;
 
 	std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
 	tab->set_margin_left(4);
@@ -34,11 +37,6 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 	tab->add_header_line("Key(s)");
 	tab->add_header_line("Creation Date");
 
-	if (key_count == 0)
-	{
-		std::cout << "[+] No masterkey found" << std::endl;
-	}
-
 	for (auto user_dir : user_dirs)
 	{
 		auto sid_dirs = explorer->mft()->list(utils::strings::to_utf8(L"C:\\Users\\" + std::get<0>(user_dir) + L"\\AppData\\Roaming\\Microsoft\\Protect"), true, false);
@@ -47,54 +45,64 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 			auto key_dirs = explorer->mft()->list(utils::strings::to_utf8(L"C:\\Users\\" + std::get<0>(user_dir) + L"\\AppData\\Roaming\\Microsoft\\Protect\\" + std::get<0>(sid_dir)), false, true);
 			for (auto key_dir : key_dirs)
 			{
-				if (std::get<0>(key_dir) == L"Preferred")
-				{
-					continue;
-				}
-
-				tab->add_item_line(std::to_string(key_count++));
+				tab->add_item_line(std::to_string(key_count + preferred_count));
 				tab->add_item_line(utils::strings::to_utf8(std::get<0>(user_dir)));
 				tab->add_item_line(utils::strings::to_utf8(std::get<0>(key_dir)));
 
 				auto record_keyfile = explorer->mft()->record_from_number(std::get<1>(key_dir));
 
 				auto data = record_keyfile->data();
-				std::shared_ptr<MasterKeyFile> mkf = std::make_shared<MasterKeyFile>(data->data(), data->size());
-
 				std::vector<std::string> cell;
-				auto master_key = mkf->master_key();
-				if (master_key)
-				{
-					cell.push_back("MasterKey ");
-					cell.push_back("    Version : " + std::to_string(master_key->header()->Version));
-					cell.push_back("    Algo    : " + constants::efs::hash_algorithm(master_key->header()->Hash_algorithm) + " - " + constants::efs::enc_algorithm(master_key->header()->Enc_algorithm));
-					cell.push_back("    Salt    : " + utils::convert::to_hex(master_key->header()->Salt, 16));
-					cell.push_back("    Rounds  : " + std::to_string(master_key->header()->Rounds));
-				}
-				auto backup_key = mkf->backup_key();
-				if (backup_key)
-				{
-					cell.push_back("BackupKey ");
-					cell.push_back("    Version : " + std::to_string(backup_key->header()->Version));
-					cell.push_back("    Algo    : " + constants::efs::hash_algorithm(backup_key->header()->Hash_algorithm) + " - " + constants::efs::enc_algorithm(backup_key->header()->Enc_algorithm));
-					cell.push_back("    Salt    : " + utils::convert::to_hex(backup_key->header()->Salt, 16));
-					cell.push_back("    Rounds  : " + std::to_string(backup_key->header()->Rounds));
-				}
-				auto cred_hist = mkf->credential_history();
-				if (cred_hist)
-				{
-					cell.push_back("CredHist");
-					cell.push_back("    Version : " + std::to_string(cred_hist->header()->Version));
-					cell.push_back("    GUID    : " + utils::id::guid_to_string(cred_hist->header()->Guid));
-				}
-				auto domain_key = mkf->domain_key();
-				if (domain_key)
-				{
-					cell.push_back("DomainKey");
-					cell.push_back("    Version : " + std::to_string(domain_key->header()->Version));
-					cell.push_back("    GUID    : " + utils::id::guid_to_string(domain_key->header()->Guid));
-				}
 
+				if (std::get<0>(key_dir) == L"Preferred")
+				{
+					preferred_count++;
+					PEFS_PREFERRED_FILE pref = reinterpret_cast<PEFS_PREFERRED_FILE>(data->data());
+					SYSTEMTIME st;
+					utils::times::filetime_to_systemtime(pref->timestamp, &st);
+
+					cell.push_back("Preferred ");
+					cell.push_back("    GUID    : " + utils::id::guid_to_string(pref->Guid));
+					cell.push_back("    Renew   : " + utils::times::display_systemtime(st));
+				}
+				else
+				{
+					key_count++;
+					std::shared_ptr<MasterKeyFile> mkf = std::make_shared<MasterKeyFile>(data->data(), data->size());
+
+					auto master_key = mkf->master_key();
+					if (master_key)
+					{
+						cell.push_back("MasterKey ");
+						cell.push_back("    Version : " + std::to_string(master_key->header()->Version));
+						cell.push_back("    Algo    : " + constants::efs::hash_algorithm(master_key->header()->Hash_algorithm) + " - " + constants::efs::enc_algorithm(master_key->header()->Enc_algorithm));
+						cell.push_back("    Salt    : " + utils::convert::to_hex(master_key->header()->Salt, 16));
+						cell.push_back("    Rounds  : " + std::to_string(master_key->header()->Rounds));
+					}
+					auto backup_key = mkf->backup_key();
+					if (backup_key)
+					{
+						cell.push_back("BackupKey ");
+						cell.push_back("    Version : " + std::to_string(backup_key->header()->Version));
+						cell.push_back("    Algo    : " + constants::efs::hash_algorithm(backup_key->header()->Hash_algorithm) + " - " + constants::efs::enc_algorithm(backup_key->header()->Enc_algorithm));
+						cell.push_back("    Salt    : " + utils::convert::to_hex(backup_key->header()->Salt, 16));
+						cell.push_back("    Rounds  : " + std::to_string(backup_key->header()->Rounds));
+					}
+					auto cred_hist = mkf->credential_history();
+					if (cred_hist)
+					{
+						cell.push_back("CredHist");
+						cell.push_back("    Version : " + std::to_string(cred_hist->header()->Version));
+						cell.push_back("    GUID    : " + utils::id::guid_to_string(cred_hist->header()->Guid));
+					}
+					auto domain_key = mkf->domain_key();
+					if (domain_key)
+					{
+						cell.push_back("DomainKey");
+						cell.push_back("    Version : " + std::to_string(domain_key->header()->Version));
+						cell.push_back("    GUID    : " + utils::id::guid_to_string(domain_key->header()->Guid));
+					}
+				}
 				tab->add_item_multiline(cell);
 
 				PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = record_keyfile->attribute_header($STANDARD_INFORMATION);
@@ -115,7 +123,16 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 		}
 	}
 
-	tab->render(std::cout);
+	if (key_count == 0)
+	{
+		std::cout << "[+] No masterkey found" << std::endl;
+	}
+	else
+	{
+		std::cout << "    " << key_count << " key(s), " << preferred_count << " preferred file(s) found" << std::endl;
+		std::cout << "[+] MasterKeys" << std::endl;
+		tab->render(std::cout);
+	}
 
 	return 0;
 }
