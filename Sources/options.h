@@ -16,6 +16,7 @@ public:
 	std::string format = "raw";
 
 	std::string password;
+	std::string sid;
 	std::string recovery;
 	std::string bek;
 	std::string fvek;
