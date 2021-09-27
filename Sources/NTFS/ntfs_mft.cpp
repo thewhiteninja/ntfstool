@@ -125,3 +125,41 @@ std::shared_ptr<MFTRecord> MFT::record_from_number(ULONG64 record_number)
 
 	return std::make_shared<MFTRecord>(buffer->data(), this, _reader);
 }
+
+std::vector<std::tuple<std::wstring, ULONG64>> MFT::list(std::string path, bool directory, bool files)
+{
+	std::vector<std::tuple<std::wstring, ULONG64>> ret;
+
+	std::shared_ptr<MFTRecord> record = record_from_path(path);
+
+	if (record != nullptr)
+	{
+		auto index = record->index();
+
+		std::set<DWORD64> win32_named_entries;
+		for (auto i : index)
+		{
+			if (i->name_type() != 2)
+			{
+				win32_named_entries.insert(i->record_number());
+			}
+		}
+
+		for (auto& entry : index)
+		{
+			if ((entry->name_type() == 2) && (win32_named_entries.find(entry->record_number()) != win32_named_entries.end())) continue;
+
+			std::shared_ptr<MFTRecord> entry_rec = record_from_number(entry->record_number());
+			if (directory && (entry_rec->header()->flag & MFT_RECORD_IS_DIRECTORY))
+			{
+				ret.push_back(std::make_tuple(entry->name(), entry->record_number()));
+			}
+			if (files && ((entry_rec->header()->flag & MFT_RECORD_IS_DIRECTORY) == 0))
+			{
+				ret.push_back(std::make_tuple(entry->name(), entry->record_number()));
+			}
+		}
+	}
+
+	return ret;
+}

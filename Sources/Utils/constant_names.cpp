@@ -715,3 +715,33 @@ std::vector<std::string> constants::disk::vss::flags(DWORD64 f)
 
 	return ret;
 }
+
+std::string constants::efs::hash_algorithm(DWORD hash_alg)
+{
+	switch (hash_alg)
+	{
+	case CALG_MD4: return "CALG_MD4";
+	case CALG_MD5: return "CALG_MD5";
+	case CALG_SHA1: return "CALG_SHA1";
+	case CALG_SHA_256: return "CALG_SHA_256";
+	case CALG_SHA_384: return "CALG_SHA_384";
+	case CALG_SHA_512: return "CALG_SHA_512";
+	default:
+		return "Unsupported";
+	}
+}
+
+std::string constants::efs::enc_algorithm(DWORD enc_alg)
+{
+	switch (enc_alg)
+	{
+	case CALG_3DES: return "CALG_3DES";
+	case CALG_AES_128: return "CALG_AES_128";
+	case CALG_AES_192: return "CALG_AES_192";
+	case CALG_AES_256: return "CALG_AES_256";
+	case CALG_DES: return "CALG_DES";
+	case CALG_DESX: return "CALG_DESX";
+	default:
+		return "Unsupported";
+	}
+}

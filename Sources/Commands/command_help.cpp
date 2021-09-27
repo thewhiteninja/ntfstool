@@ -27,6 +27,7 @@ void usage(const char* binname)
 	std::cerr << "    bitlocker  : display bitlocker guid/status and test password, recovery or bek file" << std::endl;
 	std::cerr << "    bitdecrypt : decrypt volume to an image file" << std::endl;
 	std::cerr << "    fve        : display fve metadata" << std::endl;
+	std::cerr << "    efs        : display efs keys, certificates and files" << std::endl;
 	std::cerr << "    logfile    : dump and parse log file" << std::endl;
 	std::cerr << "    usn        : dump and parse usn journal" << std::endl;
 	std::cerr << "    shadow     : list volume shadow copies" << std::endl;
@@ -262,6 +263,21 @@ void print_help_usn(const char* name)
 	std::cerr << std::endl;
 }
 
+void print_help_efs(const char* name)
+{
+	std::cerr << "EFS command" << std::endl;
+	std::cerr << "-----------" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    " << name << " efs masterkey [disk id] [volume id]" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Description:" << std::endl;
+	std::cerr << "    List, display and decrypt masterkeys on a volume." << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: List masterkeys for disk 1, volume 2" << std::endl;
+	std::cerr << "    " << name << " efs masterkey disk=1 volume=2" << std::endl;
+	std::cerr << std::endl;
+}
+
 void print_help_extract(const char* name)
 {
 	std::cerr << "Extract command" << std::endl;
@@ -395,34 +411,40 @@ void print_help_smart(const char* name)
 
 namespace commands {
 	namespace help {
-		void print_help(const char* name, std::shared_ptr<Options> opts) {
+		void print_help(std::shared_ptr<Options> opts) {
+
+			char name_buf[MAX_PATH] = { 0 };
+			GetModuleFileNameA(nullptr, name_buf, MAX_PATH);
+			std::string name = utils::files::basename(name_buf);
+
 			if (opts->subcommand == "")
 			{
-				usage(name);
+				usage(name.c_str());
 			}
 			else
 			{
-				if (opts->subcommand == "help") { print_help_help(name); return; }
-				if (opts->subcommand == "info") { print_help_info(name); return; }
-				if (opts->subcommand == "mbr") { print_help_mbr(name); return; }
-				if (opts->subcommand == "gpt") { print_help_gpt(name); return; }
-				if (opts->subcommand == "vbr") { print_help_vbr(name); return; }
-				if (opts->subcommand == "mft") { print_help_mft(name); return; }
-				if (opts->subcommand == "btree") { print_help_btree(name); return; }
-				if (opts->subcommand == "extract") { print_help_extract(name); return; }
-				if (opts->subcommand == "bitlocker") { print_help_bitlocker(name); return; }
-				if (opts->subcommand == "bitdecrypt") { print_help_bitdecrypt(name); return; }
-				if (opts->subcommand == "fve") { print_help_fve(name); return; }
-				if (opts->subcommand == "image") { print_help_image(name); return; }
-				if (opts->subcommand == "shadow") { print_help_shadow(name); return; }
-				if (opts->subcommand == "logfile") { print_help_logfile(name); return; }
-				if (opts->subcommand == "reparse") { print_help_reparse(name); return; }
-				if (opts->subcommand == "usn") { print_help_usn(name); return; }
-				if (opts->subcommand == "undelete") { print_help_undelete(name); return; }
-				if (opts->subcommand == "shell") { print_help_shell(name); return; }
-				if (opts->subcommand == "smart") { print_help_smart(name); return; }
-				if (opts->subcommand == "streams") { print_help_streams(name); return; }
-				usage(name);
+				if (opts->subcommand == "help") { print_help_help(name.c_str()); return; }
+				if (opts->subcommand == "info") { print_help_info(name.c_str()); return; }
+				if (opts->subcommand == "mbr") { print_help_mbr(name.c_str()); return; }
+				if (opts->subcommand == "gpt") { print_help_gpt(name.c_str()); return; }
+				if (opts->subcommand == "vbr") { print_help_vbr(name.c_str()); return; }
+				if (opts->subcommand == "mft") { print_help_mft(name.c_str()); return; }
+				if (opts->subcommand == "btree") { print_help_btree(name.c_str()); return; }
+				if (opts->subcommand == "extract") { print_help_extract(name.c_str()); return; }
+				if (opts->subcommand == "bitlocker") { print_help_bitlocker(name.c_str()); return; }
+				if (opts->subcommand == "bitdecrypt") { print_help_bitdecrypt(name.c_str()); return; }
+				if (opts->subcommand == "fve") { print_help_fve(name.c_str()); return; }
+				if (opts->subcommand == "image") { print_help_image(name.c_str()); return; }
+				if (opts->subcommand == "shadow") { print_help_shadow(name.c_str()); return; }
+				if (opts->subcommand == "logfile") { print_help_logfile(name.c_str()); return; }
+				if (opts->subcommand == "reparse") { print_help_reparse(name.c_str()); return; }
+				if (opts->subcommand == "usn") { print_help_usn(name.c_str()); return; }
+				if (opts->subcommand == "efs") { print_help_efs(name.c_str()); return; }
+				if (opts->subcommand == "undelete") { print_help_undelete(name.c_str()); return; }
+				if (opts->subcommand == "shell") { print_help_shell(name.c_str()); return; }
+				if (opts->subcommand == "smart") { print_help_smart(name.c_str()); return; }
+				if (opts->subcommand == "streams") { print_help_streams(name.c_str()); return; }
+				usage(name.c_str());
 			}
 		}
 	}

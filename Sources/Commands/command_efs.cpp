@@ -1,0 +1,165 @@
+#include "commands.h"
+#include "EFS/masterkey_file.h"
+#include "NTFS/ntfs_explorer.h"
+#include <Utils/table.h>
+#include <Utils/constant_names.h>
+
+int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
+{
+	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
+	{
+		std::cerr << "[!] NTFS volume required" << std::endl;
+		return 1;
+	}
+
+	std::cout << std::setfill('0');
+	utils::ui::title("List masterkeys from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+
+	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
+
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+
+	auto user_dirs = explorer->mft()->list("C:\\Users", true, false);
+	std::cout << "[+] Searching for keys in user directories" << std::endl;
+
+	int key_count = 0;
+
+
+	std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
+	tab->set_margin_left(4);
+	tab->set_interline(false);
+	tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
+	tab->add_header_line("User");
+	tab->add_header_line("Keyfile");
+	tab->add_header_line("Key(s)");
+	tab->add_header_line("Creation Date");
+
+	if (key_count == 0)
+	{
+		std::cout << "[+] No masterkey found" << std::endl;
+	}
+
+	for (auto user_dir : user_dirs)
+	{
+		auto sid_dirs = explorer->mft()->list(utils::strings::to_utf8(L"C:\\Users\\" + std::get<0>(user_dir) + L"\\AppData\\Roaming\\Microsoft\\Protect"), true, false);
+		for (auto sid_dir : sid_dirs)
+		{
+			auto key_dirs = explorer->mft()->list(utils::strings::to_utf8(L"C:\\Users\\" + std::get<0>(user_dir) + L"\\AppData\\Roaming\\Microsoft\\Protect\\" + std::get<0>(sid_dir)), false, true);
+			for (auto key_dir : key_dirs)
+			{
+				if (std::get<0>(key_dir) == L"Preferred")
+				{
+					continue;
+				}
+
+				tab->add_item_line(std::to_string(key_count++));
+				tab->add_item_line(utils::strings::to_utf8(std::get<0>(user_dir)));
+				tab->add_item_line(utils::strings::to_utf8(std::get<0>(key_dir)));
+
+				auto record_keyfile = explorer->mft()->record_from_number(std::get<1>(key_dir));
+
+				auto data = record_keyfile->data();
+				std::shared_ptr<MasterKeyFile> mkf = std::make_shared<MasterKeyFile>(data->data(), data->size());
+
+				std::vector<std::string> cell;
+				auto master_key = mkf->master_key();
+				if (master_key)
+				{
+					cell.push_back("MasterKey ");
+					cell.push_back("    Version : " + std::to_string(master_key->header()->Version));
+					cell.push_back("    Algo    : " + constants::efs::hash_algorithm(master_key->header()->Hash_algorithm) + " - " + constants::efs::enc_algorithm(master_key->header()->Enc_algorithm));
+					cell.push_back("    Salt    : " + utils::convert::to_hex(master_key->header()->Salt, 16));
+					cell.push_back("    Rounds  : " + std::to_string(master_key->header()->Rounds));
+				}
+				auto backup_key = mkf->backup_key();
+				if (backup_key)
+				{
+					cell.push_back("BackupKey ");
+					cell.push_back("    Version : " + std::to_string(backup_key->header()->Version));
+					cell.push_back("    Algo    : " + constants::efs::hash_algorithm(backup_key->header()->Hash_algorithm) + " - " + constants::efs::enc_algorithm(backup_key->header()->Enc_algorithm));
+					cell.push_back("    Salt    : " + utils::convert::to_hex(backup_key->header()->Salt, 16));
+					cell.push_back("    Rounds  : " + std::to_string(backup_key->header()->Rounds));
+				}
+				auto cred_hist = mkf->credential_history();
+				if (cred_hist)
+				{
+					cell.push_back("CredHist");
+					cell.push_back("    Version : " + std::to_string(cred_hist->header()->Version));
+					cell.push_back("    GUID    : " + utils::id::guid_to_string(cred_hist->header()->Guid));
+				}
+				auto domain_key = mkf->domain_key();
+				if (domain_key)
+				{
+					cell.push_back("DomainKey");
+					cell.push_back("    Version : " + std::to_string(domain_key->header()->Version));
+					cell.push_back("    GUID    : " + utils::id::guid_to_string(domain_key->header()->Guid));
+				}
+
+				tab->add_item_multiline(cell);
+
+				PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = record_keyfile->attribute_header($STANDARD_INFORMATION);
+				if (stdinfo_att)
+				{
+					PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION, stdinfo_att, stdinfo_att->Form.Resident.ValueOffset);
+					SYSTEMTIME st = { 0 };
+					utils::times::ull_to_local_systemtime(stdinfo->CreateTime, &st);
+					tab->add_item_line(utils::times::display_systemtime(st));
+				}
+				else
+				{
+					tab->add_item_line("");
+				}
+
+				tab->new_line();
+			}
+		}
+	}
+
+	tab->render(std::cout);
+
+	return 0;
+}
+
+namespace commands
+{
+	namespace efs
+	{
+		int dispatch(std::shared_ptr<Options> opts)
+		{
+			std::ios_base::fmtflags flag_backup(std::cout.flags());
+
+			std::shared_ptr<Disk> disk = get_disk(opts);
+			if (disk != nullptr)
+			{
+				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+				if (volume != nullptr)
+				{
+					if (opts->subcommand == "masterkey")
+					{
+						list_masterkeys(disk, volume, opts);
+					}
+					else
+					{
+						std::cerr << "[!] Invalid or missing subcommand" << std::endl;
+						return 1;
+					}
+				}
+				else
+				{
+					std::cerr << "[!] Invalid or missing volume option" << std::endl;
+					opts->subcommand = "efs";
+					commands::help::print_help(opts);
+				}
+			}
+			else
+			{
+				std::cerr << "[!] Invalid or missing disk option" << std::endl;
+				opts->subcommand = "efs";
+				commands::help::print_help(opts);
+			}
+
+			std::cout.flags(flag_backup);
+			return 0;
+		}
+	}
+}

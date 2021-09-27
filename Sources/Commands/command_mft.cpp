@@ -270,9 +270,18 @@ void print_efs_entry(std::vector<std::string>& ret, PMFT_RECORD_ATTRIBUTE_EFS_AR
 			PMFT_RECORD_ATTRIBUTE_EFS_DF_CERTIFICATE_THUMBPRINT_HEADER thumprint_header = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EFS_DF_CERTIFICATE_THUMBPRINT_HEADER, entry, entry->cert_thumbprint_header_offset);
 			ret.push_back("Certificate Fingerprint : " + utils::convert::to_hex(POINTER_ADD(PBYTE, thumprint_header, thumprint_header->thumbprint_offset), thumprint_header->thumbprint_size));
 
-			if (thumprint_header->container_name_offset) ret.push_back("Container               : " + utils::strings::to_utf8(POINTER_ADD(PWCHAR, thumprint_header, thumprint_header->container_name_offset)));
-			if (thumprint_header->provider_name_offset) ret.push_back("Cryptographic Provider  : " + utils::strings::to_utf8(POINTER_ADD(PWCHAR, thumprint_header, thumprint_header->provider_name_offset)));
-			if (thumprint_header->user_name_offset) ret.push_back("Username                : " + utils::strings::to_utf8(POINTER_ADD(PWCHAR, thumprint_header, thumprint_header->user_name_offset)));
+			if (thumprint_header->container_name_offset)
+			{
+				ret.push_back("Container               : " + utils::strings::to_utf8(POINTER_ADD(PWCHAR, thumprint_header, thumprint_header->container_name_offset)));
+			}
+			if (thumprint_header->provider_name_offset)
+			{
+				ret.push_back("Cryptographic Provider  : " + utils::strings::to_utf8(POINTER_ADD(PWCHAR, thumprint_header, thumprint_header->provider_name_offset)));
+			}
+			if (thumprint_header->user_name_offset)
+			{
+				ret.push_back("Username                : " + utils::strings::to_utf8(POINTER_ADD(PWCHAR, thumprint_header, thumprint_header->user_name_offset)));
+			}
 		}
 		ret.push_back("");
 		ret.push_back(TABLE_SEPARATOR);

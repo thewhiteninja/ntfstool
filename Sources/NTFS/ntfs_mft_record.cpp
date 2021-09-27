@@ -392,6 +392,7 @@ void MFTRecord::apply_fixups(PVOID buffer, WORD updateOffset, WORD updateSize)
 PMFT_RECORD_ATTRIBUTE_HEADER MFTRecord::attribute_header(DWORD type, std::string name, int index)
 {
 	PMFT_RECORD_ATTRIBUTE_HEADER pAttribute = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, _record->data(), _record->data()->attributeOffset);
+
 	while ((pAttribute->TypeCode != $END) && (pAttribute->RecordLength > 0))
 	{
 		if (pAttribute->TypeCode == type)

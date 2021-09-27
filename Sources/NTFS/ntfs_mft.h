@@ -33,4 +33,6 @@ public:
 	std::shared_ptr<MFTRecord> record_from_path(std::string path, ULONG64 directory_record_number = ROOT_FILE_NAME_INDEX_NUMBER);
 
 	std::shared_ptr<MFTRecord> record_from_number(ULONG64 record_number);
+
+	std::vector<std::tuple<std::wstring, ULONG64>> list(std::string path, bool directory = true, bool files = true);
 };

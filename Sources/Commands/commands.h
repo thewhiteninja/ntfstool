@@ -16,6 +16,11 @@ namespace commands {
 		int print_partitions(std::shared_ptr<Options> opts);
 	}
 
+	namespace efs
+	{
+		int dispatch(std::shared_ptr<Options> opts);
+	}
+
 	namespace mbr
 	{
 		int print_mbr(std::shared_ptr<Options> opts);
@@ -91,7 +96,7 @@ namespace commands {
 
 	namespace help
 	{
-		void print_help(const char* name, std::shared_ptr<Options> opts);
+		void print_help(std::shared_ptr<Options> opts);
 	}
 
 	namespace streams

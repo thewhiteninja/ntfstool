@@ -18,11 +18,14 @@
 
 #include "buffer.h"
 
+#include <openssl/evp.h>
+#include <openssl/aes.h>
+#include <openssl/des.h>
+
 #define POINTER_ADD(t, p, v)	(reinterpret_cast<t>(reinterpret_cast<uint64_t>(p) + v))
 
 namespace utils
 {
-
 	namespace convert
 	{
 		std::shared_ptr<Buffer<PBYTE>> from_hex(std::string s);
@@ -147,6 +150,13 @@ namespace utils
 	namespace crypto
 	{
 		void xor_buffer(PVOID data, DWORD datalen, PVOID key, DWORD keylen);
+
+		namespace cryptoapi
+		{
+			const EVP_MD* hash_to_evp(DWORD hash_alg);
+
+			const EVP_CIPHER* encryption_to_evp(DWORD enc_alg);
+		}
 	}
 
 }
