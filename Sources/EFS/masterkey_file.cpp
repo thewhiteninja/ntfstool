@@ -149,3 +149,12 @@ void MasterKeyFile::_load_keyfile()
 		_domainkey = std::make_shared<DomainKey>(_buf->data()->Data + _buf->data()->MasterKeyLen + _buf->data()->BackupKeyLen + _buf->data()->CredHistoryLen, _buf->data()->DomainKeyLen, _buf->data()->Policy);
 	}
 }
+
+bool MasterKeyFile::_check_file()
+{
+	if (_buf == nullptr) return false;
+	if (_buf->data()->Version > 2) return false;
+	if (_buf->data()->Zero0 != 0LL) return false;
+	if (_buf->data()->Zero1 != 0LL) return false;
+	return true;
+}

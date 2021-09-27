@@ -135,6 +135,7 @@ public:
 class MasterKeyFile
 {
 private:
+	bool _loaded = false;
 	DWORD _version = 0;
 	DWORD _policy = 0;
 	std::string _guid;
@@ -147,20 +148,32 @@ private:
 
 	void _load_keyfile();
 
+	bool _check_file();
+
 public:
 	MasterKeyFile(std::wstring filename)
 	{
 		_buf = Buffer<PEFS_MASTERKEY_FILE>::from_file(filename);
 
-		_load_keyfile();
+		if (_check_file())
+		{
+			_load_keyfile();
+			_loaded = true;
+		}
 	}
 
 	MasterKeyFile(PBYTE data, DWORD size)
 	{
 		_buf = std::make_shared<Buffer<PEFS_MASTERKEY_FILE>>(data, size);
 
-		_load_keyfile();
+		if (_check_file())
+		{
+			_load_keyfile();
+			_loaded = true;
+		}
 	}
+
+	bool is_loaded() { return _loaded; }
 
 	std::string guid() { return _guid; }
 
