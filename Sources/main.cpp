@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
 	if (opts->show_usage)
 	{
-		commands::help::print_help(basename.c_str(), opts);
+		commands::help::print_help(opts);
 	}
 	else {
 		try {
@@ -44,6 +44,7 @@ int main(int argc, char** argv) {
 			else if (opts->command == "logfile") 	commands::logfile::print_logfile(opts);
 			else if (opts->command == "reparse") 	commands::reparse::print_reparse(opts);
 			else if (opts->command == "streams") 	commands::streams::list(opts);
+			else if (opts->command == "efs") 		commands::efs::dispatch(opts);
 			else if (opts->command == "bitdecrypt")	commands::bitlocker::decrypt_volume(opts);
 			else if (opts->command == "bitlocker")
 			{
@@ -57,7 +58,7 @@ int main(int argc, char** argv) {
 				}
 			}
 			else if (opts->command == "fve") 		commands::bitlocker::print_fve(opts);
-			else if (opts->command == "help")		commands::help::print_help(basename.c_str(), opts);
+			else if (opts->command == "help")		commands::help::print_help(opts);
 			else if (opts->command == "info")
 			{
 				if ((opts->disk != 0xffffffff || opts->image != "") && opts->volume != 0xffffffff)
@@ -70,7 +71,7 @@ int main(int argc, char** argv) {
 				}
 			}
 			else {
-				if (opts->command == "") commands::help::print_help(basename.c_str(), opts);
+				if (opts->command == "") commands::help::print_help(opts);
 				else throw std::logic_error("unknown command '" + opts->command + "'");
 			}
 		}

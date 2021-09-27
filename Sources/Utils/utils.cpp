@@ -32,6 +32,7 @@
 
 #include "Buffer.h"
 
+
 #pragma comment(lib, "ntdll")
 #pragma comment(lib, "wintrust")
 #pragma comment(lib, "advapi32")
@@ -721,3 +722,36 @@ void utils::crypto::xor_buffer(PVOID data, DWORD datalen, PVOID key, DWORD keyle
 		PBYTE(data)[i] ^= PBYTE(key)[i % keylen];
 	}
 }
+
+const EVP_MD* utils::crypto::cryptoapi::hash_to_evp(DWORD hash_alg)
+{
+	const EVP_MD* hash = nullptr;
+	switch (hash_alg)
+	{
+	case CALG_MD4: return EVP_md4();
+	case CALG_MD5: return EVP_md5();
+	case CALG_SHA1: return EVP_sha1();
+	case CALG_SHA_256: return EVP_sha256();
+	case CALG_SHA_384: return EVP_sha384();
+	case CALG_SHA_512: return EVP_sha512();
+	default:
+		return nullptr;
+	}
+}
+
+const EVP_CIPHER* utils::crypto::cryptoapi::encryption_to_evp(DWORD enc_alg)
+{
+	const EVP_CIPHER* enc = nullptr;
+	switch (enc_alg)
+	{
+	case CALG_3DES: return EVP_des_ede3_cbc();
+	case CALG_AES_128: return EVP_aes_128_cbc();
+	case CALG_AES_192: return EVP_aes_192_cbc();
+	case CALG_AES_256: return EVP_aes_256_cbc();
+	case CALG_DES: return EVP_des_cbc();
+	case CALG_DESX: return EVP_desx_cbc();
+	default:
+		return nullptr;
+	}
+}
+

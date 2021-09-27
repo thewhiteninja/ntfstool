@@ -67,6 +67,13 @@ namespace constants {
 		}
 	}
 
+	namespace efs
+	{
+		std::string hash_algorithm(DWORD r);
+
+		std::string enc_algorithm(DWORD a);
+	}
+
 	namespace bitlocker
 	{
 		std::string state(DWORD s);

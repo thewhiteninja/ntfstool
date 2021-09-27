@@ -52,6 +52,12 @@
     <Filter Include="Source Files\Compression">
       <UniqueIdentifier>{91e9b92c-3374-43d6-9138-b05d7476800b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\EFS">
+      <UniqueIdentifier>{73d1f69b-62bc-4adf-9e5e-85605faa5043}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\EFS">
+      <UniqueIdentifier>{c3b20f0c-65ae-4b68-9e00-a7cd05c0b8c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\options.h">
@@ -140,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Utils\btree.h">
       <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\EFS\masterkey_file.h">
+      <Filter>Header Files\EFS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -262,6 +271,12 @@
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_streams.cpp">
       <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_efs.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\EFS\masterkey_file.cpp">
+      <Filter>Source Files\EFS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

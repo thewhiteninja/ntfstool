@@ -54,7 +54,7 @@ public:
 		}
 	}
 
-	explicit Buffer(T data, DWORD size)
+	explicit Buffer(PBYTE data, DWORD size)
 	{
 		_mem = static_cast<T>(malloc(size));
 		if (_mem != NULL)
@@ -137,7 +137,7 @@ public:
 			if (dwSizeOfFile != INVALID_FILE_SIZE)
 			{
 				ret = std::make_shared<Buffer<T>>(dwSizeOfFile);
-				if (ReadFile(hFile, (LPVOID)ret->data(), ret->size(), &dwWritten, NULL))
+				if (ReadFile(hFile, reinterpret_cast<LPVOID>(ret->data()), ret->size(), &dwWritten, NULL))
 				{
 					if (dwWritten != ret->size()) ret = NULL;
 				}
