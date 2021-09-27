@@ -40,6 +40,11 @@ typedef struct {
 } EFS_DOMAINKEY, * PEFS_DOMAINKEY;
 
 typedef struct {
+	GUID Guid;
+	FILETIME timestamp;
+} EFS_PREFERRED_FILE, * PEFS_PREFERRED_FILE;
+
+typedef struct {
 	DWORD	Version;
 	DWORD64	Zero0;
 	WCHAR	Guid[36];
