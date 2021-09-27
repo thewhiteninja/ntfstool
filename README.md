@@ -54,6 +54,7 @@ Options can be entered as decimal or hex number with "0x" prefix.
 | [btree](#btree)  | Display VCN content and Btree index for an inode |
 | [bitlocker](#bitlocker)  | Display detailed information and hash ($bitlocker$) for all VMK. It is possible to test a password or recovery key. If it is correct, the decrypted VMK and FVEK is displayed. |
 | [bitdecrypt](#bitdecrypt)  | Decrypt a volume to a file using password, recovery key or bek. |
+| [efs](#efs)  | List, display and decrypt EFS related structures. |
 | [fve](#fve)  | Display information for the specified FVE block (0, 1, 2) |
 | [reparse](#reparse)  | Parse and display reparse points from \$Extend\$Reparse. |
 | [logfile](#logfile)  | Dump $LogFile file in specified format: csv, json, raw. |
@@ -637,6 +638,119 @@ At build time, VisualStudio will detect the vcpkg.json file and install required
     [-]   Processed data size : 512.00 MiBs (100%)
     [+] Duration : 7535ms
     [+] Closing Volume
+</td></tr>
+</table>
+
+### EFS
+<table>
+<tr><td>efs masterkey disk=0 volume=4</td></tr>
+<tr><td>
+    List masterkeys from \\.\PhysicalDrive0 > Volume:4
+    --------------------------------------------------
+
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [+] Listing user directories
+        8 directories found
+    [+] Searching for keys
+        19 key(s), 2 preferred file(s) found
+    [+] MasterKeys
+        +--------------------------------------------------------------------------------------------------------------------------------------------------+
+        | Id | User           | Keyfile                                       | Key(s)                                               | Creation Date       |
+        +--------------------------------------------------------------------------------------------------------------------------------------------------+
+        |  0 | DefaultAppPool | Name   : e4ed144f-6522-4471-8893-a6e29e175ba6 | MasterKey                                            | 2021-08-17 14:54:41 |
+        |    |                | Record : 000000031848h                        |     Version : 2                                      |                     |
+        |    |                | Size   : 468.00 bytes                         |     Algo    : CALG_SHA_512 - CALG_AES_256            |                     |
+        |    |                |                                               |     Salt    : FA737C82899CC3F61A3B332B15FDC241       |                     |
+        |    |                |                                               |     Rounds  : 8000                                   |                     |
+        |    |                |                                               | BackupKey                                            |                     |
+        |    |                |                                               |     Version : 2                                      |                     |
+        |    |                |                                               |     Algo    : CALG_SHA_512 - CALG_AES_256            |                     |
+        |    |                |                                               |     Salt    : DF0651C903763132BC3043BF144A7DDD       |                     |
+        |    |                |                                               |     Rounds  : 8000                                   |                     |
+        |    |                |                                               | CredHist                                             |                     |
+        |    |                |                                               |     Version : 3                                      |                     |
+        |    |                |                                               |     GUID    : {00000000-0000-0000-0000-000000000000} |                     |
+        +--------------------------------------------------------------------------------------------------------------------------------------------------+
+        |  1 | DefaultAppPool | Name   : Preferred                            | Preferred                                            | 2021-08-17 14:54:41 |
+        |    |                | Record : 00000003184ah                        |     GUID    : {e4ed144f-6522-4471-8893-a6e29e175ba6} |                     |
+        |    |                | Size   : 24.00 bytes                          |     Renew   : 2021-11-15 12:54:41                    |                     |
+        +--------------------------------------------------------------------------------------------------------------------------------------------------+
+        |  2 | Bob            | Name   : 26bd8b3d-e87f-4df3-a1af-18f434788090 | MasterKey                                            | 2021-03-05 01:16:42 |
+        |    |                | Record : 000000004f4ah                        |     Version : 2                                      |                     |
+        |    |                | Size   : 468.00 bytes                         |     Algo    : CALG_SHA_512 - CALG_AES_256            |                     |
+        |    |                |                                               |     Salt    : 39B575D1816DE8224B9E11C38E35EB34       |                     |
+        |    |                |                                               |     Rounds  : 8000                                   |                     |
+        |    |                |                                               | BackupKey                                            |                     |
+                                                                          ..........
+</td></tr>
+<tr><td>efs masterkey disk=0 volume=4 inode=0x80544</td></tr>
+<tr><td>
+    Display masterkey from \\.\PhysicalDrive0 > Volume:4
+    ----------------------------------------------------
+
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [+] Reading masterkey file record: 525636
+    [+] MasterKey
+        +--------------------------------------------------------------------+
+        | Id | Property  | Value                                             |
+        +--------------------------------------------------------------------+
+        |  0 | File      | Creation : 2020-07-06 05:56:06                    |
+        |    |           | Size     : 468.00 bytes                           |
+        +--------------------------------------------------------------------+
+        |  1 | Version   | 2                                                 |
+        +--------------------------------------------------------------------+
+        |  2 | GUID      | 9ac19509-54d3-48bc-8c67-4cfb01d73498              |
+        +--------------------------------------------------------------------+
+        |  3 | Policy    | 00000005h                                         |
+        +--------------------------------------------------------------------+
+        |  4 | MasterKey | Version  : 2                                      |
+        |    |           | Salt     : 3ED4CDBCC4073D6724A512061D0597E1       |
+        |    |           | Rounds   : 8000                                   |
+        |    |           | Hash Alg : CALG_SHA_512                           |
+        |    |           | Enc Alg  : CALG_AES_256                           |
+        |    |           | Enc Key  : 3610946FE1A7B9099D0AFA7658325014       |
+        |    |           |            296D1F0E5BA93249858BE3ACCC8FD7A8       |
+        |    |           |            F62DB6808833FC303095C6588BDE3826       |
+        |    |           |            80ABF391222CD77661BCCB637DDAC490       |
+        |    |           |            B5FC02C854EF45490EE10851EF524DE2       |
+        |    |           |            85DD508F905216D528D3DC3336830FF9       |
+        |    |           |            690472730A03D64CF892E06B9AA35692       |
+        |    |           |            AB7679E908D487119030B73CB87E6F9F       |
+        |    |           |            731F65609CB8ACA972BCC9042B27B9B4       |
+        +--------------------------------------------------------------------+
+        |  5 | BackupKey | Version  : 2                                      |
+        |    |           | Salt     : B60E21F9578D02A97964D7B10151BE69       |
+        |    |           | Rounds   : 8000                                   |
+        |    |           | Hash Alg : CALG_SHA_512                           |
+        |    |           | Enc Alg  : CALG_AES_256                           |
+        |    |           | Enc Key  : CD5D3684873D6A1D66520FB1642779E1       |
+        |    |           |            D78A649F02DDFE7C069F9B5F8FF9F005       |
+        |    |           |            7DC01E0A6AA9A815C8887BC1BF5B88E6       |
+        |    |           |            E797DC5F4A3A0535B3217BADC7FAD38E       |
+        |    |           |            798C1846423C8631DE472D790B308B2D       |
+        |    |           |            F15340B87FCD55A98DAEE92196235CF9       |
+        |    |           |            B328FAF475C05A911DF19C99D54D5A3C       |
+        +--------------------------------------------------------------------+
+        |  6 | CredHist  | Version  : 3                                      |
+        |    |           | GUID     : {20e0b482-797f-429e-b4a0-30020731ef0a} |
+        +--------------------------------------------------------------------+
+</td></tr>
+<tr><td> efs masterkey disk=0 volume=4 inode=0x80544 sid="S-1-5-21-1521398434-2415347828-2753175218-1001" password="ntfst00lisc00l"</td></tr>
+<tr><td>
+    Decrypt masterkey from \\.\PhysicalDrive0 > Volume:4
+    ----------------------------------------------------
+
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [+] Reading masterkey file record: 525636
+    [-] Masterkey
+        Encryption Algorithm : CALG_AES_256
+        Hash Algorithm       : CALG_SHA_512
+        Rounds               : 8000
+        Salt                 : 3ED4CDBCC4073D6724A512061D0597E1
+    [+] Decrypting masterkey
+    [+] Clear masterkey (256bits):
+        34FAC126105CE302421A0FC7E3933FEC5639AA6BFF95000E6DA83AE67522EAB6
+        0AF58A27D834883B65611878B258AAAECD8983E3718E00F276178C5BFF4979EB
 </td></tr>
 </table>
 
