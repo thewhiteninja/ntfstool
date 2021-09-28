@@ -159,6 +159,7 @@ public:
 		{
 			_load_keyfile();
 			_loaded = true;
+			_buf = nullptr;
 		}
 	}
 
@@ -170,6 +171,7 @@ public:
 		{
 			_load_keyfile();
 			_loaded = true;
+			_buf = nullptr;
 		}
 	}
 

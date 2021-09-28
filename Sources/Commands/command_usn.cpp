@@ -227,7 +227,7 @@ namespace commands
 {
 	namespace usn
 	{
-		int print_usn_journal(std::shared_ptr<Options> opts)
+		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 

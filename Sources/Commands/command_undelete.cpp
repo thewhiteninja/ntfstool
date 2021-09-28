@@ -298,7 +298,7 @@ namespace commands
 {
 	namespace undelete
 	{
-		int print_deleted_file(std::shared_ptr<Options> opts)
+		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 

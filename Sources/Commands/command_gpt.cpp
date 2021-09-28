@@ -16,9 +16,11 @@
 #include <memory>
 #include <stdexcept>
 
-namespace commands {
-	namespace gpt {
-		int print_gpt(std::shared_ptr<Options> opts)
+namespace commands
+{
+	namespace gpt
+	{
+		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 

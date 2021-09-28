@@ -244,8 +244,8 @@ void print_bitlocker_vbr(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol
 }
 
 namespace commands {
-	namespace bitlocker {
-		int print_fve(std::shared_ptr<Options> opts)
+	namespace fve {
+		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 

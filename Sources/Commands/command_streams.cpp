@@ -90,7 +90,7 @@ int list_streams(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 
 namespace commands {
 	namespace streams {
-		int list(std::shared_ptr<Options> opts)
+		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 

@@ -286,47 +286,62 @@ void print_image_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 	std::cout << std::endl;
 }
 
-namespace commands {
-	namespace info {
-		int print_disks(std::shared_ptr<Options> opts)
+int print_disks(std::shared_ptr<Options> opts)
+{
+	if ((opts->image == "") && (opts->disk == 0xffffffff))
+	{
+		print_disks_short(core::win::disks::list());
+		return 0;
+	}
+
+	std::shared_ptr<Disk> disk = get_disk(opts);
+	if (disk != nullptr)
+	{
+		if (opts->image != "") print_image_disk(disk);
+		else print_hardware_disk(disk);
+	}
+
+	return 0;
+}
+
+int print_partitions(std::shared_ptr<Options> opts)
+{
+	std::ios_base::fmtflags flag_backup(std::cout.flags());
+
+	std::shared_ptr<Disk> disk = get_disk(opts);
+	if (disk != nullptr)
+	{
+		std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+		if (volume != nullptr)
 		{
-			if ((opts->image == "") && (opts->disk == 0xffffffff))
+			if (opts->image != "")
 			{
-				print_disks_short(core::win::disks::list());
-				return 0;
+				print_image_volume(disk, volume);
 			}
-
-			std::shared_ptr<Disk> disk = get_disk(opts);
-			if (disk != nullptr)
+			else
 			{
-				if (opts->image != "") print_image_disk(disk);
-				else print_hardware_disk(disk);
+				print_hardware_volume(disk, volume);
 			}
-
-			return 0;
 		}
+	}
+	std::cout.flags(flag_backup);
+	return 0;
+}
 
-		int print_partitions(std::shared_ptr<Options> opts)
+namespace commands
+{
+	namespace info
+	{
+		int dispatch(std::shared_ptr<Options> opts)
 		{
-			std::ios_base::fmtflags flag_backup(std::cout.flags());
-
-			std::shared_ptr<Disk> disk = get_disk(opts);
-			if (disk != nullptr)
+			if ((opts->disk != 0xffffffff || opts->image != "") && opts->volume != 0xffffffff)
 			{
-				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
-				if (volume != nullptr)
-				{
-					if (opts->image != "")
-					{
-						print_image_volume(disk, volume);
-					}
-					else
-					{
-						print_hardware_volume(disk, volume);
-					}
-				}
+				print_partitions(opts);
 			}
-			std::cout.flags(flag_backup);
+			else
+			{
+				print_disks(opts);
+			}
 			return 0;
 		}
 	}

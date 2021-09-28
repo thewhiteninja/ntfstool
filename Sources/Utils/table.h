@@ -4,6 +4,7 @@
 #include <vector>
 
 #define TABLE_SEPARATOR "-----"
+#define TABLE_MAX_SIZE (64)
 
 namespace utils
 {
@@ -37,11 +38,11 @@ namespace utils
 
 			void add_header_multiline(std::initializer_list<std::string> header, utils::ui::TableAlign align = TableAlign::LEFT);
 
-			void add_item_line(std::string item);
+			void add_item_line(std::string item, unsigned int max_size = TABLE_MAX_SIZE);
 
 			void add_item_multiline(std::initializer_list<std::string> list);
 
-			void add_item_multiline(std::vector<std::string> list, unsigned int max_size = 60);
+			void add_item_multiline(std::vector<std::string> list, unsigned int max_size = TABLE_MAX_SIZE);
 
 			void set_margin_left(uint32_t margin_left);
 

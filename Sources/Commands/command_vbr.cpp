@@ -314,9 +314,11 @@ void print_bootsector(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
 	}
 }
 
-namespace commands {
-	namespace vbr {
-		int print_vbr(std::shared_ptr<Options> opts)
+namespace commands
+{
+	namespace vbr
+	{
+		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 

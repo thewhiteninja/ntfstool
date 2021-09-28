@@ -746,3 +746,29 @@ std::string constants::efs::enc_algorithm(DWORD enc_alg)
 		return "Unsupported";
 	}
 }
+
+std::vector<std::string> constants::efs::permissions(DWORD p)
+{
+	const static std::map<DWORD, std::string> perms = {
+		{CRYPT_ENCRYPT    , "CRYPT_ENCRYPT"},
+		{CRYPT_DECRYPT    , "CRYPT_DECRYPT"},
+		{CRYPT_EXPORT     , "CRYPT_EXPORT"},
+		{CRYPT_READ       , "CRYPT_READ"},
+		{CRYPT_WRITE      , "CRYPT_WRITE"},
+		{CRYPT_MAC        , "CRYPT_MAC"},
+		{CRYPT_EXPORT_KEY , "CRYPT_EXPORT_KEY"},
+		{CRYPT_IMPORT_KEY , "CRYPT_IMPORT_KEY"},
+	};
+
+	std::vector<std::string> ret;
+
+	for (auto perm : perms)
+	{
+		if (p & perm.first)
+		{
+			ret.push_back(perm.second);
+		}
+	}
+
+	return ret;
+}

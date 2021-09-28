@@ -72,6 +72,8 @@ namespace constants {
 		std::string hash_algorithm(DWORD r);
 
 		std::string enc_algorithm(DWORD a);
+
+		std::vector<std::string> permissions(DWORD p);
 	}
 
 	namespace bitlocker

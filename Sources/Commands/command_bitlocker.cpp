@@ -526,58 +526,69 @@ void list_guid_for_all_disks(std::vector<std::shared_ptr<Disk>> disks)
 	std::cout << std::endl;
 }
 
+int test_password(std::shared_ptr<Options> opts)
+{
+	std::ios_base::fmtflags flag_backup(std::cout.flags());
 
-namespace commands {
-
-	namespace bitlocker {
-
-		int test_password(std::shared_ptr<Options> opts)
+	std::shared_ptr<Disk> disk = get_disk(opts);
+	if (disk != nullptr)
+	{
+		std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+		if (volume != nullptr)
 		{
-			std::ios_base::fmtflags flag_backup(std::cout.flags());
-
-			std::shared_ptr<Disk> disk = get_disk(opts);
-			if (disk != nullptr)
+			if (opts->password != "") print_test_bitlocker_password(disk, volume, opts);
+			else if (opts->recovery != "") print_test_bitlocker_recovery(disk, volume, opts);
+			else if (opts->bek != "") print_test_bitlocker_bek(disk, volume, opts);
+			else
 			{
-				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
-				if (volume != nullptr)
-				{
-					if (opts->password != "") print_test_bitlocker_password(disk, volume, opts);
-					else if (opts->recovery != "") print_test_bitlocker_recovery(disk, volume, opts);
-					else if (opts->bek != "") print_test_bitlocker_bek(disk, volume, opts);
-					else
-					{
-						std::cerr << "[!] Invalid or missing auth method (password, recovery or bek file)";
-						return 1;
-					}
-				}
+				std::cerr << "[!] Invalid or missing auth method (password, recovery or bek file)";
+				return 1;
 			}
-
-			std::cout.flags(flag_backup);
-			return 0;
 		}
+	}
 
-		int print_bitlocker(std::shared_ptr<Options> opts)
+	std::cout.flags(flag_backup);
+	return 0;
+}
+
+int print_bitlocker(std::shared_ptr<Options> opts)
+{
+	std::ios_base::fmtflags flag_backup(std::cout.flags());
+
+	std::shared_ptr<Disk> disk = get_disk(opts);
+	if (disk != nullptr)
+	{
+		std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+		if (volume != nullptr)
 		{
-			std::ios_base::fmtflags flag_backup(std::cout.flags());
+			print_bitlocker_info(disk, volume);
+		}
+	}
+	else
+	{
+		list_guid_for_all_disks(core::win::disks::list());
+	}
 
-			std::shared_ptr<Disk> disk = get_disk(opts);
-			if (disk != nullptr)
+	std::cout.flags(flag_backup);
+	return 0;
+}
+
+namespace commands
+{
+	namespace bitlocker
+	{
+		int dispatch(std::shared_ptr<Options> opts)
+		{
+			if (opts->password != "" || opts->recovery != "" || opts->bek != "")
 			{
-				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
-				if (volume != nullptr)
-				{
-					print_bitlocker_info(disk, volume);
-				}
+				test_password(opts);
 			}
 			else
 			{
-				list_guid_for_all_disks(core::win::disks::list());
+				print_bitlocker(opts);
 			}
-
-			std::cout.flags(flag_backup);
 			return 0;
 		}
-
 	}
 
 }

@@ -121,9 +121,11 @@ int create_image(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const 
 	return 0;
 }
 
-namespace commands {
-	namespace image {
-		int create_image(std::shared_ptr<Options> opts)
+namespace commands
+{
+	namespace image
+	{
+		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 

@@ -178,14 +178,14 @@ namespace utils
 		void ltrim(std::string& s)
 		{
 			s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-				return !std::isspace(ch & 0xff);
+				return !std::isspace(ch & 0xff) && ((ch & 0xff) != 0);
 				}));
 		}
 
 		void rtrim(std::string& s)
 		{
 			s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned int ch) {
-				return !std::isspace(ch & 0xff);
+				return !std::isspace(ch & 0xff) && ((ch & 0xff) != 0);
 				}).base(), s.end());
 		}
 

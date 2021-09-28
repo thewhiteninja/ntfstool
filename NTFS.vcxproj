@@ -33,6 +33,7 @@
     <ClInclude Include="Sources\Drive\smart.h" />
     <ClInclude Include="Sources\Drive\vbr.h" />
     <ClInclude Include="Sources\Drive\volume.h" />
+    <ClInclude Include="Sources\EFS\key_file.h" />
     <ClInclude Include="Sources\EFS\masterkey_file.h" />
     <ClInclude Include="Sources\NTFS\ntfs.h" />
     <ClInclude Include="Sources\NTFS\ntfs_explorer.h" />
@@ -58,7 +59,9 @@
     <ClCompile Include="Sources\Bitlocker\recovery.cpp" />
     <ClCompile Include="Sources\Commands\command_bitdecrypt.cpp" />
     <ClCompile Include="Sources\Commands\command_bitlocker.cpp" />
-    <ClCompile Include="Sources\Commands\command_efs.cpp" />
+    <ClCompile Include="Sources\Commands\command_btree.cpp" />
+    <ClCompile Include="Sources\Commands\command_efs_key.cpp" />
+    <ClCompile Include="Sources\Commands\command_efs_masterkey.cpp" />
     <ClCompile Include="Sources\Commands\command_extract.cpp" />
     <ClCompile Include="Sources\Commands\command_image.cpp" />
     <ClCompile Include="Sources\Commands\command_logfile.cpp" />

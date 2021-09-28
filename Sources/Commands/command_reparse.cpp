@@ -116,7 +116,7 @@ int print_reparse(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const
 
 namespace commands {
 	namespace reparse {
-		int print_reparse(std::shared_ptr<Options> opts)
+		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 
