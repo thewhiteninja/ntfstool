@@ -29,10 +29,26 @@ void utils::ui::Table::add_header_multiline(std::initializer_list<std::string> h
 	column_align.push_back(align);
 }
 
-void utils::ui::Table::add_item_line(std::string item)
+void utils::ui::Table::add_item_line(std::string item, unsigned int max_size)
 {
 	std::vector<std::string> s;
-	s.push_back(item);
+	DWORD value_len = utils::strings::utf8_string_size(item);
+
+	if (value_len < max_size)
+	{
+		s.push_back(item);
+	}
+	else
+	{
+		if (value_len > 2 * max_size)
+		{
+			max_size = 32;
+		}
+		for (unsigned int i = 0; i < value_len; i += max_size)
+		{
+			s.push_back(item.substr(i, max_size));
+		}
+	}
 	current_line.push_back(s);
 }
 

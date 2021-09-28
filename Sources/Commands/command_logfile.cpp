@@ -307,7 +307,7 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 
 namespace commands {
 	namespace logfile {
-		int print_logfile(std::shared_ptr<Options> opts)
+		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 

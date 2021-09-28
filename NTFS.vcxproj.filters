@@ -150,6 +150,9 @@
     <ClInclude Include="Sources\EFS\masterkey_file.h">
       <Filter>Header Files\EFS</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\EFS\key_file.h">
+      <Filter>Header Files\EFS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -272,11 +275,17 @@
     <ClCompile Include="Sources\Commands\command_streams.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_efs.cpp">
+    <ClCompile Include="Sources\Commands\command_efs_masterkey.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\EFS\masterkey_file.cpp">
       <Filter>Source Files\EFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_btree.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_efs_key.cpp">
+      <Filter>Source Files\Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

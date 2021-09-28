@@ -64,9 +64,11 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 	return 0;
 }
 
-namespace commands {
-	namespace extract {
-		int extract_file(std::shared_ptr<Options> opts)
+namespace commands
+{
+	namespace extract
+	{
+		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 

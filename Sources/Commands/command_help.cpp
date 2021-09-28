@@ -412,10 +412,12 @@ void print_help_smart(const char* name)
 	std::cerr << std::endl;
 }
 
-namespace commands {
-	namespace help {
-		void print_help(std::shared_ptr<Options> opts) {
-
+namespace commands
+{
+	namespace help
+	{
+		void dispatch(std::shared_ptr<Options> opts)
+		{
 			char name_buf[MAX_PATH] = { 0 };
 			GetModuleFileNameA(nullptr, name_buf, MAX_PATH);
 			std::string name = utils::files::basename(name_buf);

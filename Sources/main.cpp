@@ -25,57 +25,49 @@ int main(int argc, char** argv) {
 
 	if (opts->show_usage)
 	{
-		commands::help::print_help(opts);
+		commands::help::dispatch(opts);
 	}
 	else {
 		try {
-			if (opts->command == "mbr")				commands::mbr::print_mbr(opts);
-			else if (opts->command == "shell")		commands::shell::go(opts);
-			else if (opts->command == "smart")		commands::smart::print_smart(opts);
-			else if (opts->command == "gpt")		commands::gpt::print_gpt(opts);
-			else if (opts->command == "usn")		commands::usn::print_usn_journal(opts);
-			else if (opts->command == "extract")	commands::extract::extract_file(opts);
-			else if (opts->command == "vbr")		commands::vbr::print_vbr(opts);
-			else if (opts->command == "image")		commands::image::create_image(opts);
-			else if (opts->command == "undelete")	commands::undelete::print_deleted_file(opts);
-			else if (opts->command == "mft")		commands::mft::print_mft(opts);
-			else if (opts->command == "btree")		commands::mft::print_btree(opts);
-			else if (opts->command == "shadow")		commands::shadow::print_volumeshadow(opts);
-			else if (opts->command == "logfile") 	commands::logfile::print_logfile(opts);
-			else if (opts->command == "reparse") 	commands::reparse::print_reparse(opts);
-			else if (opts->command == "streams") 	commands::streams::list(opts);
-			else if (opts->command == "efs") 		commands::efs::dispatch(opts);
-			else if (opts->command == "bitdecrypt")	commands::bitlocker::decrypt_volume(opts);
-			else if (opts->command == "bitlocker")
+			if (opts->command == "mbr")				commands::mbr::dispatch(opts);
+			else if (opts->command == "shell")		commands::shell::dispatch(opts);
+			else if (opts->command == "smart")		commands::smart::dispatch(opts);
+			else if (opts->command == "gpt")		commands::gpt::dispatch(opts);
+			else if (opts->command == "usn")		commands::usn::dispatch(opts);
+			else if (opts->command == "extract")	commands::extract::dispatch(opts);
+			else if (opts->command == "vbr")		commands::vbr::dispatch(opts);
+			else if (opts->command == "image")		commands::image::dispatch(opts);
+			else if (opts->command == "undelete")	commands::undelete::dispatch(opts);
+			else if (opts->command == "mft")		commands::mft::dispatch(opts);
+			else if (opts->command == "btree")		commands::mft::dispatch(opts);
+			else if (opts->command == "shadow")		commands::shadow::dispatch(opts);
+			else if (opts->command == "logfile") 	commands::logfile::dispatch(opts);
+			else if (opts->command == "reparse") 	commands::reparse::dispatch(opts);
+			else if (opts->command == "streams") 	commands::streams::dispatch(opts);
+			else if (opts->command == "efs")
 			{
-				if (opts->password != "" || opts->recovery != "" || opts->bek != "")
+				if (opts->subcommand == "masterkey")commands::efs::masterkey::dispatch(opts);
+				if (opts->subcommand == "key")		commands::efs::key::dispatch(opts);
+			}
+			else if (opts->command == "bitdecrypt")	commands::bitdecrypt::dispatch(opts);
+			else if (opts->command == "bitlocker")  commands::bitlocker::dispatch(opts);
+			else if (opts->command == "fve") 		commands::fve::dispatch(opts);
+			else if (opts->command == "help")		commands::help::dispatch(opts);
+			else if (opts->command == "info")       commands::info::dispatch(opts);
+			else
+			{
+				if (opts->command == "")
 				{
-					commands::bitlocker::test_password(opts);
+					commands::help::dispatch(opts);
 				}
 				else
 				{
-					commands::bitlocker::print_bitlocker(opts);
+					throw std::logic_error("unknown command '" + opts->command + "'");
 				}
-			}
-			else if (opts->command == "fve") 		commands::bitlocker::print_fve(opts);
-			else if (opts->command == "help")		commands::help::print_help(opts);
-			else if (opts->command == "info")
-			{
-				if ((opts->disk != 0xffffffff || opts->image != "") && opts->volume != 0xffffffff)
-				{
-					commands::info::print_partitions(opts);
-				}
-				else
-				{
-					commands::info::print_disks(opts);
-				}
-			}
-			else {
-				if (opts->command == "") commands::help::print_help(opts);
-				else throw std::logic_error("unknown command '" + opts->command + "'");
 			}
 		}
-		catch (const std::exception& e) {
+		catch (const std::exception& e)
+		{
 			std::cerr << "Err: " << e.what() << std::endl << std::endl;
 		}
 	}

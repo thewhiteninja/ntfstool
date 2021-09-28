@@ -250,7 +250,7 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 
 	std::cout << "[+] Searching for keys" << std::endl;
 
-	int key_count = 0;
+	int masterkey_count = 0;
 	int preferred_count = 0;
 
 	std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
@@ -273,7 +273,7 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 				auto record_keyfile = explorer->mft()->record_from_number(std::get<1>(key_file));
 				auto data = record_keyfile->data();
 
-				tab->add_item_line(std::to_string(key_count + preferred_count));
+				tab->add_item_line(std::to_string(masterkey_count + preferred_count));
 				tab->add_item_line(utils::strings::to_utf8(std::get<0>(user_dir)));
 				tab->add_item_multiline(
 					{
@@ -298,7 +298,7 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 				}
 				else
 				{
-					key_count++;
+					masterkey_count++;
 					std::shared_ptr<MasterKeyFile> mkf = std::make_shared<MasterKeyFile>(data->data(), data->size());
 					if (mkf->is_loaded())
 					{
@@ -360,13 +360,13 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 		}
 	}
 
-	if (key_count == 0)
+	if (masterkey_count == 0)
 	{
 		std::cout << "[+] No masterkey found" << std::endl;
 	}
 	else
 	{
-		std::cout << "    " << key_count << " key(s), " << preferred_count << " preferred file(s) found" << std::endl;
+		std::cout << "    " << masterkey_count << " key(s), " << preferred_count << " preferred file(s) found" << std::endl;
 		std::cout << "[+] MasterKeys" << std::endl;
 		tab->render(std::cout);
 	}
@@ -378,17 +378,17 @@ namespace commands
 {
 	namespace efs
 	{
-		int dispatch(std::shared_ptr<Options> opts)
+		namespace masterkey
 		{
-			std::ios_base::fmtflags flag_backup(std::cout.flags());
-
-			std::shared_ptr<Disk> disk = get_disk(opts);
-			if (disk != nullptr)
+			int dispatch(std::shared_ptr<Options> opts)
 			{
-				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
-				if (volume != nullptr)
+				std::ios_base::fmtflags flag_backup(std::cout.flags());
+
+				std::shared_ptr<Disk> disk = get_disk(opts);
+				if (disk != nullptr)
 				{
-					if (opts->subcommand == "masterkey")
+					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+					if (volume != nullptr)
 					{
 						if (opts->inode != 0)
 						{
@@ -408,26 +408,21 @@ namespace commands
 					}
 					else
 					{
-						std::cerr << "[!] Invalid or missing subcommand" << std::endl;
-						return 1;
+						std::cerr << "[!] Invalid or missing volume option" << std::endl;
+						opts->subcommand = "efs";
+						commands::help::dispatch(opts);
 					}
 				}
 				else
 				{
-					std::cerr << "[!] Invalid or missing volume option" << std::endl;
+					std::cerr << "[!] Invalid or missing disk option" << std::endl;
 					opts->subcommand = "efs";
-					commands::help::print_help(opts);
+					commands::help::dispatch(opts);
 				}
-			}
-			else
-			{
-				std::cerr << "[!] Invalid or missing disk option" << std::endl;
-				opts->subcommand = "efs";
-				commands::help::print_help(opts);
-			}
 
-			std::cout.flags(flag_backup);
-			return 0;
+				std::cout.flags(flag_backup);
+				return 0;
+			}
 		}
 	}
 }

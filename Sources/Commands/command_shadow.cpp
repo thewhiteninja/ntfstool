@@ -144,7 +144,7 @@ namespace commands
 {
 	namespace shadow
 	{
-		int print_volumeshadow(std::shared_ptr<Options> opts)
+		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 

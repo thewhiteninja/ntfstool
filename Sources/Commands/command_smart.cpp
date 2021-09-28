@@ -400,11 +400,12 @@ void print_smart_data(std::shared_ptr<Disk> disk)
 	std::cout << std::endl;
 }
 
-namespace commands {
-
-	namespace smart {
-
-		int print_smart(std::shared_ptr<Options> opts) {
+namespace commands
+{
+	namespace smart
+	{
+		int dispatch(std::shared_ptr<Options> opts)
+		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 
 			std::shared_ptr<Disk> disk = get_disk(opts);
