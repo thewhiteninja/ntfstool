@@ -271,13 +271,25 @@ void print_help_efs(const char* name)
 	std::cerr << "    " << name << " efs masterkey [disk id] [volume id]" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    List, display and decrypt masterkeys on a volume." << std::endl;
+	std::cerr << "    List, display and decrypt masterkeys and keys on a volume." << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: List masterkeys for disk 1, volume 2" << std::endl;
 	std::cerr << "    " << name << " efs masterkey disk=1 volume=2" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Display a masterkey for disk 1, volume 2 and inode 0x1337" << std::endl;
 	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Decrypt a masterkey for inode 0x1337 with sid and password" << std::endl;
+	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337 sid=\"S-1123...1001\" password=\"123456\"" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: List keys for disk 1, volume 2" << std::endl;
+	std::cerr << "    " << name << " efs key disk=1 volume=2" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Display a key for disk 1, volume 2 and inode 0x1337" << std::endl;
+	std::cerr << "    " << name << " efs key disk=1 volume=2 inode=0x1337" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Decrypt a key for inode 0x1337 with masterkey" << std::endl;
+	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321" << std::endl;
 	std::cerr << std::endl;
 }
 

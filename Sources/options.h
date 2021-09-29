@@ -22,6 +22,8 @@ public:
 	std::string fvek;
 	std::string image;
 
+	std::shared_ptr<Buffer<PBYTE>> masterkey = nullptr;
+
 	unsigned long inode = 0;
 	unsigned long fve_block = 0;
 	unsigned long disk = 0xffffffff;

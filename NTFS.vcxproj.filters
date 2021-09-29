@@ -153,6 +153,18 @@
     <ClInclude Include="Sources\EFS\key_file.h">
       <Filter>Header Files\EFS</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\EFS\private_key_enc.h">
+      <Filter>Header Files\EFS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\EFS\export_flag.h">
+      <Filter>Header Files\EFS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\EFS\public_key.h">
+      <Filter>Header Files\EFS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\EFS\private_key.h">
+      <Filter>Header Files\EFS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -286,6 +298,18 @@
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_efs_key.cpp">
       <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\EFS\private_key_enc.cpp">
+      <Filter>Source Files\EFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\EFS\public_key.cpp">
+      <Filter>Source Files\EFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\EFS\key_file.cpp">
+      <Filter>Source Files\EFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\EFS\private_key.cpp">
+      <Filter>Source Files\EFS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

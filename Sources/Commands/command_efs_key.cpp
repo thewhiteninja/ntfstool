@@ -4,13 +4,147 @@
 #include <Utils/table.h>
 #include <Utils/constant_names.h>
 #include <EFS/key_file.h>
+#include <EFS/private_key.h>
 
 int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	return 0;
+	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
+	{
+		std::cerr << "[!] NTFS volume required" << std::endl;
+		return 1;
+	}
+
+	std::cout << std::setfill('0');
+	utils::ui::title("Decrypt key from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+
+	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
+
+	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+
+	std::cout << "[+] Reading key file record: " << opts->inode << std::endl;
+	auto key_file_record = explorer->mft()->record_from_number(opts->inode);
+	if (key_file_record == nullptr)
+	{
+		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
+		return 2;
+	}
+	else
+	{
+		auto data = key_file_record->data();
+		std::shared_ptr<KeyFile> key_file = std::make_shared<KeyFile>(data->data(), data->size());
+		if (!key_file->is_loaded())
+		{
+			std::cerr << "[!] Err: Failed to parse key file from record: " << opts->inode << std::endl;
+			return 3;
+		}
+
+		auto key = key_file->private_key();
+		if (key)
+		{
+			std::cout << "[-] Key" << std::endl;
+			std::cout << "    Encryption Algorithm : " << constants::efs::enc_algorithm(key->header()->EncryptionAlgorithm) << std::endl;
+			std::cout << "    Hash Algorithm       : " << constants::efs::hash_algorithm(key->header()->HashAlgorithm) << std::endl;
+			std::cout << "    Salt                 : " << utils::convert::to_hex(key->salt()->data(), key->salt()->size()) << std::endl;
+
+			std::cout << "[+] Decrypting key" << std::endl;
+			std::shared_ptr<PrivateKey> res = key->decrypt_with_masterkey(opts->masterkey);
+			if (res == nullptr)
+			{
+				std::cout << "[!] Failed to decrypt. Check masterkey." << std::endl;
+			}
+			else
+			{
+				std::cout << "[+] Clear key (" << res->header()->Bitsize << "bits):" << std::endl;
+
+				std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
+				tab->set_margin_left(4);
+				tab->set_interline(true);
+				tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
+				tab->add_header_line("Property");
+				tab->add_header_line("Value");
+
+				int i = 0;
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Magic");
+				std::string magic_str = { ((char*)(&res->header()->Magic))[0],((char*)(&res->header()->Magic))[1],((char*)(&res->header()->Magic))[2],((char*)(&res->header()->Magic))[3] };
+				tab->add_item_line(magic_str);
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Bitsize");
+				tab->add_item_line(std::to_string(res->header()->Bitsize));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Permissions");
+				tab->add_item_multiline(constants::efs::permissions(res->header()->Permissions));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Exponent");
+				tab->add_item_line(std::to_string(res->header()->Exponent));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Modulus");
+				tab->add_item_line(utils::convert::to_hex(res->modulus()->data(), res->modulus()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Prime1");
+				tab->add_item_line(utils::convert::to_hex(res->prime1()->data(), res->prime1()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Prime2");
+				tab->add_item_line(utils::convert::to_hex(res->prime2()->data(), res->prime2()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Exponent1");
+				tab->add_item_line(utils::convert::to_hex(res->exponent1()->data(), res->exponent1()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Exponent2");
+				tab->add_item_line(utils::convert::to_hex(res->exponent2()->data(), res->exponent2()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Coefficient");
+				tab->add_item_line(utils::convert::to_hex(res->coefficient()->data(), res->coefficient()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Private Exponent");
+				tab->add_item_line(utils::convert::to_hex(res->private_exponent()->data(), res->private_exponent()->size()));
+
+				tab->new_line();
+
+				tab->render(std::cout);
+			}
+		}
+		else
+		{
+			std::cerr << "[!] Err: No key in specified file." << std::endl;
+			return 3;
+		}
+
+		return 0;
+	}
 }
 
-std::vector<std::string> print_private_key(std::shared_ptr<PrivateKey> private_key)
+std::vector<std::string> print_encrypted_private_key(std::shared_ptr<PrivateKeyEnc> private_key)
 {
 	std::vector<std::string> cell =
 	{
@@ -182,7 +316,7 @@ int show_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 			tab->add_item_line(std::to_string(i++));
 			tab->add_item_line("Encrypted PrivateKey");
 
-			auto cell = print_private_key(private_key);
+			auto cell = print_encrypted_private_key(private_key);
 			tab->add_item_multiline(cell);
 
 			tab->new_line();
@@ -203,7 +337,7 @@ int show_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 			tab->add_item_line(std::to_string(i++));
 			tab->add_item_line("ExportFlag");
 
-			auto cell = print_private_key(export_flag);
+			auto cell = print_encrypted_private_key(export_flag);
 			tab->add_item_multiline(cell);
 
 			tab->new_line();
@@ -269,8 +403,6 @@ int list_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shar
 					}
 				);
 
-				std::vector<std::string> cell;
-
 				key_count++;
 				std::shared_ptr<KeyFile> kf = std::make_shared<KeyFile>(data->data(), data->size());
 				if (kf->is_loaded())
@@ -279,7 +411,7 @@ int list_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shar
 				}
 				else
 				{
-					cell.push_back("Invalid Key File");
+					tab->add_item_line("Invalid Key File");
 				}
 
 				PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = record_keyfile->attribute_header($STANDARD_INFORMATION);
@@ -332,7 +464,7 @@ namespace commands
 					{
 						if (opts->inode != 0)
 						{
-							if (opts->password != "" && opts->sid != "")
+							if (opts->masterkey != nullptr)
 							{
 								decrypt_key(disk, volume, opts);
 							}
