@@ -105,12 +105,11 @@ std::shared_ptr<Buffer<PBYTE>> MasterKey::decrypt_with_password(std::string sid,
 	auto password_hash = std::make_shared<Buffer<PBYTE>>(SHA_DIGEST_LENGTH);
 	auto derived_key = std::make_shared<Buffer<PBYTE>>(SHA_DIGEST_LENGTH);
 	auto masterkey_key = std::make_shared<Buffer<PBYTE>>(EVP_CIPHER_key_length(dec) + EVP_CIPHER_iv_length(dec));
+	auto clear_masterkey = std::make_shared<Buffer<PBYTE>>(_encrypted_masterkey->size());
 
 	hash_password(password_utf16_le, password_hash, _policy);
 	derive_intermediate_key_with_sid(password_hash, sid_utf16_le, derived_key);
 	derive_masterkey_key(hash, derived_key, masterkey_key);
-
-	auto clear_masterkey = std::make_shared<Buffer<PBYTE>>(_encrypted_masterkey->size());
 
 	decrypt_masterkey(dec, _encrypted_masterkey, masterkey_key, clear_masterkey);
 

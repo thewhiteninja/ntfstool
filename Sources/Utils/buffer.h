@@ -148,6 +148,11 @@ public:
 		return ret;
 	}
 
+	static std::shared_ptr<Buffer<T>> from_hex(std::string hexstring)
+	{
+		return utils::convert::from_hex(hexstring);;
+	}
+
 	std::shared_ptr<Buffer<PBYTE>> concat(PBYTE toAddr, size_t toSize)
 	{
 		std::shared_ptr<Buffer<PBYTE>> conc = std::make_shared<Buffer<PBYTE>>(_size + toSize);
