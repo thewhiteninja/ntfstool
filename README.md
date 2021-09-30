@@ -5,7 +5,9 @@
 [![x64](https://img.shields.io/badge/Windows-64_bit-0078d7.svg)](#)
 [![x86](https://img.shields.io/badge/Windows-32_bit-0078d7.svg)](#)
 [![v1.3](https://img.shields.io/badge/Version-1.3-ff5733.svg)](#)
-![Build](https://github.com/thewhiteninja/ntfstool/workflows/Build/badge.svg)
+[![Build](https://ci.appveyor.com/api/projects/status/a3cn5dpdv146tdji?svg=true)](https://ci.appveyor.com/project/thewhiteninja/ntfstool)
+
+
 
 <br />
 
@@ -30,6 +32,11 @@ There is no bruteforcing feature because GPU-based cracking is better (see [Bitc
 
 [1]: https://arxiv.org/pdf/1901.01337
 [2]: https://hashcat.net/hashcat/
+
+### EFS support
+
+In the current version, masterkeys and private keys can be listed, displayed and decrypt using needed inputs (sid, password).
+Decryption of EFS encrypted files is coming!
 
 ### Shell
 
@@ -69,16 +76,13 @@ Options can be entered as decimal or hex number with "0x" prefix.
 
 ## Limitations
 
-- May contains bugs and unsupported cases (feel free to open an issue)
+- May contains bugs and unsupported cases
 - No documentation :no_mouth:.
 
-## Third-parties
+Feel free to open an issue or ask for a new feature!
 
-- [openssl](https://www.openssl.org/): OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
-- [nlohmann-json](https://github.com/nlohmann/json): JSON for Modern C++
-- [distorm](https://github.com/gdabah/distorm): Powerful Disassembler Library For x86/AMD64
-- [cppcoro](https://github.com/lewissbaker/cppcoro): A library of C++ coroutine abstractions for the coroutines TS.
-     
+## Build
+    
 Vcpkg is the best way to install and use them.
 
 Install vcpkg as described here: [vcpkg#getting-started](https://github.com/microsoft/vcpkg#getting-started)
@@ -91,6 +95,13 @@ Integrate it to your VisualStudio env:
     vcpkg integrate install
 
 At build time, VisualStudio will detect the vcpkg.json file and install required packages automatically.
+
+Current external libs:
+- [openssl](https://www.openssl.org/): OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
+- [nlohmann-json](https://github.com/nlohmann/json): JSON for Modern C++
+- [distorm](https://github.com/gdabah/distorm): Powerful Disassembler Library For x86/AMD64
+- [cppcoro](https://github.com/lewissbaker/cppcoro): A library of C++ coroutine abstractions for the coroutines TS.
+
   
 
 [3]: https://www.osforensics.com/tools/mount-disk-images.html
