@@ -291,6 +291,9 @@ void print_help_efs(const char* name)
 	std::cerr << "    Example: Decrypt a key for inode 0x1337 with masterkey" << std::endl;
 	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321" << std::endl;
 	std::cerr << std::endl;
+	std::cerr << "    Example: Decrypt and export a key to mykey.pem (format in [pem])" << std::endl;
+	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321 output=mykey format=pem" << std::endl;
+	std::cerr << std::endl;
 }
 
 void print_help_extract(const char* name)

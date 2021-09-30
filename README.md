@@ -947,6 +947,31 @@ Current external libs:
 	    |    |                  | F39FC063F1F20323E3220229E29FA42D |
 	    +----------------------------------------------------------+
 </td></tr>
+<tr><td> efs key disk=0 volume=4 inode=742107 masterkey=34...eb output=mykey format=pem</td></tr>
+<tr><td>
+	
+	Decrypt key from \\.\PhysicalDrive0 > Volume:4
+	----------------------------------------------
+
+	[+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+	[+] Reading key file record: 742107
+	[-] Key
+	    Encryption Algorithm : CALG_AES_256
+	    Hash Algorithm       : CALG_SHA_512
+	    Salt                 : ABABD5324CCE0254BC726C33F5A777D38BC4D75CACC2360EF3276EB4DC42FF6A
+	[+] Decrypting key
+	[+] Clear key (2048bits):
+	    +----------------------------------------------------------+
+	    | Id | Property         | Value                            |
+	    +----------------------------------------------------------+
+	    |  0 | Magic            | RSA2                             |
+	    +----------------------------------------------------------+
+	    |  1 | Bitsize          | 2048                             |
+                          ...
+
+    [+] Private key exported to mykey.pem.	    
+</td></tr>
+
 </table>
 
 ### FVE

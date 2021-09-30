@@ -137,6 +137,7 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 
 				if (opts->out != "")
 				{
+					std::cout << std::endl;
 					if (opts->format == "")
 					{
 						opts->format = format[0];
