@@ -6,6 +6,8 @@
 #include <EFS/key_file.h>
 #include <EFS/private_key.h>
 
+const std::vector<std::string> format = { "pem" };
+
 int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
@@ -132,6 +134,35 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 				tab->new_line();
 
 				tab->render(std::cout);
+
+				if (opts->out != "")
+				{
+					if (opts->format == "")
+					{
+						opts->format = format[0];
+					}
+					else
+					{
+						opts->format = utils::strings::lower(opts->format);
+					}
+
+					if (std::find(format.begin(), format.end(), opts->format) == format.end())
+					{
+						std::cerr << "[!] Err: Invalid output format. (" << opts->format << ")" << std::endl;
+					}
+					else
+					{
+						std::string out_filename = opts->out + "." + opts->format;
+						if (res->export_to_PEM(out_filename) == 0)
+						{
+							std::cout << "[+] Private key exported to " << out_filename << "." << std::endl;
+						}
+						else
+						{
+							std::cerr << "[!] Err: Unable to export the private key." << std::endl;
+						}
+					}
+				}
 			}
 		}
 		else

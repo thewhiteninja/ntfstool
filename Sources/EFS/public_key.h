@@ -31,4 +31,6 @@ public:
 	PPUBLICKEY_BLOB header() { return &_header; }
 
 	std::shared_ptr<Buffer<PBYTE>> modulus() { return _modulus; }
+
+	int export_to_PEM(std::string filename);
 };

@@ -89,6 +89,8 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 		if (!strncmp(argv[i], "--sam", 5)) { ret->sam = true; continue; }
 		if (!strncmp(argv[i], "--system", 8)) { ret->system = true; continue; }
 		if (ret->subcommand == "") { ret->subcommand = std::string(argv[i]); continue; }
+
+		std::cerr << std::endl << "[!] Invalid option: " << argv[i] << std::endl;
 		ret->show_usage = true;
 	}
 
