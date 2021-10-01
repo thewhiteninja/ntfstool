@@ -165,6 +165,9 @@
     <ClInclude Include="Sources\EFS\private_key.h">
       <Filter>Header Files\EFS</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\EFS\certificate.h">
+      <Filter>Header Files\EFS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -310,6 +313,12 @@
     </ClCompile>
     <ClCompile Include="Sources\EFS\private_key.cpp">
       <Filter>Source Files\EFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\EFS\certificate.cpp">
+      <Filter>Source Files\EFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\EFS\command_efs_certificate.cpp">
+      <Filter>Source Files\Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

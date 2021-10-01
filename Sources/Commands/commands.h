@@ -25,6 +25,10 @@ namespace commands {
 		{
 			int dispatch(std::shared_ptr<Options> opts);
 		}
+		namespace certificate
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
 	}
 
 	namespace mbr
@@ -76,6 +80,11 @@ namespace commands {
 	}
 
 	namespace vbr
+	{
+		int dispatch(std::shared_ptr<Options> opts);
+	}
+
+	namespace btree
 	{
 		int dispatch(std::shared_ptr<Options> opts);
 	}

@@ -33,6 +33,7 @@
     <ClInclude Include="Sources\Drive\smart.h" />
     <ClInclude Include="Sources\Drive\vbr.h" />
     <ClInclude Include="Sources\Drive\volume.h" />
+    <ClInclude Include="Sources\EFS\certificate.h" />
     <ClInclude Include="Sources\EFS\export_flag.h" />
     <ClInclude Include="Sources\EFS\key_file.h" />
     <ClInclude Include="Sources\EFS\masterkey_file.h" />
@@ -86,6 +87,8 @@
     <ClCompile Include="Sources\Drive\disk.cpp" />
     <ClCompile Include="Sources\Drive\reader.cpp" />
     <ClCompile Include="Sources\Drive\volume.cpp" />
+    <ClCompile Include="Sources\EFS\certificate.cpp" />
+    <ClCompile Include="Sources\EFS\command_efs_certificate.cpp" />
     <ClCompile Include="Sources\EFS\key_file.cpp" />
     <ClCompile Include="Sources\EFS\masterkey_file.cpp" />
     <ClCompile Include="Sources\EFS\private_key.cpp" />

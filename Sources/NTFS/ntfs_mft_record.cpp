@@ -331,8 +331,13 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 		}
 		if (readSize != filesize)
 		{
+			
 			std::cout << "[!] Invalid read file size" << std::endl;
 			ret = nullptr;
+		}
+		else
+		{
+			ret->shrink(static_cast<DWORD>(filesize));
 		}
 	}
 

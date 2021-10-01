@@ -74,6 +74,14 @@ namespace constants {
 		std::string enc_algorithm(DWORD a);
 
 		std::vector<std::string> permissions(DWORD p);
+
+		std::string cert_prop_id(DWORD p);
+
+		std::string cert_prop_provider_type(DWORD t);
+
+		std::string cert_prop_flags(DWORD f);
+
+		std::string cert_prop_keyspec(DWORD k);
 	}
 
 	namespace bitlocker
