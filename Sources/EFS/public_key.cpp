@@ -28,7 +28,7 @@ int PublicKey::export_to_PEM(std::string filename)
 		RSA_set0_key(rsa, n, e, 0);
 
 		FILE* fp = nullptr;
-		fopen_s(&fp, filename.c_str(), "wb");
+		fopen_s(&fp, (filename + ".pub.pem").c_str(), "wb");
 		if (!fp)
 		{
 			return 1;

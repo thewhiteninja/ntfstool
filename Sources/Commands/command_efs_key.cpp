@@ -56,6 +56,42 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 			}
 			else
 			{
+				if (opts->out != "")
+				{
+					if (opts->format == "")
+					{
+						opts->format = format[0];
+					}
+					else
+					{
+						opts->format = utils::strings::lower(opts->format);
+					}
+
+					if (std::find(format.begin(), format.end(), opts->format) == format.end())
+					{
+						std::cerr << "[!] Err: Invalid output format. (" << opts->format << ")" << std::endl;
+					}
+					else
+					{
+						if (res->export_public_to_PEM(opts->out) == 0)
+						{
+							std::cout << "[+] Public key exported to " << opts->out << ".pub.pem" << "." << std::endl;
+						}
+						else
+						{
+							std::cerr << "[!] Err: Unable to export the public key." << std::endl;
+						}
+						if (res->export_private_to_PEM(opts->out) == 0)
+						{
+							std::cout << "[+] Private key exported to " << opts->out << ".priv.pem" << "." << std::endl;
+						}
+						else
+						{
+							std::cerr << "[!] Err: Unable to export the private key." << std::endl;
+						}
+					}
+				}
+
 				std::cout << "[+] Clear key (" << res->header()->Bitsize << "bits):" << std::endl;
 
 				std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
@@ -134,36 +170,6 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 				tab->new_line();
 
 				tab->render(std::cout);
-
-				if (opts->out != "")
-				{
-					std::cout << std::endl;
-					if (opts->format == "")
-					{
-						opts->format = format[0];
-					}
-					else
-					{
-						opts->format = utils::strings::lower(opts->format);
-					}
-
-					if (std::find(format.begin(), format.end(), opts->format) == format.end())
-					{
-						std::cerr << "[!] Err: Invalid output format. (" << opts->format << ")" << std::endl;
-					}
-					else
-					{
-						std::string out_filename = opts->out + "." + opts->format;
-						if (res->export_to_PEM(out_filename) == 0)
-						{
-							std::cout << "[+] Private key exported to " << out_filename << "." << std::endl;
-						}
-						else
-						{
-							std::cerr << "[!] Err: Unable to export the private key." << std::endl;
-						}
-					}
-				}
 			}
 		}
 		else
