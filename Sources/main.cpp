@@ -29,31 +29,32 @@ int main(int argc, char** argv) {
 	}
 	else {
 		try {
-			if (opts->command == "mbr")				commands::mbr::dispatch(opts);
-			else if (opts->command == "shell")		commands::shell::dispatch(opts);
-			else if (opts->command == "smart")		commands::smart::dispatch(opts);
-			else if (opts->command == "gpt")		commands::gpt::dispatch(opts);
-			else if (opts->command == "usn")		commands::usn::dispatch(opts);
-			else if (opts->command == "extract")	commands::extract::dispatch(opts);
-			else if (opts->command == "vbr")		commands::vbr::dispatch(opts);
-			else if (opts->command == "image")		commands::image::dispatch(opts);
-			else if (opts->command == "undelete")	commands::undelete::dispatch(opts);
-			else if (opts->command == "mft")		commands::mft::dispatch(opts);
-			else if (opts->command == "btree")		commands::mft::dispatch(opts);
-			else if (opts->command == "shadow")		commands::shadow::dispatch(opts);
-			else if (opts->command == "logfile") 	commands::logfile::dispatch(opts);
-			else if (opts->command == "reparse") 	commands::reparse::dispatch(opts);
-			else if (opts->command == "streams") 	commands::streams::dispatch(opts);
+			if (opts->command == "mbr")					commands::mbr::dispatch(opts);
+			else if (opts->command == "shell")			commands::shell::dispatch(opts);
+			else if (opts->command == "smart")			commands::smart::dispatch(opts);
+			else if (opts->command == "gpt")			commands::gpt::dispatch(opts);
+			else if (opts->command == "usn")			commands::usn::dispatch(opts);
+			else if (opts->command == "extract")		commands::extract::dispatch(opts);
+			else if (opts->command == "vbr")			commands::vbr::dispatch(opts);
+			else if (opts->command == "image")			commands::image::dispatch(opts);
+			else if (opts->command == "undelete")		commands::undelete::dispatch(opts);
+			else if (opts->command == "mft")			commands::mft::dispatch(opts);
+			else if (opts->command == "btree")			commands::btree::dispatch(opts);
+			else if (opts->command == "shadow")			commands::shadow::dispatch(opts);
+			else if (opts->command == "logfile") 		commands::logfile::dispatch(opts);
+			else if (opts->command == "reparse") 		commands::reparse::dispatch(opts);
+			else if (opts->command == "streams") 		commands::streams::dispatch(opts);
 			else if (opts->command == "efs")
 			{
-				if (opts->subcommand == "masterkey")commands::efs::masterkey::dispatch(opts);
-				if (opts->subcommand == "key")		commands::efs::key::dispatch(opts);
+				if (opts->subcommand == "masterkey")	commands::efs::masterkey::dispatch(opts);
+				if (opts->subcommand == "key")			commands::efs::key::dispatch(opts);
+				if (opts->subcommand == "certificate")	commands::efs::certificate::dispatch(opts);
 			}
-			else if (opts->command == "bitdecrypt")	commands::bitdecrypt::dispatch(opts);
-			else if (opts->command == "bitlocker")  commands::bitlocker::dispatch(opts);
-			else if (opts->command == "fve") 		commands::fve::dispatch(opts);
-			else if (opts->command == "help")		commands::help::dispatch(opts);
-			else if (opts->command == "info")       commands::info::dispatch(opts);
+			else if (opts->command == "bitdecrypt")		commands::bitdecrypt::dispatch(opts);
+			else if (opts->command == "bitlocker")		commands::bitlocker::dispatch(opts);
+			else if (opts->command == "fve") 			commands::fve::dispatch(opts);
+			else if (opts->command == "help")			commands::help::dispatch(opts);
+			else if (opts->command == "info")			commands::info::dispatch(opts);
 			else
 			{
 				if (opts->command == "")
