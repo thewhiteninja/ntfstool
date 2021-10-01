@@ -36,7 +36,7 @@ PrivateKey::PrivateKey(PBYTE data, DWORD size)
 	offset += _header.Bitsize / 8 + 4;
 }
 
-int PrivateKey::export_to_PEM(std::string filename)
+int PrivateKey::export_private_to_PEM(std::string filename)
 {
 	RSA* rsa = RSA_new();
 
@@ -68,7 +68,7 @@ int PrivateKey::export_to_PEM(std::string filename)
 		RSA_set0_crt_params(rsa, dmp1, dmq1, iqmp);
 
 		FILE* fp = nullptr;
-		fopen_s(&fp, filename.c_str(), "wb");
+		fopen_s(&fp, (filename + ".priv.pem").c_str(), "wb");
 		if (!fp)
 		{
 			return 1;
@@ -76,6 +76,46 @@ int PrivateKey::export_to_PEM(std::string filename)
 		else
 		{
 			if (!PEM_write_RSAPrivateKey(fp, rsa, nullptr, nullptr, 0, nullptr, nullptr))
+			{
+				return 2;
+			}
+			fclose(fp);
+		}
+		RSA_free(rsa);
+	}
+	else
+	{
+		return 3;
+	}
+	return 0;
+}
+
+int PrivateKey::export_public_to_PEM(std::string filename)
+{
+	RSA* rsa = RSA_new();
+
+	if (rsa != nullptr)
+	{
+		BIGNUM* n, * e;
+
+		n = BN_new();
+		e = BN_new();
+
+		auto rev_e = _byteswap_ulong(_header.Exponent);
+		BN_bin2bn((unsigned char*)&rev_e, 4, e);
+		BN_bin2bn(_modulus->data(), _modulus->size(), n);
+
+		RSA_set0_key(rsa, n, e, nullptr);
+
+		FILE* fp = nullptr;
+		fopen_s(&fp, (filename + ".pub.pem").c_str(), "wb");
+		if (!fp)
+		{
+			return 1;
+		}
+		else
+		{
+			if (!PEM_write_RSA_PUBKEY(fp, rsa))
 			{
 				return 2;
 			}

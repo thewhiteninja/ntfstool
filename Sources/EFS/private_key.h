@@ -53,5 +53,7 @@ public:
 
 	std::shared_ptr<Buffer<PBYTE>> private_exponent() { return _private_exponent; }
 
-	int export_to_PEM(std::string filename);
+	int export_private_to_PEM(std::string filename);
+
+	int export_public_to_PEM(std::string filename);
 };
