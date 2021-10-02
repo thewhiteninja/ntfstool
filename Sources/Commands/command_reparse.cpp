@@ -126,7 +126,7 @@ namespace commands {
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					print_reparse(disk, volume, opts->format, opts->out);
+					print_reparse(disk, volume, opts->format, opts->output);
 				}
 			}
 

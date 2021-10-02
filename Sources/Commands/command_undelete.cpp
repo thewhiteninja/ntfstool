@@ -283,9 +283,9 @@ int extract_deleted_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol
 
 		std::cout << "[+] Extracting ";
 		std::wcout << name;
-		std::cout << " to " << opts->out << std::endl;
+		std::cout << " to " << opts->output << std::endl;
 
-		std::wstring output(opts->out.begin(), opts->out.end());
+		std::wstring output(opts->output.begin(), opts->output.end());
 		record->data_to_file(output);
 
 		std::cout << "[+] " << record->datasize() << " bytes written" << std::endl;
@@ -308,7 +308,7 @@ namespace commands
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					if (opts->inode != 0 && !opts->out.empty())
+					if (opts->inode != 0 && !opts->output.empty())
 					{
 						extract_deleted_file(disk, volume, opts);
 					}

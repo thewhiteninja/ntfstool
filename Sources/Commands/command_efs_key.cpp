@@ -56,7 +56,7 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 			}
 			else
 			{
-				if (opts->out != "")
+				if (opts->output != "")
 				{
 					if (opts->format == "")
 					{
@@ -73,17 +73,17 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 					}
 					else
 					{
-						if (res->export_public_to_PEM(opts->out) == 0)
+						if (res->export_public_to_PEM(opts->output) == 0)
 						{
-							std::cout << "[+] Public key exported to " << opts->out << ".pub.pem" << "." << std::endl;
+							std::cout << "[+] Public key exported to " << opts->output << ".pub.pem" << "." << std::endl;
 						}
 						else
 						{
 							std::cerr << "[!] Err: Unable to export the public key." << std::endl;
 						}
-						if (res->export_private_to_PEM(opts->out) == 0)
+						if (res->export_private_to_PEM(opts->output) == 0)
 						{
-							std::cout << "[+] Private key exported to " << opts->out << ".priv.pem" << "." << std::endl;
+							std::cout << "[+] Private key exported to " << opts->output << ".priv.pem" << "." << std::endl;
 						}
 						else
 						{
@@ -409,7 +409,6 @@ int list_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shar
 	std::cout << "[+] Searching for keys" << std::endl;
 
 	int key_count = 0;
-	int preferred_count = 0;
 
 	std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
 	tab->set_margin_left(4);
@@ -431,7 +430,7 @@ int list_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shar
 				auto record_keyfile = explorer->mft()->record_from_number(std::get<1>(key_file));
 				auto data = record_keyfile->data();
 
-				tab->add_item_line(std::to_string(key_count + preferred_count));
+				tab->add_item_line(std::to_string(key_count));
 				tab->add_item_line(utils::strings::to_utf8(std::get<0>(user_dir)));
 				tab->add_item_multiline(
 					{
@@ -476,7 +475,7 @@ int list_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shar
 	}
 	else
 	{
-		std::cout << "    " << key_count << " key(s), " << preferred_count << " preferred file(s) found" << std::endl;
+		std::cout << "    " << key_count << " key(s) found" << std::endl;
 		std::cout << "[+] Keys" << std::endl;
 		tab->render(std::cout);
 	}

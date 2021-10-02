@@ -317,9 +317,9 @@ namespace commands {
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					if (opts->out != "")
+					if (opts->output != "")
 					{
-						print_logfile_records(disk, volume, opts->format, opts->out);
+						print_logfile_records(disk, volume, opts->format, opts->output);
 					}
 					else
 					{

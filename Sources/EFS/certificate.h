@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <map>
+#include <vector>
 
 #include "Utils/buffer.h"
 
@@ -20,8 +21,6 @@ typedef struct {
 	DWORD	Count;
 	BYTE	Data[1];
 } DER_ELEMENT, * PDER_ELEMENT;
-
-
 
 typedef struct {
 	DWORD	dwParam;
@@ -40,12 +39,24 @@ typedef struct {
 	DWORD	KeySpec;
 } MY_CRYPT_KEY_PROV_INFO, * PMY_CRYPT_KEY_PROV_INFO;
 
+typedef struct {
+	std::string container_name;
+	std::string provider_name;
+	std::string provider_type;
+	std::string keyspec;
+	std::string friendly_name;
+} MY_CERT_INFO, * PMY_CERT_INFO;
+
 #pragma pack(pop)
 
 class Certificate
 {
 private:
 	bool _loaded = false;
+
+	MY_CERT_INFO _info;
+
+	std::vector<std::string> _description;
 
 	std::map<DWORD, std::shared_ptr<Buffer<PBYTE>>> _fields;
 
@@ -55,4 +66,10 @@ public:
 	bool is_loaded() { return _loaded; }
 
 	std::map<DWORD, std::shared_ptr<Buffer<PBYTE>>> fields() { return _fields; }
+
+	PMY_CERT_INFO info() { return &_info; }
+
+	int export_to_PEM(std::string name);
+
+	std::vector<std::string> certificate_description() { return _description; }
 };

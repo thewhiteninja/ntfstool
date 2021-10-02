@@ -237,9 +237,9 @@ namespace commands
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					if (opts->out != "")
+					if (opts->output != "")
 					{
-						print_usn_journal(disk, volume, opts->format, opts->out);
+						print_usn_journal(disk, volume, opts->format, opts->output);
 					}
 					else
 					{

@@ -71,7 +71,7 @@ int decrypt_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 
 		FVE_BLOCK_HEADER fve_bh = vol->bitlocker().metadata[0].block_header;
 
-		HANDLE houtput = CreateFileA(opts->out.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+		HANDLE houtput = CreateFileA(opts->output.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 		if (houtput == INVALID_HANDLE_VALUE)
 		{
 			std::cout << "[!] Error creating output file" << std::endl;
@@ -145,7 +145,7 @@ namespace commands {
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					if (opts->out == "")
+					if (opts->output == "")
 					{
 						std::cerr << "[!] Invalid or missing output option" << std::endl;
 						return 1;

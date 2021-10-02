@@ -142,7 +142,7 @@ namespace commands
 						return 1;
 					}
 				}
-				create_image(disk, volume, opts->format, opts->out);
+				create_image(disk, volume, opts->format, opts->output);
 			}
 			else
 			{
