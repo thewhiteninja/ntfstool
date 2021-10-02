@@ -4,12 +4,11 @@
 #include <Utils/constant_names.h>
 #include "EFS/certificate.h"
 
-#include <openssl/x509.h>
 
+const std::vector<std::string> format = { "pem" };
 
 int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
 		std::cerr << "[!] NTFS volume required" << std::endl;
@@ -39,6 +38,8 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 			std::cerr << "[!] Err: Failed to parse certificate file from record: " << opts->inode << std::endl;
 			return 3;
 		}
+
+		X509* x = nullptr;
 
 		std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
 		tab->set_margin_left(4);
@@ -104,40 +105,18 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 			{
 				tab->add_item_line(std::to_string(((PDWORD)(std::get<1>(element)->data()))[0]));
 			}
+			else if (prop_id == CERT_FRIENDLY_NAME_PROP_ID)
+			{
+				tab->add_item_line(utils::strings::to_utf8(reinterpret_cast<wchar_t*>(std::get<1>(element)->data())));
+			}
 			else if (prop_id == CERT_CERTIFICATE_FILE)
 			{
-				const unsigned char* bufder = std::get<1>(element)->data();
-				bool err = false;
-				X509* x = d2i_X509(NULL, &bufder, std::get<1>(element)->size());
-				if (x)
+				auto desc = certificate_file->certificate_description();
+				if (!desc.empty())
 				{
-					BIO* bio = BIO_new(BIO_s_mem());
-					if (bio)
-					{
-						X509_print(bio, x);
-
-						char* pp;
-						unsigned int size = BIO_get_mem_data(bio, &pp);
-						pp[size] = '\0';
-						auto lines = utils::strings::split(pp, '\n');
-						lines.erase(lines.begin(), lines.begin() + 1);
-						lines.erase(
-							std::remove_if(
-								lines.begin(),
-								lines.end(),
-								[](std::string const& s) { return s.size() < 4; }),
-							lines.end());
-						for (auto& line : lines)
-						{
-							line = line.substr(4);
-						}
-						tab->add_item_multiline(lines);
-
-						BIO_free(bio);
-					}
-					X509_free(x);
+					tab->add_item_multiline(desc);
 				}
-				if (err)
+				else
 				{
 					tab->add_item_line(utils::convert::to_hex(std::get<1>(element)->data(), std::get<1>(element)->size()));
 				}
@@ -150,6 +129,34 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 			tab->new_line();
 		}
 
+		if (opts->output != "")
+		{
+			if (opts->format == "")
+			{
+				opts->format = format[0];
+			}
+			else
+			{
+				opts->format = utils::strings::lower(opts->format);
+			}
+
+			if (std::find(format.begin(), format.end(), opts->format) == format.end())
+			{
+				std::cerr << "[!] Err: Invalid output format. (" << opts->format << ")" << std::endl;
+			}
+			else
+			{
+				if (certificate_file->export_to_PEM(opts->output) == 0)
+				{
+					std::cout << "[+] Certificate exported to " << opts->output << ".pem" << "." << std::endl;
+				}
+				else
+				{
+					std::cerr << "[!] Err: Unable to export the certificate." << std::endl;
+				}
+			}
+		}
+
 		std::cout << "[+] Certificate" << std::endl;
 		tab->render(std::cout);
 	}
@@ -158,7 +165,6 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 
 int list_certificates(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	/*
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
 		std::cerr << "[!] NTFS volume required" << std::endl;
@@ -166,7 +172,7 @@ int list_certificates(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, s
 	}
 
 	std::cout << std::setfill('0');
-	utils::ui::title("List keys from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("List certificates from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
@@ -176,80 +182,81 @@ int list_certificates(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, s
 	auto user_dirs = explorer->mft()->list("C:\\Users", true, false);
 	std::cout << "    " << user_dirs.size() << " directories found" << std::endl;
 
-	std::cout << "[+] Searching for keys" << std::endl;
+	std::cout << "[+] Searching for certificates" << std::endl;
 
-	int key_count = 0;
-	int preferred_count = 0;
+	int certificate_count = 0;
 
 	std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
 	tab->set_margin_left(4);
 	tab->set_interline(true);
 	tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
 	tab->add_header_line("User");
-	tab->add_header_line("Keyfile");
-	tab->add_header_line("Name");
-	tab->add_header_line("Creation Date");
+	tab->add_header_line("File");
+	tab->add_header_line("Certificate");
 
 	for (auto user_dir : user_dirs)
 	{
-		auto sid_dirs = explorer->mft()->list(utils::strings::to_utf8(L"C:\\Users\\" + std::get<0>(user_dir) + L"\\AppData\\Roaming\\Microsoft\\Crypto\\RSA"), true, false);
-		for (auto sid_dir : sid_dirs)
+		auto certificate_files = explorer->mft()->list(utils::strings::to_utf8(L"C:\\Users\\" + std::get<0>(user_dir) + L"\\AppData\\Roaming\\Microsoft\\SystemCertificates\\My\\Certificates"), false, true);
+		for (auto certificate_file : certificate_files)
 		{
-			auto key_files = explorer->mft()->list(utils::strings::to_utf8(L"C:\\Users\\" + std::get<0>(user_dir) + L"\\AppData\\Roaming\\Microsoft\\Crypto\\RSA\\" + std::get<0>(sid_dir)), false, true);
-			for (auto key_file : key_files)
+			auto record_certificate_file = explorer->mft()->record_from_number(std::get<1>(certificate_file));
+			auto data = record_certificate_file->data();
+
+			tab->add_item_line(std::to_string(certificate_count));
+			tab->add_item_line(utils::strings::to_utf8(std::get<0>(user_dir)));
+
+			std::string date;
+			PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = record_certificate_file->attribute_header($STANDARD_INFORMATION);
+			if (stdinfo_att)
 			{
-				auto record_keyfile = explorer->mft()->record_from_number(std::get<1>(key_file));
-				auto data = record_keyfile->data();
-
-				tab->add_item_line(std::to_string(key_count + preferred_count));
-				tab->add_item_line(utils::strings::to_utf8(std::get<0>(user_dir)));
-				tab->add_item_multiline(
-					{
-						"Name   : " + utils::strings::to_utf8(std::get<0>(key_file)),
-						"Record : " + utils::format::hex6(record_keyfile->header()->MFTRecordIndex, true),
-						"Size   : " + utils::format::size(data->size())
-					}
-				);
-
-				key_count++;
-				std::shared_ptr<KeyFile> kf = std::make_shared<KeyFile>(data->data(), data->size());
-				if (kf->is_loaded())
-				{
-					tab->add_item_line(kf->name());
-				}
-				else
-				{
-					tab->add_item_line("Invalid Key File");
-				}
-
-				PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = record_keyfile->attribute_header($STANDARD_INFORMATION);
-				if (stdinfo_att)
-				{
-					PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION, stdinfo_att, stdinfo_att->Form.Resident.ValueOffset);
-					SYSTEMTIME st = { 0 };
-					utils::times::ull_to_local_systemtime(stdinfo->CreateTime, &st);
-					tab->add_item_line(utils::times::display_systemtime(st));
-				}
-				else
-				{
-					tab->add_item_line("");
-				}
-
-				tab->new_line();
+				PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION, stdinfo_att, stdinfo_att->Form.Resident.ValueOffset);
+				SYSTEMTIME st = { 0 };
+				utils::times::ull_to_local_systemtime(stdinfo->CreateTime, &st);
+				date = utils::times::display_systemtime(st);
 			}
+
+			tab->add_item_multiline(
+				{
+					"Name     : " + utils::strings::to_utf8(std::get<0>(certificate_file)),
+					"Record   : " + utils::format::hex6(record_certificate_file->header()->MFTRecordIndex, true),
+					"Size     : " + utils::format::size(data->size()),
+					"",
+					"Creation : " + date
+				}
+			);
+
+			certificate_count++;
+			std::shared_ptr<Certificate> cert = std::make_shared<Certificate>(data->data(), data->size());
+			if (cert->is_loaded())
+			{
+				auto info = cert->info();
+				std::vector<std::string> cell;
+				if (info->container_name != "") cell.push_back("Container     : " + info->container_name);
+				if (info->provider_name != "") cell.push_back("Provider      : " + info->provider_name);
+				if (info->provider_type != "") cell.push_back("Type          : " + info->provider_type);
+				if (info->keyspec != "") cell.push_back("KeySpec       : " + info->keyspec);
+				if (info->friendly_name != "") cell.push_back("Friendly Name : " + info->friendly_name);
+				tab->add_item_multiline(cell);
+			}
+			else
+			{
+				tab->add_item_line("Invalid certificate file");
+			}
+
+			tab->new_line();
 		}
 	}
 
-	if (key_count == 0)
+	if (certificate_count == 0)
 	{
-		std::cout << "[+] No key found" << std::endl;
+		std::cout << "[+] No certificate found" << std::endl;
 	}
 	else
 	{
-		std::cout << "    " << key_count << " key(s), " << preferred_count << " preferred file(s) found" << std::endl;
-		std::cout << "[+] Keys" << std::endl;
+		std::cout << "    " << certificate_count << " certificate(s) found" << std::endl;
+		std::cout << "[+] Certificates" << std::endl;
 		tab->render(std::cout);
-	}*/
+	}
 
 	return 0;
 }

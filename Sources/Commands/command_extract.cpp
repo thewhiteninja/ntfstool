@@ -45,7 +45,7 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 		std::cout << "[-] Source      : Inode(" << opts->inode << ")" << std::endl;
 		record = explorer->mft()->record_from_number(opts->inode);
 	}
-	std::cout << "[-] Destination : " << opts->out << std::endl;
+	std::cout << "[-] Destination : " << opts->output << std::endl;
 
 	if (record == nullptr)
 	{
@@ -57,7 +57,7 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 		std::cout << "[-] Record Num  : " << record->header()->MFTRecordIndex << " (" << utils::format::hex(record->header()->MFTRecordIndex, true) << ")" << std::endl;
 	}
 
-	ULONG64 written = record->data_to_file(utils::strings::from_string(opts->out), stream_name);
+	ULONG64 written = record->data_to_file(utils::strings::from_string(opts->output), stream_name);
 
 	std::cout << "[+] " << written << " bytes (" + utils::format::size(written) << ") written" << std::endl;
 
@@ -91,7 +91,7 @@ namespace commands
 						std::cerr << "[!] Invalid or missing from file/inode";
 						return 1;
 					}
-					if (opts->out != "")
+					if (opts->output != "")
 					{
 						extract_file(disk, volume, opts);
 					}

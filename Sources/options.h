@@ -12,7 +12,7 @@ public:
 	std::string command;
 	std::string subcommand;
 	std::string from;
-	std::string out;
+	std::string output;
 	std::string format = "raw";
 
 	std::string password;
