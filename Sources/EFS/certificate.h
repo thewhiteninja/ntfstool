@@ -56,8 +56,6 @@ private:
 
 	MY_CERT_INFO _info;
 
-	std::vector<std::string> _description;
-
 	std::map<DWORD, std::shared_ptr<Buffer<PBYTE>>> _fields;
 
 public:
@@ -69,7 +67,7 @@ public:
 
 	PMY_CERT_INFO info() { return &_info; }
 
-	int export_to_PEM(std::string name);
+	std::vector<std::string> certificate_ossl_description();
 
-	std::vector<std::string> certificate_description() { return _description; }
+	int export_to_PEM(std::string name);
 };

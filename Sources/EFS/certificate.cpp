@@ -38,39 +38,6 @@ Certificate::Certificate(PBYTE data, DWORD size)
 			{
 				_info.friendly_name = utils::strings::to_utf8(reinterpret_cast<wchar_t*>(std::get<1>(element)->data()));
 			}
-			else if (prop_id == CERT_CERTIFICATE_FILE)
-			{
-				const unsigned char* bufder = std::get<1>(element)->data();
-				X509* x = d2i_X509(NULL, &bufder, std::get<1>(element)->size());
-				if (x)
-				{
-					BIO* bio = BIO_new(BIO_s_mem());
-					if (bio)
-					{
-						X509_print(bio, x);
-
-						char* pp;
-						unsigned int size = BIO_get_mem_data(bio, &pp);
-						pp[size] = '\0';
-						auto lines = utils::strings::split(pp, '\n');
-						lines.erase(lines.begin(), lines.begin() + 1);
-						lines.erase(
-							std::remove_if(
-								lines.begin(),
-								lines.end(),
-								[](std::string const& s) { return s.size() < 4; }),
-							lines.end());
-						for (auto& line : lines)
-						{
-							line = line.substr(4);
-						}
-						_description = lines;
-
-						BIO_free(bio);
-					}
-					X509_free(x);
-				}
-			}
 		}
 	}
 }
@@ -106,6 +73,52 @@ int Certificate::export_to_PEM(std::string name)
 		}
 	}
 	return 0;
+}
+
+std::vector<std::string> Certificate::certificate_ossl_description()
+{
+	std::vector<std::string> ret;
+
+	for (auto element : _fields)
+	{
+		DWORD prop_id = std::get<0>(element);
+
+		if (prop_id == CERT_CERTIFICATE_FILE)
+		{
+			const unsigned char* bufder = std::get<1>(element)->data();
+			X509* x = d2i_X509(NULL, &bufder, std::get<1>(element)->size());
+			if (x)
+			{
+				BIO* bio = BIO_new(BIO_s_mem());
+				if (bio)
+				{
+					X509_print(bio, x);
+
+					char* pp;
+					unsigned int size = BIO_get_mem_data(bio, &pp);
+					pp[size] = '\0';
+					auto lines = utils::strings::split(pp, '\n');
+					lines.erase(lines.begin(), lines.begin() + 1);
+					lines.erase(
+						std::remove_if(
+							lines.begin(),
+							lines.end(),
+							[](std::string const& s) { return s.size() < 4; }),
+						lines.end());
+					for (auto& line : lines)
+					{
+						line = line.substr(4);
+					}
+					ret = lines;
+
+					BIO_free(bio);
+				}
+				X509_free(x);
+			}
+		}
+	}
+
+	return ret;
 }
 
 

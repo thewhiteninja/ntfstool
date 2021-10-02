@@ -23,8 +23,20 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
-	std::cout << "[+] Reading key file record: " << opts->inode << std::endl;
-	auto key_file_record = explorer->mft()->record_from_number(opts->inode);
+	std::shared_ptr<MFTRecord> key_file_record = nullptr;
+
+	std::cout << "[+] Reading key file record: ";
+	if (opts->from != "")
+	{
+		std::cout << opts->from << std::endl;
+		key_file_record = explorer->mft()->record_from_path(opts->from);
+	}
+	else
+	{
+		std::cout << opts->inode << std::endl;
+		key_file_record = explorer->mft()->record_from_number(opts->inode);
+	}
+
 	if (key_file_record == nullptr)
 	{
 		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
@@ -91,85 +103,88 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 						}
 					}
 				}
+				else
+				{
 
-				std::cout << "[+] Clear key (" << res->header()->Bitsize << "bits):" << std::endl;
+					std::cout << "[+] Clear key (" << res->header()->Bitsize << "bits):" << std::endl;
 
-				std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
-				tab->set_margin_left(4);
-				tab->set_interline(true);
-				tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
-				tab->add_header_line("Property");
-				tab->add_header_line("Value");
+					std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
+					tab->set_margin_left(4);
+					tab->set_interline(true);
+					tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
+					tab->add_header_line("Property");
+					tab->add_header_line("Value");
 
-				int i = 0;
-				tab->add_item_line(std::to_string(i++));
-				tab->add_item_line("Magic");
-				std::string magic_str = { ((char*)(&res->header()->Magic))[0],((char*)(&res->header()->Magic))[1],((char*)(&res->header()->Magic))[2],((char*)(&res->header()->Magic))[3] };
-				tab->add_item_line(magic_str);
+					int i = 0;
+					tab->add_item_line(std::to_string(i++));
+					tab->add_item_line("Magic");
+					std::string magic_str = { ((char*)(&res->header()->Magic))[0],((char*)(&res->header()->Magic))[1],((char*)(&res->header()->Magic))[2],((char*)(&res->header()->Magic))[3] };
+					tab->add_item_line(magic_str);
 
-				tab->new_line();
+					tab->new_line();
 
-				tab->add_item_line(std::to_string(i++));
-				tab->add_item_line("Bitsize");
-				tab->add_item_line(std::to_string(res->header()->Bitsize));
+					tab->add_item_line(std::to_string(i++));
+					tab->add_item_line("Bitsize");
+					tab->add_item_line(std::to_string(res->header()->Bitsize));
 
-				tab->new_line();
+					tab->new_line();
 
-				tab->add_item_line(std::to_string(i++));
-				tab->add_item_line("Permissions");
-				tab->add_item_multiline(constants::efs::permissions(res->header()->Permissions));
+					tab->add_item_line(std::to_string(i++));
+					tab->add_item_line("Permissions");
+					tab->add_item_multiline(constants::efs::permissions(res->header()->Permissions));
 
-				tab->new_line();
+					tab->new_line();
 
-				tab->add_item_line(std::to_string(i++));
-				tab->add_item_line("Exponent");
-				tab->add_item_line(std::to_string(res->header()->Exponent));
+					tab->add_item_line(std::to_string(i++));
+					tab->add_item_line("Exponent");
+					tab->add_item_line(std::to_string(res->header()->Exponent));
 
-				tab->new_line();
+					tab->new_line();
 
-				tab->add_item_line(std::to_string(i++));
-				tab->add_item_line("Modulus");
-				tab->add_item_line(utils::convert::to_hex(res->modulus()->data(), res->modulus()->size()));
+					tab->add_item_line(std::to_string(i++));
+					tab->add_item_line("Modulus");
+					tab->add_item_line(utils::convert::to_hex(res->modulus()->data(), res->modulus()->size()));
 
-				tab->new_line();
+					tab->new_line();
 
-				tab->add_item_line(std::to_string(i++));
-				tab->add_item_line("Prime1");
-				tab->add_item_line(utils::convert::to_hex(res->prime1()->data(), res->prime1()->size()));
+					tab->add_item_line(std::to_string(i++));
+					tab->add_item_line("Prime1");
+					tab->add_item_line(utils::convert::to_hex(res->prime1()->data(), res->prime1()->size()));
 
-				tab->new_line();
+					tab->new_line();
 
-				tab->add_item_line(std::to_string(i++));
-				tab->add_item_line("Prime2");
-				tab->add_item_line(utils::convert::to_hex(res->prime2()->data(), res->prime2()->size()));
+					tab->add_item_line(std::to_string(i++));
+					tab->add_item_line("Prime2");
+					tab->add_item_line(utils::convert::to_hex(res->prime2()->data(), res->prime2()->size()));
 
-				tab->new_line();
+					tab->new_line();
 
-				tab->add_item_line(std::to_string(i++));
-				tab->add_item_line("Exponent1");
-				tab->add_item_line(utils::convert::to_hex(res->exponent1()->data(), res->exponent1()->size()));
+					tab->add_item_line(std::to_string(i++));
+					tab->add_item_line("Exponent1");
+					tab->add_item_line(utils::convert::to_hex(res->exponent1()->data(), res->exponent1()->size()));
 
-				tab->new_line();
+					tab->new_line();
 
-				tab->add_item_line(std::to_string(i++));
-				tab->add_item_line("Exponent2");
-				tab->add_item_line(utils::convert::to_hex(res->exponent2()->data(), res->exponent2()->size()));
+					tab->add_item_line(std::to_string(i++));
+					tab->add_item_line("Exponent2");
+					tab->add_item_line(utils::convert::to_hex(res->exponent2()->data(), res->exponent2()->size()));
 
-				tab->new_line();
+					tab->new_line();
 
-				tab->add_item_line(std::to_string(i++));
-				tab->add_item_line("Coefficient");
-				tab->add_item_line(utils::convert::to_hex(res->coefficient()->data(), res->coefficient()->size()));
+					tab->add_item_line(std::to_string(i++));
+					tab->add_item_line("Coefficient");
+					tab->add_item_line(utils::convert::to_hex(res->coefficient()->data(), res->coefficient()->size()));
 
-				tab->new_line();
+					tab->new_line();
 
-				tab->add_item_line(std::to_string(i++));
-				tab->add_item_line("Private Exponent");
-				tab->add_item_line(utils::convert::to_hex(res->private_exponent()->data(), res->private_exponent()->size()));
+					tab->add_item_line(std::to_string(i++));
+					tab->add_item_line("Private Exponent");
+					tab->add_item_line(utils::convert::to_hex(res->private_exponent()->data(), res->private_exponent()->size()));
 
-				tab->new_line();
+					tab->new_line();
 
-				tab->render(std::cout);
+					tab->render(std::cout);
+				}
 			}
 		}
 		else
@@ -234,9 +249,20 @@ int show_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+	std::shared_ptr<MFTRecord> key_file_record = nullptr;
 
-	std::cout << "[+] Reading key file record: " << opts->inode << std::endl;
-	auto key_file_record = explorer->mft()->record_from_number(opts->inode);
+	std::cout << "[+] Reading key file record: ";
+	if (opts->from != "")
+	{
+		std::cout << opts->from << std::endl;
+		key_file_record = explorer->mft()->record_from_path(opts->from);
+	}
+	else
+	{
+		std::cout << opts->inode << std::endl;
+		key_file_record = explorer->mft()->record_from_number(opts->inode);
+	}
+
 	if (key_file_record == nullptr)
 	{
 		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
@@ -499,7 +525,7 @@ namespace commands
 					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 					if (volume != nullptr)
 					{
-						if (opts->inode != 0)
+						if (opts->inode != 0 || opts->from != "")
 						{
 							if (opts->masterkey != nullptr)
 							{

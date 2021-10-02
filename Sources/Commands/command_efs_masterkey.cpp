@@ -19,9 +19,20 @@ int decrypt_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, s
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+	std::shared_ptr<MFTRecord> masterkey_file_record = nullptr;
 
-	std::cout << "[+] Reading masterkey file record: " << opts->inode << std::endl;
-	auto masterkey_file_record = explorer->mft()->record_from_number(opts->inode);
+	std::cout << "[+] Reading key file record: ";
+	if (opts->from != "")
+	{
+		std::cout << opts->from << std::endl;
+		masterkey_file_record = explorer->mft()->record_from_path(opts->from);
+	}
+	else
+	{
+		std::cout << opts->inode << std::endl;
+		masterkey_file_record = explorer->mft()->record_from_number(opts->inode);
+	}
+
 	if (masterkey_file_record == nullptr)
 	{
 		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
@@ -88,9 +99,20 @@ int show_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+	std::shared_ptr<MFTRecord> masterkey_file_record = nullptr;
 
-	std::cout << "[+] Reading masterkey file record: " << opts->inode << std::endl;
-	auto masterkey_file_record = explorer->mft()->record_from_number(opts->inode);
+	std::cout << "[+] Reading key file record: ";
+	if (opts->from != "")
+	{
+		std::cout << opts->from << std::endl;
+		masterkey_file_record = explorer->mft()->record_from_path(opts->from);
+	}
+	else
+	{
+		std::cout << opts->inode << std::endl;
+		masterkey_file_record = explorer->mft()->record_from_number(opts->inode);
+	}
+
 	if (masterkey_file_record == nullptr)
 	{
 		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
@@ -390,7 +412,7 @@ namespace commands
 					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 					if (volume != nullptr)
 					{
-						if (opts->inode != 0)
+						if (opts->inode != 0 || opts->from != "")
 						{
 							if (opts->password != "" && opts->sid != "")
 							{
