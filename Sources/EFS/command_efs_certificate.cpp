@@ -4,6 +4,8 @@
 #include <Utils/constant_names.h>
 #include "EFS/certificate.h"
 
+#include <openssl/x509.h>
+
 
 int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
@@ -101,6 +103,44 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 			else if (prop_id == CERT_SUBJECT_PUB_KEY_BIT_LENGTH_PROP_ID)
 			{
 				tab->add_item_line(std::to_string(((PDWORD)(std::get<1>(element)->data()))[0]));
+			}
+			else if (prop_id == CERT_CERTIFICATE_FILE)
+			{
+				const unsigned char* bufder = std::get<1>(element)->data();
+				bool err = false;
+				X509* x = d2i_X509(NULL, &bufder, std::get<1>(element)->size());
+				if (x)
+				{
+					BIO* bio = BIO_new(BIO_s_mem());
+					if (bio)
+					{
+						X509_print(bio, x);
+
+						char* pp;
+						unsigned int size = BIO_get_mem_data(bio, &pp);
+						pp[size] = '\0';
+						auto lines = utils::strings::split(pp, '\n');
+						lines.erase(lines.begin(), lines.begin() + 1);
+						lines.erase(
+							std::remove_if(
+								lines.begin(),
+								lines.end(),
+								[](std::string const& s) { return s.size() < 4; }),
+							lines.end());
+						for (auto& line : lines)
+						{
+							line = line.substr(4);
+						}
+						tab->add_item_multiline(lines);
+
+						BIO_free(bio);
+					}
+					X509_free(x);
+				}
+				if (err)
+				{
+					tab->add_item_line(utils::convert::to_hex(std::get<1>(element)->data(), std::get<1>(element)->size()));
+				}
 			}
 			else
 			{
