@@ -21,12 +21,23 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+	std::shared_ptr<MFTRecord> certificate_file_record = nullptr;
 
-	std::cout << "[+] Reading certificate file record: " << opts->inode << std::endl;
-	auto certificate_file_record = explorer->mft()->record_from_number(opts->inode);
+	std::cout << "[+] Reading certificate file record: ";
+	if (opts->from != "")
+	{
+		std::cout << opts->from << std::endl;
+		certificate_file_record = explorer->mft()->record_from_path(opts->from);
+	}
+	else
+	{
+		std::cout << opts->inode << std::endl;
+		certificate_file_record = explorer->mft()->record_from_number(opts->inode);
+	}
+
 	if (certificate_file_record == nullptr)
 	{
-		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
+		std::cerr << "[!] Err: Failed to read certificate record" << std::endl;
 		return 2;
 	}
 	else
@@ -39,97 +50,99 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 			return 3;
 		}
 
-		X509* x = nullptr;
-
-		std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
-		tab->set_margin_left(4);
-		tab->set_interline(true);
-		tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
-		tab->add_header_line("Property");
-		tab->add_header_line("Value");
-
-		std::string date;
-		PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = certificate_file_record->attribute_header($STANDARD_INFORMATION);
-		if (stdinfo_att)
+		if (opts->output == "")
 		{
-			PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION, stdinfo_att, stdinfo_att->Form.Resident.ValueOffset);
-			SYSTEMTIME st = { 0 };
-			utils::times::ull_to_local_systemtime(stdinfo->CreateTime, &st);
-			date = utils::times::display_systemtime(st);
-		}
+			std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
+			tab->set_margin_left(4);
+			tab->set_interline(true);
+			tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
+			tab->add_header_line("Property");
+			tab->add_header_line("Value");
 
-		int i = 0;
-		tab->add_item_line(std::to_string(i++));
-		tab->add_item_line("File");
-		tab->add_item_multiline(
+			std::string date;
+			PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = certificate_file_record->attribute_header($STANDARD_INFORMATION);
+			if (stdinfo_att)
 			{
-				"Creation : " + date,
-				"Size     : " + utils::format::size(data->size())
+				PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION, stdinfo_att, stdinfo_att->Form.Resident.ValueOffset);
+				SYSTEMTIME st = { 0 };
+				utils::times::ull_to_local_systemtime(stdinfo->CreateTime, &st);
+				date = utils::times::display_systemtime(st);
 			}
-		);
 
-		tab->new_line();
-
-		for (auto element : certificate_file->fields())
-		{
+			int i = 0;
 			tab->add_item_line(std::to_string(i++));
-
-			DWORD prop_id = std::get<0>(element);
-			tab->add_item_line(constants::efs::cert_prop_id(prop_id));
-
-			if (prop_id == CERT_KEY_PROV_INFO_PROP_ID)
-			{
-				PMY_CRYPT_KEY_PROV_INFO info = reinterpret_cast<PMY_CRYPT_KEY_PROV_INFO>(std::get<1>(element)->data());
-
-				std::vector<std::string> cell = {
-					"Container Name : " + utils::strings::to_utf8(POINTER_ADD(wchar_t*, info, info->ContainerNameOffset)),
-					"Provider Name  : " + utils::strings::to_utf8(POINTER_ADD(wchar_t*, info, info->ProvNameOffset)),
-					"Provider Type  : " + constants::efs::cert_prop_provider_type(info->ProvType),
-					"Flags          : " + constants::efs::cert_prop_flags(info->Flags),
-					"KeySpec        : " + constants::efs::cert_prop_keyspec(info->KeySpec)
-				};
-				if (info->ProvParam)
+			tab->add_item_line("File");
+			tab->add_item_multiline(
 				{
-					cell.push_back("");
-					auto params = POINTER_ADD(PMY_CRYPT_KEY_PROV_PARAM, info, info->ProvParamOffset);
-					for (unsigned int i = 0; i < info->ProvParam; i++)
-					{
-						auto param = params[i];
-						cell.push_back(utils::format::hex(param.dwParam) + " : " + utils::format::hex(param.dwFlags) + " : " + utils::format::hex(param.cbData) + " : " + utils::format::hex(param.pbDataOffset));
-					}
+					"Creation : " + date,
+					"Size     : " + utils::format::size(data->size())
 				}
+			);
 
-				tab->add_item_multiline(cell);
-			}
-			else if (prop_id == CERT_SUBJECT_PUB_KEY_BIT_LENGTH_PROP_ID)
+			tab->new_line();
+
+			for (auto element : certificate_file->fields())
 			{
-				tab->add_item_line(std::to_string(((PDWORD)(std::get<1>(element)->data()))[0]));
-			}
-			else if (prop_id == CERT_FRIENDLY_NAME_PROP_ID)
-			{
-				tab->add_item_line(utils::strings::to_utf8(reinterpret_cast<wchar_t*>(std::get<1>(element)->data())));
-			}
-			else if (prop_id == CERT_CERTIFICATE_FILE)
-			{
-				auto desc = certificate_file->certificate_description();
-				if (!desc.empty())
+				tab->add_item_line(std::to_string(i++));
+
+				DWORD prop_id = std::get<0>(element);
+				tab->add_item_line(constants::efs::cert_prop_id(prop_id));
+
+				if (prop_id == CERT_KEY_PROV_INFO_PROP_ID)
 				{
-					tab->add_item_multiline(desc);
+					PMY_CRYPT_KEY_PROV_INFO info = reinterpret_cast<PMY_CRYPT_KEY_PROV_INFO>(std::get<1>(element)->data());
+
+					std::vector<std::string> cell = {
+						"Container Name : " + utils::strings::to_utf8(POINTER_ADD(wchar_t*, info, info->ContainerNameOffset)),
+						"Provider Name  : " + utils::strings::to_utf8(POINTER_ADD(wchar_t*, info, info->ProvNameOffset)),
+						"Provider Type  : " + constants::efs::cert_prop_provider_type(info->ProvType),
+						"Flags          : " + constants::efs::cert_prop_flags(info->Flags),
+						"KeySpec        : " + constants::efs::cert_prop_keyspec(info->KeySpec)
+					};
+					if (info->ProvParam)
+					{
+						cell.push_back("");
+						auto params = POINTER_ADD(PMY_CRYPT_KEY_PROV_PARAM, info, info->ProvParamOffset);
+						for (unsigned int i = 0; i < info->ProvParam; i++)
+						{
+							auto param = params[i];
+							cell.push_back(utils::format::hex(param.dwParam) + " : " + utils::format::hex(param.dwFlags) + " : " + utils::format::hex(param.cbData) + " : " + utils::format::hex(param.pbDataOffset));
+						}
+					}
+
+					tab->add_item_multiline(cell);
+				}
+				else if (prop_id == CERT_SUBJECT_PUB_KEY_BIT_LENGTH_PROP_ID)
+				{
+					tab->add_item_line(std::to_string(((PDWORD)(std::get<1>(element)->data()))[0]));
+				}
+				else if (prop_id == CERT_FRIENDLY_NAME_PROP_ID)
+				{
+					tab->add_item_line(utils::strings::to_utf8(reinterpret_cast<wchar_t*>(std::get<1>(element)->data())));
+				}
+				else if (prop_id == CERT_CERTIFICATE_FILE)
+				{
+					auto desc = certificate_file->certificate_ossl_description();
+					if (!desc.empty())
+					{
+						tab->add_item_multiline(desc);
+					}
+					else
+					{
+						tab->add_item_line(utils::convert::to_hex(std::get<1>(element)->data(), std::get<1>(element)->size()));
+					}
 				}
 				else
 				{
 					tab->add_item_line(utils::convert::to_hex(std::get<1>(element)->data(), std::get<1>(element)->size()));
 				}
-			}
-			else
-			{
-				tab->add_item_line(utils::convert::to_hex(std::get<1>(element)->data(), std::get<1>(element)->size()));
-			}
 
-			tab->new_line();
+				tab->new_line();
+			}
+			std::cout << "[+] Certificate" << std::endl;
+			tab->render(std::cout);
 		}
-
-		if (opts->output != "")
+		else
 		{
 			if (opts->format == "")
 			{
@@ -142,23 +155,20 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 
 			if (std::find(format.begin(), format.end(), opts->format) == format.end())
 			{
-				std::cerr << "[!] Err: Invalid output format. (" << opts->format << ")" << std::endl;
+				std::cerr << "[!] Err: Invalid output format (" << opts->format << ")" << std::endl;
 			}
 			else
 			{
 				if (certificate_file->export_to_PEM(opts->output) == 0)
 				{
-					std::cout << "[+] Certificate exported to " << opts->output << ".pem" << "." << std::endl;
+					std::cout << "[+] Certificate exported to " << opts->output << ".pem" << std::endl;
 				}
 				else
 				{
-					std::cerr << "[!] Err: Unable to export the certificate." << std::endl;
+					std::cerr << "[!] Err: Unable to export the certificate" << std::endl;
 				}
 			}
 		}
-
-		std::cout << "[+] Certificate" << std::endl;
-		tab->render(std::cout);
 	}
 	return 0;
 }
@@ -277,7 +287,7 @@ namespace commands
 					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 					if (volume != nullptr)
 					{
-						if (opts->inode != 0)
+						if (opts->inode != 0 || opts->from != "")
 						{
 							show_certificate(disk, volume, opts);
 						}
