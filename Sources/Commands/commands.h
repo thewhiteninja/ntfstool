@@ -29,6 +29,10 @@ namespace commands {
 		{
 			int dispatch(std::shared_ptr<Options> opts);
 		}
+		namespace backup
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
 	}
 
 	namespace mbr

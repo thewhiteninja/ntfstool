@@ -320,6 +320,9 @@
     <ClCompile Include="Sources\EFS\command_efs_certificate.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Commands\command_efs_backup.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">

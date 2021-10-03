@@ -470,7 +470,13 @@ int list_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shar
 				std::shared_ptr<KeyFile> kf = std::make_shared<KeyFile>(data->data(), data->size());
 				if (kf->is_loaded())
 				{
-					tab->add_item_line(kf->name());
+					std::vector<std::string> cell = { "Name      : " + kf->name() };
+					auto private_enc = kf->private_key();
+					if (private_enc)
+					{
+						cell.push_back("Masterkey : " + utils::id::guid_to_string(private_enc->header()->MasterKeyGuid));
+					}
+					tab->add_item_multiline(cell);
 				}
 				else
 				{

@@ -324,6 +324,9 @@ int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std
 					std::shared_ptr<MasterKeyFile> mkf = std::make_shared<MasterKeyFile>(data->data(), data->size());
 					if (mkf->is_loaded())
 					{
+						cell.push_back("GUID        : " + mkf->guid());
+						cell.push_back("");
+
 						auto master_key = mkf->master_key();
 						if (master_key)
 						{
