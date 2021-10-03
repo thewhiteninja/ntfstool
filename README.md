@@ -61,8 +61,9 @@ Options can be entered as decimal or hex number with "0x" prefix.
 | [btree](#btree)  | Display VCN content and Btree index for an inode |
 | [bitlocker](#bitlocker)  | Display detailed information and hash ($bitlocker$) for all VMK. It is possible to test a password or recovery key. If it is correct, the decrypted VMK and FVEK is displayed. |
 | [bitdecrypt](#bitdecrypt)  | Decrypt a volume to a file using password, recovery key or bek. |
-| [efs masterkey](#efs-masterkey)  | List, display and decrypt masterkeys structures (Protect). |
-| [efs key](#efs-key)  | List, display and decrypt keys structures (Crypto/RSA). |
+| [efs.certificate](#efs-certificate)  | List, display and export system certificates (SystemCertificates/My/Certificates). |
+| [efs.key](#efs-key)  | List, display, decrypt and export private keys (Crypto/RSA). |
+| [efs.masterkey](#efs-masterkey)  | List, display and decrypt masterkeys (Protect). |
 | [fve](#fve)  | Display information for the specified FVE block (0, 1, 2) |
 | [reparse](#reparse)  | Parse and display reparse points from \$Extend\$Reparse. |
 | [logfile](#logfile)  | Dump $LogFile file in specified format: csv, json, raw. |
@@ -76,7 +77,7 @@ Options can be entered as decimal or hex number with "0x" prefix.
 
 ## Limitations
 
-- May contains bugs and unsupported cases
+- Few unsupported cases
 - No documentation :no_mouth:.
 
 Feel free to open an issue or ask for a new feature!
@@ -653,125 +654,125 @@ Current external libs:
 </td></tr>
 </table>
 
-### EFS-masterkey
+
+### EFS-certificate
 <table>
-<tr><td>efs masterkey disk=0 volume=4</td></tr>
+<tr><td>efs.certificate disk=0 volume=4</td></tr>
 <tr><td>
 	
-    List masterkeys from \\.\PhysicalDrive0 > Volume:4
-    --------------------------------------------------
+    List certificates from \\.\PhysicalDrive0 > Volume:4
+    ----------------------------------------------------
 
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [+] Listing user directories
         8 directories found
-    [+] Searching for keys
-        19 key(s), 2 preferred file(s) found
-    [+] MasterKeys
-        +--------------------------------------------------------------------------------------------------------------------------------------------------+
-        | Id | User           | Keyfile                                       | Key(s)                                               | Creation Date       |
-        +--------------------------------------------------------------------------------------------------------------------------------------------------+
-        |  0 | DefaultAppPool | Name   : e4ed144f-6522-4471-8893-a6e29e175ba6 | MasterKey                                            | 2021-08-17 14:54:41 |
-        |    |                | Record : 000000031848h                        |     Version : 2                                      |                     |
-        |    |                | Size   : 468.00 bytes                         |     Algo    : CALG_SHA_512 - CALG_AES_256            |                     |
-        |    |                |                                               |     Salt    : FA737C82899CC3F61A3B332B15FDC241       |                     |
-        |    |                |                                               |     Rounds  : 8000                                   |                     |
-        |    |                |                                               | BackupKey                                            |                     |
-        |    |                |                                               |     Version : 2                                      |                     |
-        |    |                |                                               |     Algo    : CALG_SHA_512 - CALG_AES_256            |                     |
-        |    |                |                                               |     Salt    : DF0651C903763132BC3043BF144A7DDD       |                     |
-        |    |                |                                               |     Rounds  : 8000                                   |                     |
-        |    |                |                                               | CredHist                                             |                     |
-        |    |                |                                               |     Version : 3                                      |                     |
-        |    |                |                                               |     GUID    : {00000000-0000-0000-0000-000000000000} |                     |
-        +--------------------------------------------------------------------------------------------------------------------------------------------------+
-        |  1 | DefaultAppPool | Name   : Preferred                            | Preferred                                            | 2021-08-17 14:54:41 |
-        |    |                | Record : 00000003184ah                        |     GUID    : {e4ed144f-6522-4471-8893-a6e29e175ba6} |                     |
-        |    |                | Size   : 24.00 bytes                          |     Renew   : 2021-11-15 12:54:41                    |                     |
-        +--------------------------------------------------------------------------------------------------------------------------------------------------+
-        |  2 | Bob            | Name   : 26bd8b3d-e87f-4df3-a1af-18f434788090 | MasterKey                                            | 2021-03-05 01:16:42 |
-        |    |                | Record : 000000004f4ah                        |     Version : 2                                      |                     |
-        |    |                | Size   : 468.00 bytes                         |     Algo    : CALG_SHA_512 - CALG_AES_256            |                     |
-        |    |                |                                               |     Salt    : 39B575D1816DE8224B9E11C38E35EB34       |                     |
-        |    |                |                                               |     Rounds  : 8000                                   |                     |
-        |    |                |                                               | BackupKey                                            |                     |
+    [+] Searching for certificates
+        8 certificate(s) found
+    [+] Certificates
+        +-----------------------------------------------------------------------------------------------------------------------------------+
+        | Id | User  | File                                                | Certificate                                                    |
+        +-----------------------------------------------------------------------------------------------------------------------------------+
+        |  0 | Bobby | Name     : 02728B6DF5573C5955A4DFF22319441C889C367B | Friendly Name : APNS certificate Direct                        |
+        |    |       | Record   : 00000001d2d5h                            |                                                                |
+        |    |       | Size     : 850.00 bytes                             |                                                                |
+        |    |       |                                                     |                                                                |
+        |    |       | Creation : 2019-05-11 15:59:29                      |                                                                |
+        +-----------------------------------------------------------------------------------------------------------------------------------+
+        |  1 | Bobby | Name     : 14BB7663C51C77FF5CAD89B4DC34495864338C67 | Friendly Name : APNS certificate                               |
+        |    |       | Record   : 00000000b5a4h                            |                                                                |
+        |    |       | Size     : 824.00 bytes                             |                                                                |
+        |    |       |                                                     |                                                                |
+        |    |       | Creation : 2021-03-03 18:02:33                      |                                                                |
+        +-----------------------------------------------------------------------------------------------------------------------------------+
+        |  2 | Bobby | Name     : 564481148D4DBDD09AA1FF467ED71F0F28ACF61B | Container     : ef456e5b-36e4-4eda-a80b-e234611306d4           |
+        |    |       | Record   : 00000000ab23h                            | Provider      : Microsoft Enhanced Cryptographic Provider v1.0 |
+        |    |       | Size     : 1.15 KiB                                 | Type          : PROV_RSA_FULL                                  |
+        |    |       |                                                     | KeySpec       : AT_KEYEXCHANGE                                 |
+        |    |       | Creation : 2020-08-17 13:20:03                      |                                                                |
+        +-----------------------------------------------------------------------------------------------------------------------------------+
                                                                 ..........
 </td></tr>
-<tr><td>efs masterkey disk=0 volume=4 inode=0x80544</td></tr>
+<tr><td>efs.certificate disk=0 volume=4 inode=0xb5a4</td></tr>
 <tr><td>
 	
-    Display masterkey from \\.\PhysicalDrive0 > Volume:4
-    ----------------------------------------------------
-
+    Display certificate from \\.\PhysicalDrive0 > Volume:4
+    ------------------------------------------------------
+    
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
-    [+] Reading masterkey file record: 525636
-    [+] MasterKey
-        +--------------------------------------------------------------------+
-        | Id | Property  | Value                                             |
-        +--------------------------------------------------------------------+
-        |  0 | File      | Creation : 2020-07-06 05:56:06                    |
-        |    |           | Size     : 468.00 bytes                           |
-        +--------------------------------------------------------------------+
-        |  1 | Version   | 2                                                 |
-        +--------------------------------------------------------------------+
-        |  2 | GUID      | 9ac19509-54d3-48bc-8c67-4cfb01d73498              |
-        +--------------------------------------------------------------------+
-        |  3 | Policy    | 00000005h                                         |
-        +--------------------------------------------------------------------+
-        |  4 | MasterKey | Version  : 2                                      |
-        |    |           | Salt     : 3ED4CDBCC4073D6724A512061D0597E1       |
-        |    |           | Rounds   : 8000                                   |
-        |    |           | Hash Alg : CALG_SHA_512                           |
-        |    |           | Enc Alg  : CALG_AES_256                           |
-        |    |           | Enc Key  : 3610946FE1A7B9099D0AFA7658325014       |
-        |    |           |            296D1F0E5BA93249858BE3ACCC8FD7A8       |
-        |    |           |            F62DB6808833FC303095C6588BDE3826       |
-        |    |           |            80ABF391222CD77661BCCB637DDAC490       |
-        |    |           |            B5FC02C854EF45490EE10851EF524DE2       |
-        |    |           |            85DD508F905216D528D3DC3336830FF9       |
-        |    |           |            690472730A03D64CF892E06B9AA35692       |
-        |    |           |            AB7679E908D487119030B73CB87E6F9F       |
-        |    |           |            731F65609CB8ACA972BCC9042B27B9B4       |
-        +--------------------------------------------------------------------+
-        |  5 | BackupKey | Version  : 2                                      |
-        |    |           | Salt     : B60E21F9578D02A97964D7B10151BE69       |
-        |    |           | Rounds   : 8000                                   |
-        |    |           | Hash Alg : CALG_SHA_512                           |
-        |    |           | Enc Alg  : CALG_AES_256                           |
-        |    |           | Enc Key  : CD5D3684873D6A1D66520FB1642779E1       |
-        |    |           |            D78A649F02DDFE7C069F9B5F8FF9F005       |
-        |    |           |            7DC01E0A6AA9A815C8887BC1BF5B88E6       |
-        |    |           |            E797DC5F4A3A0535B3217BADC7FAD38E       |
-        |    |           |            798C1846423C8631DE472D790B308B2D       |
-        |    |           |            F15340B87FCD55A98DAEE92196235CF9       |
-        |    |           |            B328FAF475C05A911DF19C99D54D5A3C       |
-        +--------------------------------------------------------------------+
-        |  6 | CredHist  | Version  : 3                                      |
-        |    |           | GUID     : {20e0b482-797f-429e-b4a0-30020731ef0a} |
-        +--------------------------------------------------------------------+
+    [+] Reading certificate file record: 46500
+    [+] Certificate
+        +----------------------------------------------------------------------------------------------------------------------------+
+        | Id | Property                                 | Value                                                                      |
+        +----------------------------------------------------------------------------------------------------------------------------+
+        |  0 | File                                     | Creation : 2021-03-03 18:02:33                                             |
+        |    |                                          | Size     : 824.00 bytes                                                    |
+        +----------------------------------------------------------------------------------------------------------------------------+
+        |  1 | CERT_SHA1_HASH_PROP_ID                   | 14A67663C51C66FF5CAD89B4DC34495864338C67                                   |
+        +----------------------------------------------------------------------------------------------------------------------------+
+        |  2 | CERT_FRIENDLY_NAME_PROP_ID               | APNS certificate                                                           |
+        +----------------------------------------------------------------------------------------------------------------------------+
+        |  3 | CERT_KEY_IDENTIFIER_PROP_ID              | 82B87AE4F2251242252A2644D98169F34F909CA8                                   |
+        +----------------------------------------------------------------------------------------------------------------------------+
+        |  4 | CERT_SUBJECT_PUBLIC_KEY_MD5_HASH_PROP_ID | DB532C4794A15E5D0392C7C605FCBCA8                                           |
+        +----------------------------------------------------------------------------------------------------------------------------+
+        |  5 | CERT_CERTIFICATE_FILE                    | Data:                                                                      |
+        |    |                                          |     Version: 3 (0x2)                                                       |
+        |    |                                          |     Serial Number:                                                         |
+        |    |                                          |         01:20:cb:ab:28:8a:97:ee:99:cc                                      |
+        |    |                                          |     Signature Algorithm: sha1WithRSAEncryption                             |
+        |    |                                          |     Issuer: C=US, O=Apple Inc., OU=Apple iPhone, CN=Apple iPhone Device CA |
+        |    |                                          |     Validity                                                               |
+        |    |                                          |         Not Before: Mar  3 15:57:33 2021 GMT                               |
+        |    |                                          |         Not After : Mar  3 16:02:33 2022 GMT                               |
+        |    |                                          |     Subject: CN=1A6032AA-91A2-4B1D-B6AF-5509FC173686                       |
+        |    |                                          |     Subject Public Key Info:                                               |
+        |    |                                          |         Public Key Algorithm: rsaEncryption                                |
+        |    |                                          |             RSA Public-Key: (1024 bit)                                     |
+        |    |                                          |             Modulus:                                                       |
+        |    |                                          |                 00:a2:75:db:69:8d:c9:b3:fd:96:4d:28:b9:43:94:              |
+        |    |                                          |                 db:7d:73:53:88:c9:79:e9:fa:de:e4:12:14:2c:de:              |
+                                                               ...
+        |    |                                          |                 a7:6b:d0:01:9e:dc:66:27:ef:2e:20:7e:e5:2a:42:              |
+        |    |                                          |                 9e:6f:85:9c:b6:8f:be:d3:05                                 |
+        |    |                                          |             Exponent: 65537 (0x10001)                                      |
+        |    |                                          |     X509v3 extensions:                                                     |
+        |    |                                          |         X509v3 Authority Key Identifier:                                   |
+        |    |                                          |             keyid:B2:FE:21:23:44:86:95:6A:79:D5:81:26:8E:73:10:D           |
+        |    |                                          | 8:A7:4C:8E:74                                                              |
+        |    |                                          |         X509v3 Subject Key Identifier:                                     |
+        |    |                                          |             82:B8:7A:E4:F2:25:12:42:25:2A:26:44:D9:81:69:F3:4F:9           |
+        |    |                                          | 0:9C:A8                                                                    |
+        |    |                                          |         X509v3 Basic Constraints: critical                                 |
+        |    |                                          |             CA:FALSE                                                       |
+        |    |                                          |         X509v3 Key Usage: critical                                         |
+        |    |                                          |             Digital Signature, Key Encipherment                            |
+        |    |                                          |         X509v3 Extended Key Usage: critical                                |
+        |    |                                          |             TLS Web Server Authentication, TLS Web Client Authen           |
+        |    |                                          | tication                                                                   |
+        |    |                                          |         1.2.840.113635.100.6.10.6:                                         |
+        |    |                                          |             ..                                                             |
+        |    |                                          | Signature Algorithm: sha1WithRSAEncryption                                 |
+        |    |                                          |      28:54:6c:d9:4e:97:f5:dd:1f:79:4a:6a:74:42:ad:6e:a1:11:                |
+                                                               ...
+        |    |                                          |      27:58:3b:d5:1e:c3:71:af:6b:bd:fe:5d:ad:4d:bd:82:fa:53:                |
+        |    |                                          |      ff:0c                                                                 |
+        +----------------------------------------------------------------------------------------------------------------------------+
 </td></tr>
-<tr><td> efs masterkey disk=0 volume=4 inode=0x80544 sid="S-1-5-21-1521398...3175218-1001" password="ntfst00l"</td></tr>
+<tr><td>efs.certificate disk=0 volume=4 inode=0xb5a4 output=mycert format=pem</td></tr>
 <tr><td>
 	
-    Decrypt masterkey from \\.\PhysicalDrive0 > Volume:4
-    ----------------------------------------------------
-
+    Display certificate from \\.\PhysicalDrive0 > Volume:4
+    ------------------------------------------------------
+    
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
-    [+] Reading masterkey file record: 525636
-    [-] Masterkey
-        Encryption Algorithm : CALG_AES_256
-        Hash Algorithm       : CALG_SHA_512
-        Rounds               : 8000
-        Salt                 : 3ED4CDBCC4073D6724A512061D0597E1
-    [+] Decrypting masterkey
-    [+] Clear masterkey (256bits):
-        34FAC126105CE302421A0FC7E3933FEC5639AA6BFF95000E6DA83AE67522EAB6
-        0AF58A27D834883B65611878B258AAAECD8983E3718E00F276178C5BFF4979EB
+    [+] Reading certificate file record: 46500
+    [+] Certificate exported to mycert.pem
 </td></tr>
 </table>
 
 ### EFS-key
 <table>
-<tr><td>efs key disk=0 volume=4</td></tr>
+<tr><td>efs.key disk=0 volume=4</td></tr>
 <tr><td>
 	
 	List keys from \\.\PhysicalDrive0 > Volume:4
@@ -797,7 +798,7 @@ Current external libs:
 	|  2 | User1 | Name   : 002a02ec680e...9a0a8d52ca67 | {3A3E1CF2-5AC2-4717-8006-D7C0F2936435} | 2019-06-26 15:50:50 |
                                                                 ..........
 </td></tr>
-<tr><td>efs masterkey disk=0 volume=4 inode=742107</td></tr>
+<tr><td>efs.key disk=0 volume=4 inode=742107</td></tr>
 <tr><td>
 	
 	Display key from \\.\PhysicalDrive0 > Volume:4
@@ -826,10 +827,7 @@ Current external libs:
 	|    |                      |               CRYPT_DECRYPT                                                          |
 	|    |                      |               CRYPT_EXPORT                                                           |
 	|    |                      |               CRYPT_READ                                                             |
-	|    |                      |               CRYPT_WRITE                                                            |
-	|    |                      |               CRYPT_MAC                                                              |
-	|    |                      |               CRYPT_EXPORT_KEY                                                       |
-	|    |                      |               CRYPT_IMPORT_KEY                                                       |
+                                                            ...
 	|    |                      |                                                                                      |
 	|    |                      | Modulus     : 96883F07FF78DA8354D037A94F897BD7                                       |
 							    ...
@@ -884,7 +882,7 @@ Current external libs:
 	|    |                      |                     9FA17D397A2375E362DE6F17193E3D084C06B0DCDB38E6C746150C1056145178 |
 	+------------------------------------------------------------------------------------------------------------------+
 </td></tr>
-<tr><td> efs key disk=0 volume=4 inode=742107 masterkey=34fac126105ce30...178c5bff4979eb</td></tr>
+<tr><td> efs.key disk=0 volume=4 inode=742107 masterkey=34fac126105ce30...178c5bff4979eb</td></tr>
 <tr><td>
 	
 	Decrypt key from \\.\PhysicalDrive0 > Volume:4
@@ -947,7 +945,7 @@ Current external libs:
 	    |    |                  | F39FC063F1F20323E3220229E29FA42D |
 	    +----------------------------------------------------------+
 </td></tr>
-<tr><td> efs key disk=0 volume=4 inode=742107 masterkey=34...eb output=mykey format=pem</td></tr>
+<tr><td> efs.key disk=0 volume=4 inode=742107 masterkey=34...eb output=mykey format=pem</td></tr>
 <tr><td>
 	
 	Decrypt key from \\.\PhysicalDrive0 > Volume:4
@@ -960,19 +958,127 @@ Current external libs:
 	    Hash Algorithm       : CALG_SHA_512
 	    Salt                 : ABABD5324CCE0254BC726C33F5A777D38BC4D75CACC2360EF3276EB4DC42FF6A
 	[+] Decrypting key
-	[+] Clear key (2048bits):
-	    +----------------------------------------------------------+
-	    | Id | Property         | Value                            |
-	    +----------------------------------------------------------+
-	    |  0 | Magic            | RSA2                             |
-	    +----------------------------------------------------------+
-	    |  1 | Bitsize          | 2048                             |
-                          ...
-
-    [+] Private key exported to mykey.pem.	    
+	[+] Public key exported to mykey.pub.pem.	    
+        [+] Private key exported to mykey.priv.pem.	    
 </td></tr>
-
 </table>
+
+### EFS-masterkey
+<table>
+<tr><td>efs.masterkey disk=0 volume=4</td></tr>
+<tr><td>
+	
+    List masterkeys from \\.\PhysicalDrive0 > Volume:4
+    --------------------------------------------------
+
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [+] Listing user directories
+        8 directories found
+    [+] Searching for keys
+        19 key(s), 2 preferred file(s) found
+    [+] MasterKeys
+        +--------------------------------------------------------------------------------------------------------------------------------------------------+
+        | Id | User           | Keyfile                                       | Key(s)                                               | Creation Date       |
+        +--------------------------------------------------------------------------------------------------------------------------------------------------+
+        |  0 | DefaultAppPool | Name   : e4ed144f-6522-4471-8893-a6e29e175ba6 | MasterKey                                            | 2021-08-17 14:54:41 |
+        |    |                | Record : 000000031848h                        |     Version : 2                                      |                     |
+        |    |                | Size   : 468.00 bytes                         |     Algo    : CALG_SHA_512 - CALG_AES_256            |                     |
+        |    |                |                                               |     Salt    : FA737C82899CC3F61A3B332B15FDC241       |                     |
+        |    |                |                                               |     Rounds  : 8000                                   |                     |
+        |    |                |                                               | BackupKey                                            |                     |
+        |    |                |                                               |     Version : 2                                      |                     |
+        |    |                |                                               |     Algo    : CALG_SHA_512 - CALG_AES_256            |                     |
+        |    |                |                                               |     Salt    : DF0651C903763132BC3043BF144A7DDD       |                     |
+        |    |                |                                               |     Rounds  : 8000                                   |                     |
+        |    |                |                                               | CredHist                                             |                     |
+        |    |                |                                               |     Version : 3                                      |                     |
+        |    |                |                                               |     GUID    : {00000000-0000-0000-0000-000000000000} |                     |
+        +--------------------------------------------------------------------------------------------------------------------------------------------------+
+        |  1 | DefaultAppPool | Name   : Preferred                            | Preferred                                            | 2021-08-17 14:54:41 |
+        |    |                | Record : 00000003184ah                        |     GUID    : {e4ed144f-6522-4471-8893-a6e29e175ba6} |                     |
+        |    |                | Size   : 24.00 bytes                          |     Renew   : 2021-11-15 12:54:41                    |                     |
+        +--------------------------------------------------------------------------------------------------------------------------------------------------+
+        |  2 | Bob            | Name   : 26bd8b3d-e87f-4df3-a1af-18f434788090 | MasterKey                                            | 2021-03-05 01:16:42 |
+        |    |                | Record : 000000004f4ah                        |     Version : 2                                      |                     |
+        |    |                | Size   : 468.00 bytes                         |     Algo    : CALG_SHA_512 - CALG_AES_256            |                     |
+        |    |                |                                               |     Salt    : 39B575D1816DE8224B9E11C38E35EB34       |                     |
+        |    |                |                                               |     Rounds  : 8000                                   |                     |
+        |    |                |                                               | BackupKey                                            |                     |
+                                                                ..........
+</td></tr>
+<tr><td>efs.masterkey disk=0 volume=4 inode=0x80544</td></tr>
+<tr><td>
+	
+    Display masterkey from \\.\PhysicalDrive0 > Volume:4
+    ----------------------------------------------------
+
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [+] Reading masterkey file record: 525636
+    [+] MasterKey
+        +--------------------------------------------------------------------+
+        | Id | Property  | Value                                             |
+        +--------------------------------------------------------------------+
+        |  0 | File      | Creation : 2020-07-06 05:56:06                    |
+        |    |           | Size     : 468.00 bytes                           |
+        +--------------------------------------------------------------------+
+        |  1 | Version   | 2                                                 |
+        +--------------------------------------------------------------------+
+        |  2 | GUID      | 9ac19509-54d3-48bc-8c67-4cfb01d73498              |
+        +--------------------------------------------------------------------+
+        |  3 | Policy    | 00000005h                                         |
+        +--------------------------------------------------------------------+
+        |  4 | MasterKey | Version  : 2                                      |
+        |    |           | Salt     : 3ED4CDBCC4073D6724A512061D0597E1       |
+        |    |           | Rounds   : 8000                                   |
+        |    |           | Hash Alg : CALG_SHA_512                           |
+        |    |           | Enc Alg  : CALG_AES_256                           |
+        |    |           | Enc Key  : 3610946FE1A7B9099D0AFA7658325014       |
+        |    |           |            296D1F0E5BA93249858BE3ACCC8FD7A8       |
+        |    |           |            F62DB6808833FC303095C6588BDE3826       |
+        |    |           |            80ABF391222CD77661BCCB637DDAC490       |
+        |    |           |            B5FC02C854EF45490EE10851EF524DE2       |
+        |    |           |            85DD508F905216D528D3DC3336830FF9       |
+        |    |           |            690472730A03D64CF892E06B9AA35692       |
+        |    |           |            AB7679E908D487119030B73CB87E6F9F       |
+        |    |           |            731F65609CB8ACA972BCC9042B27B9B4       |
+        +--------------------------------------------------------------------+
+        |  5 | BackupKey | Version  : 2                                      |
+        |    |           | Salt     : B60E21F9578D02A97964D7B10151BE69       |
+        |    |           | Rounds   : 8000                                   |
+        |    |           | Hash Alg : CALG_SHA_512                           |
+        |    |           | Enc Alg  : CALG_AES_256                           |
+        |    |           | Enc Key  : CD5D3684873D6A1D66520FB1642779E1       |
+        |    |           |            D78A649F02DDFE7C069F9B5F8FF9F005       |
+        |    |           |            7DC01E0A6AA9A815C8887BC1BF5B88E6       |
+        |    |           |            E797DC5F4A3A0535B3217BADC7FAD38E       |
+        |    |           |            798C1846423C8631DE472D790B308B2D       |
+        |    |           |            F15340B87FCD55A98DAEE92196235CF9       |
+        |    |           |            B328FAF475C05A911DF19C99D54D5A3C       |
+        +--------------------------------------------------------------------+
+        |  6 | CredHist  | Version  : 3                                      |
+        |    |           | GUID     : {20e0b482-797f-429e-b4a0-30020731ef0a} |
+        +--------------------------------------------------------------------+
+</td></tr>
+<tr><td> efs.masterkey disk=0 volume=4 inode=0x80544 sid="S-1-5-21-1521398...3175218-1001" password="ntfst00l"</td></tr>
+<tr><td>
+	
+    Decrypt masterkey from \\.\PhysicalDrive0 > Volume:4
+    ----------------------------------------------------
+
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [+] Reading masterkey file record: 525636
+    [-] Masterkey
+        Encryption Algorithm : CALG_AES_256
+        Hash Algorithm       : CALG_SHA_512
+        Rounds               : 8000
+        Salt                 : 3ED4CDBCC4073D6724A512061D0597E1
+    [+] Decrypting masterkey
+    [+] Clear masterkey (256bits):
+        34FAC126105CE302421A0FC7E3933FEC5639AA6BFF95000E6DA83AE67522EAB6
+        0AF58A27D834883B65611878B258AAAECD8983E3718E00F276178C5BFF4979EB
+</td></tr>
+</table>
+
 
 ### FVE
 <table>
