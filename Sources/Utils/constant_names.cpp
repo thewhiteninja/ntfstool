@@ -778,6 +778,7 @@ std::string constants::efs::cert_prop_provider_type(DWORD t)
 {
 	switch (t)
 	{
+	case 0: return "NO_PROV";
 	case PROV_RSA_FULL: return "PROV_RSA_FULL";
 	case PROV_RSA_SIG: return "PROV_RSA_SIG";
 	case PROV_DSS: return "PROV_DSS";
@@ -796,7 +797,7 @@ std::string constants::efs::cert_prop_provider_type(DWORD t)
 	case PROV_INTEL_SEC: return "PROV_INTEL_SEC";
 	case PROV_REPLACE_OWF: return "PROV_REPLACE_OWF";
 	case PROV_RSA_AES: return "PROV_RSA_AES";
-	default: return "UNK_PROV";
+	default: return "UNK_PROV (" + utils::format::hex(t, true) + ")";
 	}
 }
 
@@ -814,10 +815,11 @@ std::string constants::efs::cert_prop_keyspec(DWORD k)
 {
 	switch (k)
 	{
+	case 0: return "NO_KEYSPEC";
 	case AT_KEYEXCHANGE: return "AT_KEYEXCHANGE";
 	case AT_SIGNATURE: return "AT_SIGNATURE";
 	default:
-		return "UNK_KEYSPEC";
+		return "UNK_KEYSPEC (" + utils::format::hex(k, true) + ")";
 	}
 }
 
