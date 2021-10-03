@@ -65,6 +65,7 @@
     <ClCompile Include="Sources\Commands\command_bitdecrypt.cpp" />
     <ClCompile Include="Sources\Commands\command_bitlocker.cpp" />
     <ClCompile Include="Sources\Commands\command_btree.cpp" />
+    <ClCompile Include="Sources\Commands\command_efs_backup.cpp" />
     <ClCompile Include="Sources\Commands\command_efs_key.cpp" />
     <ClCompile Include="Sources\Commands\command_efs_masterkey.cpp" />
     <ClCompile Include="Sources\Commands\command_extract.cpp" />

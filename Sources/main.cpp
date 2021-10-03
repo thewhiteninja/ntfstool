@@ -44,6 +44,7 @@ int main(int argc, char** argv) {
 			else if (opts->command == "logfile") 			commands::logfile::dispatch(opts);
 			else if (opts->command == "reparse") 			commands::reparse::dispatch(opts);
 			else if (opts->command == "streams") 			commands::streams::dispatch(opts);
+			else if (opts->command == "efs.backup")			commands::efs::backup::dispatch(opts);
 			else if (opts->command == "efs.certificate")	commands::efs::certificate::dispatch(opts);
 			else if (opts->command == "efs.masterkey")		commands::efs::masterkey::dispatch(opts);
 			else if (opts->command == "efs.key")			commands::efs::key::dispatch(opts);
