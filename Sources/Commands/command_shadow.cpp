@@ -69,13 +69,13 @@ int print_volumeshadow(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) 
 						SetFilePointer(hVolume, store_header_offset.LowPart, &store_header_offset.HighPart, FILE_BEGIN);
 						if (ReadFile(hVolume, store_header_buf->data(), 512, &read, NULL))
 						{
+							df_table->set_cell_max_size(38);
 							df_table->add_item_multiline(
 								{
 								utils::id::guid_to_string(store_header_buf->data()->set_id),
 								"",
 								utils::id::guid_to_string(store_header_buf->data()->id)
-								},
-								38
+								}
 							);
 
 							df_table->add_item_line(std::to_string(store_header_buf->data()->count));
@@ -107,7 +107,8 @@ int print_volumeshadow(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) 
 								cellstrings.push_back("                   - " + flagsstr);
 							}
 
-							df_table->add_item_multiline(cellstrings, 42);
+							df_table->set_cell_max_size(42);
+							df_table->add_item_multiline(cellstrings);
 
 							df_table->new_line();
 						}

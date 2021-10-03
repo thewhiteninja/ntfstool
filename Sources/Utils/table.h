@@ -4,7 +4,7 @@
 #include <vector>
 
 #define TABLE_SEPARATOR "-----"
-#define TABLE_MAX_SIZE (64)
+#define TABLE_MAX_SIZE_DEFAULT (64)
 
 namespace utils
 {
@@ -31,6 +31,7 @@ namespace utils
 			bool header_interline = true;
 			bool corner = true;
 			uint32_t margin_left;
+			uint32_t cell_max_size = TABLE_MAX_SIZE_DEFAULT;
 		public:
 			explicit Table();
 
@@ -38,13 +39,15 @@ namespace utils
 
 			void add_header_multiline(std::initializer_list<std::string> header, utils::ui::TableAlign align = TableAlign::LEFT);
 
-			void add_item_line(std::string item, unsigned int max_size = TABLE_MAX_SIZE);
+			void add_item_line(std::string item);
 
 			void add_item_multiline(std::initializer_list<std::string> list);
 
-			void add_item_multiline(std::vector<std::string> list, unsigned int max_size = TABLE_MAX_SIZE);
+			void add_item_multiline(std::vector<std::string> list);
 
 			void set_margin_left(uint32_t margin_left);
+
+			void set_cell_max_size(uint32_t max_size);
 
 			void set_corner(bool show) { corner = show; }
 

@@ -691,7 +691,8 @@ int commands::mft::print_mft_info_details(std::shared_ptr<MFTRecord> record, ULO
 		}
 		case $DATA:
 		{
-			fr_attributes->add_item_multiline(print_attribute_data(record, pAttribute, cluster_size), 46);
+			fr_attributes->set_cell_max_size(46);
+			fr_attributes->add_item_multiline(print_attribute_data(record, pAttribute, cluster_size));
 			break;
 		}
 		case $LOGGED_UTILITY_STREAM:
