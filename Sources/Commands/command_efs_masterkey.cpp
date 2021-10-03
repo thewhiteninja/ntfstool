@@ -431,14 +431,14 @@ namespace commands
 					else
 					{
 						std::cerr << "[!] Invalid or missing volume option" << std::endl;
-						opts->subcommand = "efs";
+						opts->subcommand = "efs.masterkey";
 						commands::help::dispatch(opts);
 					}
 				}
 				else
 				{
 					std::cerr << "[!] Invalid or missing disk option" << std::endl;
-					opts->subcommand = "efs";
+					opts->subcommand = "efs.masterkey";
 					commands::help::dispatch(opts);
 				}
 

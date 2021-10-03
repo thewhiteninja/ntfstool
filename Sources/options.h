@@ -13,7 +13,7 @@ public:
 	std::string subcommand;
 	std::string from;
 	std::string output;
-	std::string format = "raw";
+	std::string format;
 
 	std::string password;
 	std::string sid;

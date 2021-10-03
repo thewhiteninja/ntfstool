@@ -17,25 +17,27 @@ void usage(const char* binname)
 	std::cerr << std::endl;
 	std::cerr << "Version: " << VERSION << " (" << __DATE__ << ")" << std::endl << std::endl;
 	std::cerr << "Commands:" << std::endl;
-	std::cerr << "    info       : list and display physical disks and volumes" << std::endl;
-	std::cerr << "    mbr        : display master boot record" << std::endl;
-	std::cerr << "    gpt        : display guid partition table" << std::endl;
-	std::cerr << "    vbr        : display volume boot record" << std::endl;
-	std::cerr << "    mft        : display master file table" << std::endl;
-	std::cerr << "    btree      : display index btree" << std::endl;
-	std::cerr << "    extract    : extract a file" << std::endl;
-	std::cerr << "    bitlocker  : display bitlocker guid/status and test password, recovery or bek file" << std::endl;
-	std::cerr << "    bitdecrypt : decrypt volume to an image file" << std::endl;
-	std::cerr << "    fve        : display fve metadata" << std::endl;
-	std::cerr << "    efs        : display efs keys, certificates and files" << std::endl;
-	std::cerr << "    logfile    : dump and parse log file" << std::endl;
-	std::cerr << "    usn        : dump and parse usn journal" << std::endl;
-	std::cerr << "    shadow     : list volume shadow copies" << std::endl;
-	std::cerr << "    reparse    : parse and display reparse points" << std::endl;
-	std::cerr << "    undelete   : find deleted files" << std::endl;
-	std::cerr << "    shell      : start a mini-shell" << std::endl;
-	std::cerr << "    smart      : display S.M.A.R.T data" << std::endl;
-	std::cerr << "    help       : display this message or command help" << std::endl;
+	std::cerr << "    info            : list and display physical disks and volumes" << std::endl;
+	std::cerr << "    mbr             : display master boot record" << std::endl;
+	std::cerr << "    gpt             : display guid partition table" << std::endl;
+	std::cerr << "    vbr             : display volume boot record" << std::endl;
+	std::cerr << "    mft             : display master file table" << std::endl;
+	std::cerr << "    btree           : display index btree" << std::endl;
+	std::cerr << "    extract         : extract a file" << std::endl;
+	std::cerr << "    bitlocker       : display bitlocker guid/status and test password, recovery or bek file" << std::endl;
+	std::cerr << "    bitdecrypt      : decrypt volume to an image file" << std::endl;
+	std::cerr << "    fve             : display fve metadata" << std::endl;
+	std::cerr << "    efs.certificate : list, display and export system certificates" << std::endl;
+	std::cerr << "    efs.key         : list, display, decrypt and export private keys" << std::endl;
+	std::cerr << "    efs.masterkey   : list, display and decrypt masterkeys" << std::endl;
+	std::cerr << "    logfile         : dump and parse log file" << std::endl;
+	std::cerr << "    usn             : dump and parse usn journal" << std::endl;
+	std::cerr << "    shadow          : list volume shadow copies" << std::endl;
+	std::cerr << "    reparse         : parse and display reparse points" << std::endl;
+	std::cerr << "    undelete        : find deleted files" << std::endl;
+	std::cerr << "    shell           : start a mini-shell" << std::endl;
+	std::cerr << "    smart           : display S.M.A.R.T data" << std::endl;
+	std::cerr << "    help            : display this message or command help" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "Example:" << std::endl;
 	std::cerr << "    help extract" << std::endl;
@@ -263,12 +265,13 @@ void print_help_usn(const char* name)
 	std::cerr << std::endl;
 }
 
-void print_help_efs(const char* name)
+
+void print_help_efs_masterkey(const char* name)
 {
-	std::cerr << "EFS command" << std::endl;
-	std::cerr << "-----------" << std::endl;
+	std::cerr << "EFS masterkey command" << std::endl;
+	std::cerr << "---------------------" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "    " << name << " efs masterkey [disk id] [volume id]" << std::endl;
+	std::cerr << "    " << name << " efs masterkey [disk id] [volume id] (inode/from) (sid) (password)" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Description:" << std::endl;
 	std::cerr << "    List, display and decrypt masterkeys and keys on a volume." << std::endl;
@@ -279,8 +282,17 @@ void print_help_efs(const char* name)
 	std::cerr << "    Example: Display a masterkey for disk 1, volume 2 and inode 0x1337" << std::endl;
 	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "    Example: Decrypt a masterkey for inode 0x1337 with sid and password" << std::endl;
+	std::cerr << "    Example: Decrypt and display a masterkey using sid and password" << std::endl;
 	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337 sid=\"S-1123...1001\" password=\"123456\"" << std::endl;
+	std::cerr << std::endl;
+}
+
+void print_help_efs_key(const char* name)
+{
+	std::cerr << "EFS key command" << std::endl;
+	std::cerr << "---------------" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    " << name << " efs key [disk id] [volume id] [inode|from] (masterkey) (output) (format)" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: List keys for disk 1, volume 2" << std::endl;
 	std::cerr << "    " << name << " efs key disk=1 volume=2" << std::endl;
@@ -289,10 +301,28 @@ void print_help_efs(const char* name)
 	std::cerr << "    " << name << " efs key disk=1 volume=2 inode=0x1337" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Decrypt a key for inode 0x1337 with masterkey" << std::endl;
-	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321" << std::endl;
+	std::cerr << "    " << name << " efs key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "    Example: Decrypt and export a key to mykey.pem (format in [pem])" << std::endl;
-	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321 output=mykey format=pem" << std::endl;
+	std::cerr << "    Example: Export a key to mykey.pem (format in [pem])" << std::endl;
+	std::cerr << "    " << name << " efs key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321 output=mykey format=pem" << std::endl;
+	std::cerr << std::endl;
+}
+
+void print_help_efs_certificate(const char* name)
+{
+	std::cerr << "EFS certificate command" << std::endl;
+	std::cerr << "-----------------------" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    " << name << " efs certificate [disk id] [volume id] [inode|from] (output) (format)" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: List certificates for disk 1, volume 2" << std::endl;
+	std::cerr << "    " << name << " efs certificate disk=1 volume=2" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Display a certificate for disk 1, volume 2 and inode 0x1337" << std::endl;
+	std::cerr << "    " << name << " efs certificate disk=1 volume=2 inode=0x1337" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Export a certificate to mycert.pem (format in [pem])" << std::endl;
+	std::cerr << "    " << name << " efs certificate disk=1 volume=2 inode=0x1337 output=mycert format=pem" << std::endl;
 	std::cerr << std::endl;
 }
 
@@ -459,7 +489,9 @@ namespace commands
 				if (opts->subcommand == "logfile") { print_help_logfile(name.c_str()); return; }
 				if (opts->subcommand == "reparse") { print_help_reparse(name.c_str()); return; }
 				if (opts->subcommand == "usn") { print_help_usn(name.c_str()); return; }
-				if (opts->subcommand == "efs") { print_help_efs(name.c_str()); return; }
+				if (opts->subcommand == "efs.certificate") { print_help_efs_certificate(name.c_str()); return; }
+				if (opts->subcommand == "efs.key") { print_help_efs_key(name.c_str()); return; }
+				if (opts->subcommand == "efs.masterkey") { print_help_efs_masterkey(name.c_str()); return; }
 				if (opts->subcommand == "undelete") { print_help_undelete(name.c_str()); return; }
 				if (opts->subcommand == "shell") { print_help_shell(name.c_str()); return; }
 				if (opts->subcommand == "smart") { print_help_smart(name.c_str()); return; }
