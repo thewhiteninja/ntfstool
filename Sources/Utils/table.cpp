@@ -29,24 +29,24 @@ void utils::ui::Table::add_header_multiline(std::initializer_list<std::string> h
 	column_align.push_back(align);
 }
 
-void utils::ui::Table::add_item_line(std::string item, unsigned int max_size)
+void utils::ui::Table::add_item_line(std::string item)
 {
 	std::vector<std::string> s;
 	DWORD value_len = utils::strings::utf8_string_size(item);
 
-	if (value_len < max_size)
+	if (value_len < cell_max_size)
 	{
 		s.push_back(item);
 	}
 	else
 	{
-		if (value_len > 2 * max_size)
+		if (value_len > 2 * cell_max_size)
 		{
-			max_size = 32;
+			cell_max_size = 32;
 		}
-		for (unsigned int i = 0; i < value_len; i += max_size)
+		for (unsigned int i = 0; i < value_len; i += cell_max_size)
 		{
-			s.push_back(item.substr(i, max_size));
+			s.push_back(item.substr(i, cell_max_size));
 		}
 	}
 	current_line.push_back(s);
@@ -62,13 +62,13 @@ void utils::ui::Table::add_item_multiline(std::initializer_list<std::string> lis
 	add_item_multiline(s);
 }
 
-void utils::ui::Table::add_item_multiline(std::vector<std::string> list, unsigned int max_size)
+void utils::ui::Table::add_item_multiline(std::vector<std::string> list)
 {
 	std::vector<std::string> s;
 	for (auto& i : list)
 	{
 		auto i_len = utils::strings::utf8_string_size(i);
-		if (i_len > max_size) {
+		if (i_len > cell_max_size) {
 			size_t sep = i.find(':');
 			if (sep != std::string::npos && sep < i_len - 1 && i[sep + 1] == ' ')
 			{
@@ -79,27 +79,27 @@ void utils::ui::Table::add_item_multiline(std::vector<std::string> list, unsigne
 				std::string value = i.substr(sep + 2);
 				auto value_len = utils::strings::utf8_string_size(value);
 				auto offset = value.length() - value_len;
-				if (value_len > max_size)
+				if (value_len > cell_max_size)
 				{
-					auto tmp_max_size = max_size;
-					if (value_len > 2 * max_size)
+					auto tmp_max_size = cell_max_size;
+					if (value_len > 2 * cell_max_size)
 					{
-						max_size = 32;
+						cell_max_size = 32;
 					}
-					s.push_back(key + ": " + value.substr(0, max_size + offset));
-					value = value.substr(max_size + offset);
+					s.push_back(key + ": " + value.substr(0, cell_max_size + offset));
+					value = value.substr(cell_max_size + offset);
 					value_len = utils::strings::utf8_string_size(value);
 					offset = value.length() - value_len;
-					while (value_len > max_size) {
-						s.push_back(whitespace + "  " + value.substr(0, max_size + offset));
-						value = value.substr(max_size + offset);
+					while (value_len > cell_max_size) {
+						s.push_back(whitespace + "  " + value.substr(0, cell_max_size + offset));
+						value = value.substr(cell_max_size + offset);
 						value_len = utils::strings::utf8_string_size(value);
 					}
 					if (value_len > 0)
 					{
 						s.push_back(whitespace + "  " + value);
 					}
-					max_size = tmp_max_size;
+					cell_max_size = tmp_max_size;
 				}
 				else
 				{
@@ -110,15 +110,15 @@ void utils::ui::Table::add_item_multiline(std::vector<std::string> list, unsigne
 			{
 				std::string value = i;
 
-				while (value.length() > max_size) {
-					s.push_back(value.substr(0, max_size));
-					value = value.substr(max_size);
+				while (value.length() > cell_max_size) {
+					s.push_back(value.substr(0, cell_max_size));
+					value = value.substr(cell_max_size);
 				}
 				if (value.length() > 0) {
 					if (value == TABLE_SEPARATOR)
 					{
 						std::string padded_sep = "";
-						for (int i = 0; i < (max_size - strlen(TABLE_SEPARATOR)) / 2; i++)
+						for (int i = 0; i < (cell_max_size - strlen(TABLE_SEPARATOR)) / 2; i++)
 						{
 							padded_sep.append(" ");
 						}
@@ -142,6 +142,11 @@ void utils::ui::Table::add_item_multiline(std::vector<std::string> list, unsigne
 void utils::ui::Table::set_margin_left(uint32_t margin_left)
 {
 	this->margin_left = margin_left;
+}
+
+void utils::ui::Table::set_cell_max_size(uint32_t max_size)
+{
+	this->cell_max_size = max_size;
 }
 
 void utils::ui::Table::new_line()

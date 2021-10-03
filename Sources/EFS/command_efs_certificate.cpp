@@ -54,6 +54,7 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 		{
 			std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
 			tab->set_margin_left(4);
+			tab->set_cell_max_size(78);
 			tab->set_interline(true);
 			tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
 			tab->add_header_line("Property");
@@ -241,11 +242,15 @@ int list_certificates(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, s
 			{
 				auto info = cert->info();
 				std::vector<std::string> cell;
+				if (info->friendly_name != "")
+				{
+					cell.push_back("Friendly Name : " + info->friendly_name);
+					cell.push_back("");
+				}
 				if (info->container_name != "") cell.push_back("Container     : " + info->container_name);
 				if (info->provider_name != "") cell.push_back("Provider      : " + info->provider_name);
 				if (info->provider_type != "") cell.push_back("Type          : " + info->provider_type);
 				if (info->keyspec != "") cell.push_back("KeySpec       : " + info->keyspec);
-				if (info->friendly_name != "") cell.push_back("Friendly Name : " + info->friendly_name);
 				tab->add_item_multiline(cell);
 			}
 			else
