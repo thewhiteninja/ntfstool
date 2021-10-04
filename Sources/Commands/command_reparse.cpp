@@ -81,16 +81,16 @@ int print_reparse(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const
 					}
 					else if (rp_value->ReparseTag == IO_REPARSE_TAG_APPEXECLINK)
 					{
-						unsigned int n = 0;
+						unsigned int idx = 0;
 						size_t i = 0;
-						while (n < rp_value->AppExecLinkReparseBuffer.StringCount && i < rp_value->ReparseDataLength)
+						while (idx < rp_value->AppExecLinkReparseBuffer.StringCount && i < rp_value->ReparseDataLength)
 						{
 							std::wstring subs_name = std::wstring(POINTER_ADD(PWCHAR, rp_value->AppExecLinkReparseBuffer.StringBuffer, i));
 							target.push_back(utils::strings::to_utf8(subs_name));
-							if (n < rp_value->AppExecLinkReparseBuffer.StringCount - 1) target.push_back("");
+							if (idx < rp_value->AppExecLinkReparseBuffer.StringCount - 1) target.push_back("");
 
 							i += (subs_name.length() + 1) * sizeof(WCHAR);
-							n++;
+							idx++;
 						}
 					}
 					else

@@ -5,7 +5,7 @@
 #include <openssl/x509.h>
 #include <openssl/pem.h>
 
-Certificate::Certificate(PBYTE data, DWORD size)
+CertificateFile::CertificateFile(PBYTE data, DWORD size)
 {
 	DER_ELEMENT e;
 	unsigned int pos = 0;
@@ -42,7 +42,7 @@ Certificate::Certificate(PBYTE data, DWORD size)
 	}
 }
 
-int Certificate::export_to_PEM(std::string name)
+int CertificateFile::export_to_PEM(std::string name)
 {
 	for (auto element : _fields)
 	{
@@ -75,7 +75,7 @@ int Certificate::export_to_PEM(std::string name)
 	return 0;
 }
 
-std::vector<std::string> Certificate::certificate_ossl_description()
+std::vector<std::string> CertificateFile::certificate_ossl_description()
 {
 	std::vector<std::string> ret;
 

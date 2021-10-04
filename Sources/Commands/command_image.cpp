@@ -49,8 +49,6 @@ int create_image(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const 
 
 	if (input != INVALID_HANDLE_VALUE)
 	{
-		DWORD64 read = 0;
-
 		std::cout << "[-] Size     : " << size << " (" << utils::format::size(size) << ")" << std::endl;
 		std::cout << "[-] BlockSize: " << IMAGE_BLOCK_SIZE << std::endl;
 
@@ -59,6 +57,8 @@ int create_image(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const 
 		{
 			auto progress_bar = std::make_shared<ProgressBar>(100, 32, L"[+] Copying  : ");
 			progress_bar->set_display_time(true);
+
+			DWORD64 read;
 
 			std::future<void> consumer = std::async(std::launch::async,
 				[input, houtput, buffer, size, &read, &progress_bar]() {

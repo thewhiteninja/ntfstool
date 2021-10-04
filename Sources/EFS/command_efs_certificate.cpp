@@ -43,7 +43,7 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 	else
 	{
 		auto data = certificate_file_record->data();
-		std::shared_ptr<Certificate> certificate_file = std::make_shared<Certificate>(data->data(), data->size());
+		std::shared_ptr<CertificateFile> certificate_file = std::make_shared<CertificateFile>(data->data(), data->size());
 		if (!certificate_file->is_loaded())
 		{
 			std::cerr << "[!] Err: Failed to parse certificate file from record: " << opts->inode << std::endl;
@@ -237,7 +237,7 @@ int list_certificates(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, s
 			);
 
 			certificate_count++;
-			std::shared_ptr<Certificate> cert = std::make_shared<Certificate>(data->data(), data->size());
+			std::shared_ptr<CertificateFile> cert = std::make_shared<CertificateFile>(data->data(), data->size());
 			if (cert->is_loaded())
 			{
 				auto info = cert->info();
