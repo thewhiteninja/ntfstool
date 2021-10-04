@@ -49,7 +49,7 @@ typedef struct {
 
 #pragma pack(pop)
 
-class Certificate
+class CertificateFile
 {
 private:
 	bool _loaded = false;
@@ -59,7 +59,7 @@ private:
 	std::map<DWORD, std::shared_ptr<Buffer<PBYTE>>> _fields;
 
 public:
-	Certificate(PBYTE data, DWORD size);
+	CertificateFile(PBYTE data, DWORD size);
 
 	bool is_loaded() { return _loaded; }
 
