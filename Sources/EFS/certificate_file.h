@@ -6,6 +6,8 @@
 #include <map>
 #include <vector>
 
+#include <openssl/x509.h>
+
 #include "Utils/buffer.h"
 
 #define CERT_CERTIFICATE_FILE 32
@@ -69,5 +71,9 @@ public:
 
 	std::vector<std::string> certificate_ossl_description();
 
+	std::string hash();
+
 	int export_to_PEM(std::string name);
+
+	X509* export_to_X509();
 };

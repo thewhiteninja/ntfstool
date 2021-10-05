@@ -61,6 +61,7 @@ Options can be entered as decimal or hex number with "0x" prefix.
 | [btree](#btree)  | Display VCN content and Btree index for an inode |
 | [bitlocker](#bitlocker)  | Display detailed information and hash ($bitlocker$) for all VMK. It is possible to test a password or recovery key. If it is correct, the decrypted VMK and FVEK is displayed. |
 | [bitdecrypt](#bitdecrypt)  | Decrypt a volume to a file using password, recovery key or bek. |
+| [efs.backup](#efs-backup)  | Export EFS keys in PKCS12 (pfx) format. |
 | [efs.certificate](#efs-certificate)  | List, display and export system certificates (SystemCertificates/My/Certificates). |
 | [efs.key](#efs-key)  | List, display, decrypt and export private keys (Crypto/RSA). |
 | [efs.masterkey](#efs-masterkey)  | List, display and decrypt masterkeys (Protect). |
@@ -654,6 +655,29 @@ Current external libs:
 </td></tr>
 </table>
 
+
+### EFS-backup
+<table>
+<tr><td>efs.backup disk=0 volume=4 password=123456</td></tr>
+<tr><td>
+	
+    Backup certificates and keys from \\.\PhysicalDrive0 > Volume:4
+    ---------------------------------------------------------------
+    
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [+] Listing user directories
+        8 directories found
+    [+] Searching for certificates
+        - 8BB98DE9ED4DBDD09AA1FF467ED71F0F28ACF61B
+    [+] Finding corresponding private keys
+        - 5f2870d8a6f1ef6487be2e1aee746fb5_bbc401c6-854a-4d12-9b65-8d52ca66cb6a
+    [+] Finding corresponding masterkeys
+        - 9ac19509-54d3-48bc-8c67-4cfb01d73498
+    [+] Exporting 1 certificates and keys (pass: backup)
+        - ef456e5b-43e4-4eda-a80b-e234611306d4 : Ok
+          Exported to 8BB98DE9ED4DBDD09AA1FF467ED71F0F28ACF61B.pfx
+</td></tr>
+</table>
 
 ### EFS-certificate
 <table>

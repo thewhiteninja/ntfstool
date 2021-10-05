@@ -521,6 +521,12 @@ namespace utils
 
 	namespace files {
 
+		std::string ensure_file_ext(const std::string& str, std::string ext)
+		{
+			std::filesystem::path p(str);
+			return p.replace_extension(ext).string();
+		}
+
 		std::string basename(const std::string& str)
 		{
 			size_t found = str.find_last_of("/\\");

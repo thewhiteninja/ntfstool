@@ -56,4 +56,6 @@ public:
 	int export_private_to_PEM(std::string filename);
 
 	int export_public_to_PEM(std::string filename);
+
+	RSA* export_private_to_RSA();
 };

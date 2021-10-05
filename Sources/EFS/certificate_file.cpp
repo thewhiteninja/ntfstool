@@ -1,8 +1,8 @@
-#include "EFS/certificate.h"
+#include "EFS/certificate_file.h"
 #include <Utils/utils.h>
 #include <Utils/constant_names.h>
 
-#include <openssl/x509.h>
+
 #include <openssl/pem.h>
 
 CertificateFile::CertificateFile(PBYTE data, DWORD size)
@@ -75,6 +75,25 @@ int CertificateFile::export_to_PEM(std::string name)
 	return 0;
 }
 
+X509* CertificateFile::export_to_X509()
+{
+	for (auto element : _fields)
+	{
+		DWORD prop_id = std::get<0>(element);
+
+		if (prop_id == CERT_CERTIFICATE_FILE)
+		{
+			const unsigned char* bufder = std::get<1>(element)->data();
+			X509* x = d2i_X509(NULL, &bufder, std::get<1>(element)->size());
+			if (x)
+			{
+				return x;
+			}
+		}
+	}
+	return nullptr;
+}
+
 std::vector<std::string> CertificateFile::certificate_ossl_description()
 {
 	std::vector<std::string> ret;
@@ -121,4 +140,16 @@ std::vector<std::string> CertificateFile::certificate_ossl_description()
 	return ret;
 }
 
+std::string CertificateFile::hash()
+{
+	for (auto element : _fields)
+	{
+		DWORD prop_id = std::get<0>(element);
 
+		if (prop_id == CERT_HASH_PROP_ID)
+		{
+			return utils::convert::to_hex(std::get<1>(element)->data(), std::get<1>(element)->size());
+		}
+	}
+	return "";
+}

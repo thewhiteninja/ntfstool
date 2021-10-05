@@ -96,6 +96,8 @@ namespace utils
 
 	namespace files
 	{
+		std::string ensure_file_ext(const std::string& str, std::string ext);
+
 		std::string basename(const std::string& str);
 
 		std::pair<std::string, std::string> split_file_and_stream(std::string& str);
