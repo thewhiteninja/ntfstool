@@ -41,12 +41,13 @@ IndexDetails::IndexDetails(std::shared_ptr<MFTRecord> pMFT)
 				indexBlocks = pMFT->attribute_data<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>(pAttrAllocation);
 
 				PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK pIndexSubBlockData = indexBlocks->data();
+				DWORD IndexSubBlockDataSize = indexBlocks->size();
 				DWORD blockPos = 0;
 				while (blockPos < indexBlocks->size())
 				{
 					if (pIndexSubBlockData->Magic == MAGIC_INDX)
 					{
-						pMFT->apply_fixups(pIndexSubBlockData, pIndexSubBlockData->OffsetOfUS, pIndexSubBlockData->SizeOfUS);
+						pMFT->apply_fixups(pIndexSubBlockData, IndexSubBlockDataSize - blockPos, pIndexSubBlockData->OffsetOfUS, pIndexSubBlockData->SizeOfUS);
 						vcnToBlock[pIndexSubBlockData->VCN] = pIndexSubBlockData;
 
 						auto entries = _parse_entries_block(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_INDEX_ENTRY, pIndexSubBlockData, pIndexSubBlockData->EntryOffset + 0x18), type);
