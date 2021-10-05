@@ -20,12 +20,16 @@ See examples below to see some of the features!
 ### Forensics
 
 NTFSTool displays the complete structure of master boot record, volume boot record, partition table and MFT file record.
-It is also possible to dump any file (even hidden $mft) or parse $usnjrnl, $logfile including file from Alternate Data Stream (ADS).
+It is also possible to dump any file (even hidden [$mft][8]) or parse [$usnjrnl][6], [$logfile][7] including file from Alternate Data Stream ([ADS][5]).
 The undelete command will search for any file record marked as "not in use" and allow you to retrieve the file (or part of the file if it was already rewritten).
 It support input from image file or live disks. You can also use tools like [OSFMount][3] to mount your disk image.
 Sparse and compressed files are also (partially) supported. 
 
 [3]: https://www.osforensics.com/tools/mount-disk-images.html
+[5]: https://docs.microsoft.com/en-us/archive/blogs/askcore/alternate-data-streams-in-ntfs
+[6]: https://docs.microsoft.com/en-gb/windows/win32/fileio/change-journal-records
+[7]: https://dfir.ru/2019/02/16/how-the-logfile-works/
+[8]: https://en.wikipedia.org/wiki/NTFS#Master_File_Table
 
 ### Bitlocker support
 
@@ -86,7 +90,7 @@ Options can be entered as decimal or hex number with "0x" prefix.
 
 ## Limitations
 
-- Few unsupported cases
+- Some unsupported cases
 - No documentation :no_mouth:.
 
 Feel free to open an issue or ask for a new feature!
@@ -111,9 +115,6 @@ Current external libs:
 - [nlohmann-json](https://github.com/nlohmann/json): JSON for Modern C++
 - [distorm](https://github.com/gdabah/distorm): Powerful Disassembler Library For x86/AMD64
 - [cppcoro](https://github.com/lewissbaker/cppcoro): A library of C++ coroutine abstractions for the coroutines TS.
-
-  
-
 
 
 ## Output examples
