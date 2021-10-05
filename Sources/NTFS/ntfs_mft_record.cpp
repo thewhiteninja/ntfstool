@@ -21,7 +21,7 @@ MFTRecord::MFTRecord(PMFT_RECORD_HEADER pRecordHeader, MFT* mft, std::shared_ptr
 		_record = std::make_shared<Buffer<PMFT_RECORD_HEADER>>(_reader->sizes.record_size);
 		memcpy(_record->data(), pRecordHeader, _reader->sizes.record_size);
 
-		apply_fixups(_record->data(), _record->data()->updateOffset, _record->data()->updateNumber);
+		apply_fixups(_record->data(), _record->size(), _record->data()->updateOffset, _record->data()->updateNumber);
 	}
 }
 
@@ -127,12 +127,13 @@ std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> MFTRecord::parse_index_bloc
 	std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> mapVCNToIndexBlock;
 
 	PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK pIndexSubBlockData = pIndexBlock->data();
+	DWORD IndexSubBlockDataSize = pIndexBlock->size();
 	DWORD blockPos = 0;
 	while (blockPos < pIndexBlock->size())
 	{
 		if (pIndexSubBlockData->Magic == MAGIC_INDX)
 		{
-			apply_fixups(pIndexSubBlockData, pIndexSubBlockData->OffsetOfUS, pIndexSubBlockData->SizeOfUS);
+			apply_fixups(pIndexSubBlockData, IndexSubBlockDataSize - blockPos, pIndexSubBlockData->OffsetOfUS, pIndexSubBlockData->SizeOfUS);
 			mapVCNToIndexBlock[pIndexSubBlockData->VCN] = pIndexSubBlockData;
 		}
 
@@ -331,7 +332,7 @@ std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADE
 		}
 		if (readSize != filesize)
 		{
-			
+
 			std::cout << "[!] Invalid read file size" << std::endl;
 			ret = nullptr;
 		}
@@ -382,15 +383,23 @@ std::vector<MFT_DATARUN> MFTRecord::read_dataruns(PMFT_RECORD_ATTRIBUTE_HEADER p
 	return result;
 }
 
-void MFTRecord::apply_fixups(PVOID buffer, WORD updateOffset, WORD updateSize)
+void MFTRecord::apply_fixups(PVOID buffer, DWORD buffer_size, WORD updateOffset, WORD updateSize)
 {
 	PWORD usarray = POINTER_ADD(PWORD, buffer, updateOffset);
 	PWORD sector = (PWORD)buffer;
 
+	DWORD offset = _reader->sizes.sector_size;
 	for (DWORD i = 1; i < updateSize; i++)
 	{
-		sector[(_reader->sizes.sector_size - 2) / sizeof(WORD)] = usarray[i];
-		sector = POINTER_ADD(PWORD, sector, _reader->sizes.sector_size);
+		if (offset <= buffer_size)
+		{
+			sector[(offset - 2) / sizeof(WORD)] = usarray[i];
+			offset += _reader->sizes.sector_size;
+		}
+		else
+		{
+			break;
+		}
 	}
 }
 

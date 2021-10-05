@@ -45,7 +45,7 @@ public:
 
 	PMFT_RECORD_HEADER header() { return _record->data(); }
 
-	void apply_fixups(PVOID buffer, WORD updateOffset, WORD updateSize);
+	void apply_fixups(PVOID buffer, DWORD buffer_size, WORD updateOffset, WORD updateSize);
 
 	PMFT_RECORD_ATTRIBUTE_HEADER attribute_header(DWORD type, std::string name = "", int index = 0);
 
