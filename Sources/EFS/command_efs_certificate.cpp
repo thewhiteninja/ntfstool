@@ -2,7 +2,7 @@
 #include "NTFS/ntfs_explorer.h"
 #include <Utils/table.h>
 #include <Utils/constant_names.h>
-#include "EFS/certificate.h"
+#include "EFS/certificate_file.h"
 
 
 const std::vector<std::string> format = { "pem" };

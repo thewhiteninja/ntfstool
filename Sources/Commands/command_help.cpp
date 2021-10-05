@@ -271,19 +271,35 @@ void print_help_efs_masterkey(const char* name)
 	std::cerr << "EFS masterkey command" << std::endl;
 	std::cerr << "---------------------" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "    " << name << " efs masterkey [disk id] [volume id] (inode/from) (sid) (password)" << std::endl;
+	std::cerr << "    " << name << " efs.masterkey [disk id] [volume id] (inode/from) (sid) (password)" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Description:" << std::endl;
 	std::cerr << "    List, display and decrypt masterkeys and keys on a volume." << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: List masterkeys for disk 1, volume 2" << std::endl;
-	std::cerr << "    " << name << " efs masterkey disk=1 volume=2" << std::endl;
+	std::cerr << "    " << name << " efs.masterkey disk=1 volume=2" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Display a masterkey for disk 1, volume 2 and inode 0x1337" << std::endl;
-	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337" << std::endl;
+	std::cerr << "    " << name << " efs.masterkey disk=1 volume=2 inode=0x1337" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Decrypt and display a masterkey using sid and password" << std::endl;
-	std::cerr << "    " << name << " efs masterkey disk=1 volume=2 inode=0x1337 sid=\"S-1123...1001\" password=\"123456\"" << std::endl;
+	std::cerr << "    " << name << " efs.masterkey disk=1 volume=2 inode=0x1337 sid=\"S-1123...1001\" password=\"123456\"" << std::endl;
+	std::cerr << std::endl;
+}
+
+
+void print_help_efs_backup(const char* name)
+{
+	std::cerr << "EFS backup command" << std::endl;
+	std::cerr << "---------------------" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    " << name << " efs.backup [disk id] [volume id] [password]" << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Description:" << std::endl;
+	std::cerr << "    Export EFS keys on a volume." << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "    Example: Export EFS keys for disk 1, volume 2 using password:123456" << std::endl;
+	std::cerr << "    " << name << " efs.backup disk=1 volume=2 password=123456" << std::endl;
 	std::cerr << std::endl;
 }
 
@@ -292,19 +308,19 @@ void print_help_efs_key(const char* name)
 	std::cerr << "EFS key command" << std::endl;
 	std::cerr << "---------------" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "    " << name << " efs key [disk id] [volume id] [inode|from] (masterkey) (output) (format)" << std::endl;
+	std::cerr << "    " << name << " efs.key [disk id] [volume id] [inode|from] (masterkey) (output) (format)" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: List keys for disk 1, volume 2" << std::endl;
-	std::cerr << "    " << name << " efs key disk=1 volume=2" << std::endl;
+	std::cerr << "    " << name << " efs.key disk=1 volume=2" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Display a key for disk 1, volume 2 and inode 0x1337" << std::endl;
-	std::cerr << "    " << name << " efs key disk=1 volume=2 inode=0x1337" << std::endl;
+	std::cerr << "    " << name << " efs.key disk=1 volume=2 inode=0x1337" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Decrypt a key for inode 0x1337 with masterkey" << std::endl;
-	std::cerr << "    " << name << " efs key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321" << std::endl;
+	std::cerr << "    " << name << " efs.key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Export a key to mykey.pem (format in [pem])" << std::endl;
-	std::cerr << "    " << name << " efs key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321 output=mykey format=pem" << std::endl;
+	std::cerr << "    " << name << " efs.key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321 output=mykey format=pem" << std::endl;
 	std::cerr << std::endl;
 }
 
@@ -313,16 +329,16 @@ void print_help_efs_certificate(const char* name)
 	std::cerr << "EFS certificate command" << std::endl;
 	std::cerr << "-----------------------" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "    " << name << " efs certificate [disk id] [volume id] [inode|from] (output) (format)" << std::endl;
+	std::cerr << "    " << name << " efs.certificate [disk id] [volume id] [inode|from] (output) (format)" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: List certificates for disk 1, volume 2" << std::endl;
-	std::cerr << "    " << name << " efs certificate disk=1 volume=2" << std::endl;
+	std::cerr << "    " << name << " efs.certificate disk=1 volume=2" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Display a certificate for disk 1, volume 2 and inode 0x1337" << std::endl;
-	std::cerr << "    " << name << " efs certificate disk=1 volume=2 inode=0x1337" << std::endl;
+	std::cerr << "    " << name << " efs.certificate disk=1 volume=2 inode=0x1337" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "    Example: Export a certificate to mycert.pem (format in [pem])" << std::endl;
-	std::cerr << "    " << name << " efs certificate disk=1 volume=2 inode=0x1337 output=mycert format=pem" << std::endl;
+	std::cerr << "    " << name << " efs.certificate disk=1 volume=2 inode=0x1337 output=mycert format=pem" << std::endl;
 	std::cerr << std::endl;
 }
 
@@ -492,6 +508,7 @@ namespace commands
 				if (opts->subcommand == "efs.certificate") { print_help_efs_certificate(name.c_str()); return; }
 				if (opts->subcommand == "efs.key") { print_help_efs_key(name.c_str()); return; }
 				if (opts->subcommand == "efs.masterkey") { print_help_efs_masterkey(name.c_str()); return; }
+				if (opts->subcommand == "efs.backup") { print_help_efs_backup(name.c_str()); return; }
 				if (opts->subcommand == "undelete") { print_help_undelete(name.c_str()); return; }
 				if (opts->subcommand == "shell") { print_help_shell(name.c_str()); return; }
 				if (opts->subcommand == "smart") { print_help_smart(name.c_str()); return; }

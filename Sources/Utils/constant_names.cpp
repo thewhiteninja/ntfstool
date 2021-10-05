@@ -3,11 +3,10 @@
 #include "Drive/mbr_gpt.h"
 #include "Bitlocker/bitlocker.h"
 #include "NTFS/ntfs.h"
+#include <EFS/certificate_file.h>
 
 #include <map>
 #include <vss.h>
-#include <EFS/certificate.h>
-
 
 
 std::string constants::disk::smart::attribute_name(DWORD index)
