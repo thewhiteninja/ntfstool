@@ -25,6 +25,8 @@ The undelete command will search for any file record marked as "not in use" and 
 It support input from image file or live disks. You can also use tools like [OSFMount][3] to mount your disk image.
 Sparse and compressed files are also (partially) supported. 
 
+[3]: https://www.osforensics.com/tools/mount-disk-images.html
+
 ### Bitlocker support
 
 For bitlocked partition, it can display FVE records, check a password and support 3 formats (bek, password, recovery key), extract VMK and FVEK.
@@ -35,7 +37,13 @@ There is no bruteforcing feature because GPU-based cracking is better (see [Bitc
 
 ### EFS support
 
-In the current version, masterkeys and private keys can be listed, displayed and decrypt using needed inputs (sid, password).
+In the current version, masterkeys and private keys and certificates can be listed, displayed and decrypted using needed inputs (sid, password).
+Certificates with private keys can be exported using the backup command.
+Reinmport the backup on another machine to be able to read your encrypted file again!
+More information on [Mimikatz Wiki][4] 
+
+[4]: https://github.com/gentilkiwi/mimikatz/wiki/howto-~-decrypt-EFS-files#installing-the-pfx
+
 Decryption of EFS encrypted files is coming!
 
 ### Shell
@@ -106,7 +114,7 @@ Current external libs:
 
   
 
-[3]: https://www.osforensics.com/tools/mount-disk-images.html
+
 
 ## Output examples
 
