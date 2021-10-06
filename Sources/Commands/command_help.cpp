@@ -15,462 +15,248 @@ void usage(const char* binname)
 {
 	std::cerr << "Usage: " << binname << " command [options]" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "Version: " << VERSION << " (" << __DATE__ << ")" << std::endl << std::endl;
+	std::cerr << "Version: " << VERSION << " (Build date: " << __DATE__ << " " << __TIME__ << ")" << std::endl << std::endl;
 	std::cerr << "Commands:" << std::endl;
-	std::cerr << "    info            : list and display physical disks and volumes" << std::endl;
-	std::cerr << "    mbr             : display master boot record" << std::endl;
-	std::cerr << "    gpt             : display guid partition table" << std::endl;
-	std::cerr << "    vbr             : display volume boot record" << std::endl;
-	std::cerr << "    mft             : display master file table" << std::endl;
-	std::cerr << "    btree           : display index btree" << std::endl;
-	std::cerr << "    extract         : extract a file" << std::endl;
-	std::cerr << "    bitlocker       : display bitlocker guid/status and test password, recovery or bek file" << std::endl;
-	std::cerr << "    bitdecrypt      : decrypt volume to an image file" << std::endl;
-	std::cerr << "    fve             : display fve metadata" << std::endl;
-	std::cerr << "    efs.certificate : list, display and export system certificates" << std::endl;
-	std::cerr << "    efs.key         : list, display, decrypt and export private keys" << std::endl;
-	std::cerr << "    efs.masterkey   : list, display and decrypt masterkeys" << std::endl;
-	std::cerr << "    logfile         : dump and parse log file" << std::endl;
-	std::cerr << "    usn             : dump and parse usn journal" << std::endl;
-	std::cerr << "    shadow          : list volume shadow copies" << std::endl;
-	std::cerr << "    reparse         : parse and display reparse points" << std::endl;
-	std::cerr << "    undelete        : find deleted files" << std::endl;
-	std::cerr << "    shell           : start a mini-shell" << std::endl;
-	std::cerr << "    smart           : display S.M.A.R.T data" << std::endl;
-	std::cerr << "    help            : display this message or command help" << std::endl;
+	std::cerr << "  info            : list and display physical disks and volumes" << std::endl;
+	std::cerr << "  mbr             : display master boot record" << std::endl;
+	std::cerr << "  gpt             : display GUID partition table" << std::endl;
+	std::cerr << "  vbr             : display volume boot record" << std::endl;
+	std::cerr << "  mft             : display master file table" << std::endl;
+	std::cerr << "  btree           : display index btree" << std::endl;
+	std::cerr << "  extract         : extract a file" << std::endl;
+	std::cerr << "  bitlocker       : display bitlocker GUID/status and test password, recovery or BEK file" << std::endl;
+	std::cerr << "  bitdecrypt      : decrypt volume to an image file" << std::endl;
+	std::cerr << "  fve             : display FVE metadata" << std::endl;
+	std::cerr << "  efs.backup      : Export EFS keys from a volume" << std::endl;
+	std::cerr << "  efs.certificate : list, display and export system certificates" << std::endl;
+	std::cerr << "  efs.key         : list, display, decrypt and export private keys" << std::endl;
+	std::cerr << "  efs.masterkey   : list, display and decrypt masterkeys" << std::endl;
+	std::cerr << "  logfile         : dump and parse log file" << std::endl;
+	std::cerr << "  usn             : dump and parse usn journal" << std::endl;
+	std::cerr << "  shadow          : list volume shadow copies" << std::endl;
+	std::cerr << "  reparse         : parse and display reparse points" << std::endl;
+	std::cerr << "  undelete        : find deleted files" << std::endl;
+	std::cerr << "  shell           : start a mini-shell" << std::endl;
+	std::cerr << "  smart           : display SMART data" << std::endl;
+	std::cerr << "  help            : display this message or command help" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "Example:" << std::endl;
-	std::cerr << "    help extract" << std::endl;
+	std::cerr << "Help for a command?" << std::endl;
+	std::cerr << "    help [command]" << std::endl;
+	std::cerr << std::endl;
+}
+
+void command_header(const char* cmd)
+{
+	std::cerr << cmd << " command" << std::endl;
+	for (int i = 0; i < strnlen_s(cmd, 20) + 8; i++) std::cerr << "-";
+	std::cerr << std::endl << std::endl;
+}
+
+void command_description(const char* name, const char* usage, const char* description)
+{
+	std::cerr << "  " << name << " " << usage << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "  - " << description << std::endl;
+	std::cerr << std::endl;
+}
+
+void command_examples(const char* name, const char* title, const char* example)
+{
+
+	std::cerr << "  " << title << ":" << std::endl;
+	std::cerr << "  > " << name << " " << example << std::endl;
 	std::cerr << std::endl;
 }
 
 void print_help_help(const char* name)
 {
-	std::cerr << "Help command" << std::endl;
-	std::cerr << "------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " help [command]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Provides help information for all commands." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: " << std::endl;
-	std::cerr << "    " << name << " help shell" << std::endl;
-	std::cerr << std::endl;
+	command_header("help");
+	command_description(name, "help [command]", "Provides help information for all commands");
+	command_examples(name, "Example", "help shell");
 }
 
 void print_help_info(const char* name)
 {
-	std::cerr << "Info command" << std::endl;
-	std::cerr << "------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " info (disk id) (volume id)" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Provides a list of physical disks or information for selected disk and volume." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: List of physical disks" << std::endl;
-	std::cerr << "    " << name << " info" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Information on disk 1" << std::endl;
-	std::cerr << "    " << name << " info disk=1" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Information on disk 2 and volume 1" << std::endl;
-	std::cerr << "    " << name << " info disk=2 volume=1" << std::endl;
-	std::cerr << std::endl;
+	command_header("info");
+	command_description(name, "info (disk id) (volume id)", "Provides a list of physical disks or information for selected disk and volume");
+	command_examples(name, "Display the lsit of physical disks", "info");
+	command_examples(name, "Display information on disk 1", "info disk=1");
+	command_examples(name, "Display information on disk 2 and volume 1", "info disk=2 volume=1");
 }
 
 void print_help_mbr(const char* name)
 {
-	std::cerr << "MBR command" << std::endl;
-	std::cerr << "-----------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " mbr [disk id]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Provides MBR information and partition table for selected disk." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: MBR for disk 0" << std::endl;
-	std::cerr << "    " << name << " mbr disk=0" << std::endl;
-	std::cerr << std::endl;
+	command_header("mbr");
+	command_description(name, "mbr [disk id]", "Provides MBR information and partition table for selected disk");
+	command_examples(name, "Display MBR for disk 0", "mbr disk=0");
 }
 
 void print_help_gpt(const char* name)
 {
-	std::cerr << "GPT command" << std::endl;
-	std::cerr << "-----------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " gpt [disk id]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Provides GPT information and partition table for selected disk." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: GPT for disk 0" << std::endl;
-	std::cerr << "    " << name << " gpt disk=0" << std::endl;
-	std::cerr << std::endl;
+	command_header("gpt");
+	command_description(name, "gpt [disk id]", "Provides GPT information and partition table for selected disk");
+	command_examples(name, "Display GPT for disk 0", "gpt disk=0");
 }
 
 void print_help_vbr(const char* name)
 {
-	std::cerr << "VBR command" << std::endl;
-	std::cerr << "-----------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " vbr [disk id] [volume id]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Provides VBR information and disassembly for selected disk and volume." << std::endl;
-	std::cerr << "    Support: FAT, NTFS, Bitlocker." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: vbr for disk 0 and volume 2" << std::endl;
-	std::cerr << "    " << name << " vbr disk=0 volume=2" << std::endl;
-	std::cerr << std::endl;
+	command_header("vbr");
+	command_description(name, "vbr [disk id] [volume id]", "Provides VBR information and disassembly for selected disk and volume");
+	command_examples(name, "Display VBR for disk 0 and volume 2", "vbr disk=0 volume=2");
 }
 
 void print_help_mft(const char* name)
 {
-	std::cerr << "MFT command" << std::endl;
-	std::cerr << "-----------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " mft [disk id] [volume id] (inode/from)" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Provides MFT file record information and detailed attributes for selected disk, volume and inode/path." << std::endl;
-	std::cerr << "    Default inode: 0 (MFT)." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: MFT file record for disk 0, volume 2" << std::endl;
-	std::cerr << "    " << name << " mft disk=0 volume=2" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: File record for disk 0, volume 2 and inode 5" << std::endl;
-	std::cerr << "    " << name << " mft disk=0 volume=2 inode=5" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: File record for disk 0, volume 2 and from \"c:\\file.bin\"" << std::endl;
-	std::cerr << "    " << name << " mft disk=0 volume=2 from=\"c:\\file.bin\"" << std::endl;
-	std::cerr << std::endl;
+	command_header("mft");
+	command_description(name, "mft [disk id] [volume id] (inode/from)", "Display MFT file record information and detailed attributes for selected disk, volume and inode/path");
+	command_examples(name, "Display MFT file record for disk 0, volume 2", "mft disk=0 volume=2");
+	command_examples(name, "Display MFT file record for disk 0, volume 2 and inode 5", "mft disk=0 volume=2 inode=5");
+	command_examples(name, "Display MFT File record for disk 0, volume 2 and file \"c:\\file.bin\"", "mft disk=0 volume=2 from=\"c:\\file.bin\"");
 }
 
 void print_help_btree(const char* name)
 {
-	std::cerr << "Btree command" << std::endl;
-	std::cerr << "-----------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " btree [disk id] [volume id] (inode/from)" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Display index B-tree nodes and detailed attributes for selected disk, volume and inode/path." << std::endl;
-	std::cerr << "    Default inode: 5 (Root)." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Index B-tree for disk 0, volume 2 and inode 5" << std::endl;
-	std::cerr << "    " << name << " btree disk=0 volume=2 inode=5" << std::endl;
-	std::cerr << "    Example: Index B-tree for disk 0, volume 2 and from \"c:\\file.bin\"" << std::endl;
-	std::cerr << "    " << name << " btree disk=0 volume=2 from \"c:\\file.bin\"" << std::endl;
-	std::cerr << std::endl;
+	command_header("btree");
+	command_description(name, "btree [disk id] [volume id] (inode/from)", "Display index B-tree nodes and detailed attributes for selected disk, volume and inode/path");
+	command_examples(name, "Display Index B-tree for disk 0, volume 2 and inode 5", "btree disk=0 volume=2 inode=5");
+	command_examples(name, "Display Index B-tree for disk 0, volume 2 and from \"c:\\file.bin\"", "btree disk=0 volume=2 from \"c:\\file.bin\"");
 }
 
 void print_help_bitlocker(const char* name)
 {
-	std::cerr << "Bitlocker command" << std::endl;
-	std::cerr << "-----------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " bitlocker [disk id] [volume id] (password | recovery | bek)" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Provides Bitlocker information for selected disk, volume." << std::endl;
-	std::cerr << "    It is also possible to test a password, recovery key or BEK file using the corresponding option." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Bitlocker information disk 2, volume 4" << std::endl;
-	std::cerr << "    " << name << " bitlocker disk=2 volume=4" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Test a password for encrypted disk 2 and volume 4" << std::endl;
-	std::cerr << "    " << name << " mft disk=0 volume=2 password=123456" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Test a recovery key for encrypted disk 2 and volume 4" << std::endl;
-	std::cerr << "    " << name << " mft disk=0 volume=2 recovery=123456-234567-345678-456789-567890-678901-789012-890123" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Test a BEK file for encrypted disk 2 and volume 4" << std::endl;
-	std::cerr << "    " << name << " mft disk=0 volume=2 bek=H:\\3926293F-E661-4417-A36B-B41175B4D862.BEK" << std::endl;
-	std::cerr << std::endl;
+	command_header("bitlocker");
+	command_description(name, "bitlocker [disk id] [volume id] (password | recovery | bek)", "Provides Bitlocker information for selected disk, volume");
+	command_examples(name, "Display Bitlocker information disk 2, volume 4", "bitlocker disk=2 volume=4");
+	command_examples(name, "Test a password for encrypted disk 2 and volume 4", "mft disk=0 volume=2 password=123456");
+	command_examples(name, "Test a recovery key for encrypted disk 2 and volume 4", "mft disk=0 volume=2 recovery=123456-234567-345678-456789-567890-678901-789012-890123");
+	command_examples(name, "Test a BEK file for encrypted disk 2 and volume 4", "mft disk=0 volume=2 bek=H:\\3926293F-E661-4417-A36B-B41175B4D862.BEK");
 }
 
 void print_help_bitdecrypt(const char* name)
 {
-	std::cerr << "Bitdecrypt command" << std::endl;
-	std::cerr << "------------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " bitdecrypt [disk id] [volume id] [fvek] [output]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Decrypt Bitlocker encrypted volume to a file using the Full Volume Encryption Key (FVEK)." << std::endl;
-	std::cerr << "    FVEK can be retrieved using the bitlocker command." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Decrypt disk 2, volume 4 to decrypted.img" << std::endl;
-	std::cerr << "    " << name << " bitdecrypt disk=2 volume=4 fvek=21DA18B8434D864D11654FE84AAB1BDDF135DFDE912EBCAD54A6D87CB8EF64AC output=decrypted.img" << std::endl;
-	std::cerr << std::endl;
+	command_header("bitdecrypt");
+	command_description(name, "bitdecrypt [disk id] [volume id] [fvek] [output]", "Decrypt Bitlocker encrypted volume to a file using the Full Volume Encryption Key (FVEK)");
+	command_examples(name, "Decrypt disk 2, volume 4 to decrypted.img", "bitdecrypt disk=2 volume=4 fvek=21DA18B8434D864D11654FE84AAB1BDDF135DFDE912EBCAD54A6D87CB8EF64AC output=decrypted.img");
 }
 
 void print_help_fve(const char* name)
 {
-	std::cerr << "FVE command" << std::endl;
-	std::cerr << "-----------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " bitdecrypt [disk id] [volume id] [fvek] [output]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Provides FVE metadata information for an Bitlocker encrypted volume." << std::endl;
-	std::cerr << "    Three copies of the FVE data are stored on the volume." << std::endl;
-	std::cerr << "    Option fve_block can be used to select the block (Default: 0)." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: FVE metadata for disk 0, volume 1" << std::endl;
-	std::cerr << "    " << name << " fve disk=0 volume=1" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: FVE metadata for disk 2, volume 4 and FVE block 2" << std::endl;
-	std::cerr << "    " << name << " fve disk=2 volume=4 fve_block=2" << std::endl;
-	std::cerr << std::endl;
+	command_header("fve");
+	command_description(name, "fve [disk id] [volume id] (block)", "Display FVE metadata information for an Bitlocker encrypted volume");
+	command_examples(name, "Display FVE metadata for disk 0, volume 1", "fve disk=0 volume=1");
+	command_examples(name, "Display FVE metadata for disk 2, volume 4 and FVE block 2", "fve disk=2 volume=4 fve_block=2");
 }
 
 void print_help_logfile(const char* name)
 {
-	std::cerr << "Logfile command" << std::endl;
-	std::cerr << "---------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " logfile [disk id] [volume id] [output] (format)" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Dump or parse the $LogFile of a NTFS volume." << std::endl;
-	std::cerr << "    Format: raw, csv, json. Default: raw." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Dump raw $LogFile for disk 1, volume 2 to log.dat" << std::endl;
-	std::cerr << "    " << name << " logfile disk=1 volume=2 output=log.dat" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Parse logfile for disk 2, volume 4 and output results in csv file" << std::endl;
-	std::cerr << "    " << name << " logfile disk=2 volume=4 output=log.csv format=csv" << std::endl;
-	std::cerr << std::endl;
+	command_header("logfile");
+	command_description(name, "logfile [disk id] [volume id] [output] (format)", "Dump or parse the $LogFile of a NTFS volume ");
+	command_examples(name, "Dump raw $LogFile for disk 1, volume 2 to log.dat", "logfile disk=1 volume=2 output=log.dat");
+	command_examples(name, "Parse logfile for disk 2, volume 4 and output results in csv file", "logfile disk=2 volume=4 output=log.csv format=csv");
 }
 
 void print_help_usn(const char* name)
 {
-	std::cerr << "USN command" << std::endl;
-	std::cerr << "-----------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " usn [disk id] [volume id] [output] (format)" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Dump or parse the $UsnJrnl of a NTFS volume." << std::endl;
-	std::cerr << "    Format: raw, csv, json. Default: raw." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Dump raw $UsnJrnl for disk 1, volume 2 to usn.dat" << std::endl;
-	std::cerr << "    " << name << " usn disk=1 volume=2 output=usn.dat" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Parse usn journal for disk 2, volume 4 and output results in json file" << std::endl;
-	std::cerr << "    " << name << " usn disk=2 volume=4 output=usn.json format=json" << std::endl;
-	std::cerr << std::endl;
+	command_header("usn");
+	command_description(name, "usn [disk id] [volume id] [output] (format)", "Dump or parse the $UsnJrnl of a NTFS volume (raw, csv, json)");
+	command_examples(name, "Dump raw $UsnJrnl for disk 1, volume 2 to usn.dat", "usn disk=1 volume=2 output=usn.dat");
+	command_examples(name, "Parse usn journal for disk 2, volume 4 and output results in json file", "usn disk=2 volume=4 output=usn.json format=json");
 }
 
 
 void print_help_efs_masterkey(const char* name)
 {
-	std::cerr << "EFS masterkey command" << std::endl;
-	std::cerr << "---------------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " efs.masterkey [disk id] [volume id] (inode/from) (sid) (password)" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    List, display and decrypt masterkeys and keys on a volume." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: List masterkeys for disk 1, volume 2" << std::endl;
-	std::cerr << "    " << name << " efs.masterkey disk=1 volume=2" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Display a masterkey for disk 1, volume 2 and inode 0x1337" << std::endl;
-	std::cerr << "    " << name << " efs.masterkey disk=1 volume=2 inode=0x1337" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Decrypt and display a masterkey using sid and password" << std::endl;
-	std::cerr << "    " << name << " efs.masterkey disk=1 volume=2 inode=0x1337 sid=\"S-1123...1001\" password=\"123456\"" << std::endl;
-	std::cerr << std::endl;
+	command_header("efs.masterkey");
+	command_description(name, "efs.masterkey [disk id] [volume id] (inode/from) (sid) (password)", "List, display and decrypt masterkeys on a volume");
+	command_examples(name, "List masterkeys for disk 1, volume 2", "efs.masterkey disk=1 volume=2");
+	command_examples(name, "Display a masterkey for disk 1, volume 2 and inode 0x1337", "efs.masterkey disk=1 volume=2 inode=0x1337");
+	command_examples(name, "Decrypt and display a masterkey using sid and password", "efs.masterkey disk=1 volume=2 inode=0x1337 sid=\"S-1123...1001\" password=\"123456\"");
 }
 
 
 void print_help_efs_backup(const char* name)
 {
-	std::cerr << "EFS backup command" << std::endl;
-	std::cerr << "---------------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " efs.backup [disk id] [volume id] [password]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Export EFS keys on a volume." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Export EFS keys for disk 1, volume 2 using password:123456" << std::endl;
-	std::cerr << "    " << name << " efs.backup disk=1 volume=2 password=123456" << std::endl;
-	std::cerr << std::endl;
+	command_header("efs.backup");
+	command_description(name, "efs.backup [disk id] [volume id] [password]", "Export EFS keys from a volume");
+	command_examples(name, "Export EFS keys for disk 1, volume 2 using password:123456", "efs.backup disk=1 volume=2 password=123456");
 }
 
 void print_help_efs_key(const char* name)
 {
-	std::cerr << "EFS key command" << std::endl;
-	std::cerr << "---------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " efs.key [disk id] [volume id] [inode|from] (masterkey) (output) (format)" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: List keys for disk 1, volume 2" << std::endl;
-	std::cerr << "    " << name << " efs.key disk=1 volume=2" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Display a key for disk 1, volume 2 and inode 0x1337" << std::endl;
-	std::cerr << "    " << name << " efs.key disk=1 volume=2 inode=0x1337" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Decrypt a key for inode 0x1337 with masterkey" << std::endl;
-	std::cerr << "    " << name << " efs.key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Export a key to mykey.pem (format in [pem])" << std::endl;
-	std::cerr << "    " << name << " efs.key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321 output=mykey format=pem" << std::endl;
-	std::cerr << std::endl;
+	command_header("efs.key");
+	command_description(name, "efs.key [disk id] [volume id] [inode|from] (masterkey) (output) (format)", "List, display and decrypt keys on a volume");
+	command_examples(name, "List keys for disk 1, volume 2", "efs.key disk=1 volume=2");
+	command_examples(name, "Display a key for disk 1, volume 2 and inode 0x1337", "efs.key disk=1 volume=2 inode=0x1337");
+	command_examples(name, "Decrypt a key for inode 0x1337 with masterkey", "efs.key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321");
+	command_examples(name, "Export a key to mykey.pem (format in [pem])", "efs.key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321 output=mykey format=pem");
 }
 
 void print_help_efs_certificate(const char* name)
 {
-	std::cerr << "EFS certificate command" << std::endl;
-	std::cerr << "-----------------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " efs.certificate [disk id] [volume id] [inode|from] (output) (format)" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: List certificates for disk 1, volume 2" << std::endl;
-	std::cerr << "    " << name << " efs.certificate disk=1 volume=2" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Display a certificate for disk 1, volume 2 and inode 0x1337" << std::endl;
-	std::cerr << "    " << name << " efs.certificate disk=1 volume=2 inode=0x1337" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Export a certificate to mycert.pem (format in [pem])" << std::endl;
-	std::cerr << "    " << name << " efs.certificate disk=1 volume=2 inode=0x1337 output=mycert format=pem" << std::endl;
-	std::cerr << std::endl;
+	command_header("efs.certificate");
+	command_description(name, "efs.certificate [disk id] [volume id] [inode|from] (output) (format)", "List and display certificate on a volume");
+	command_examples(name, "List certificates for disk 1, volume 2", "efs.certificate disk=1 volume=2");
+	command_examples(name, "Display a certificate for disk 1, volume 2 and inode 0x1337", "efs.certificate disk=1 volume=2 inode=0x1337");
+	command_examples(name, "Export a certificate to mycert.pem (format in [pem])", "efs.certificate disk=1 volume=2 inode=0x1337 output=mycert format=pem");
 }
 
 void print_help_extract(const char* name)
 {
-	std::cerr << "Extract command" << std::endl;
-	std::cerr << "---------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " extract [disk id] [volume id] [from] [output]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Extract a file specified by a path in from to output." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Extract a file" << std::endl;
-	std::cerr << "    " << name << " extract disk=0 volume=1 from=\"c:\\windows\\notepad.exe\" output = \"d:\\notepad.exe\"" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Extract SAM" << std::endl;
-	std::cerr << "    " << name << " extract disk=0 volume=1 --sam output = \"d:\\sam\"" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Extract SYSTEM file" << std::endl;
-	std::cerr << "    " << name << " extract disk=0 volume=1 --system output = \"d:\\system\"" << std::endl;
-	std::cerr << std::endl;
+	command_header("extract");
+	command_description(name, "extract [disk id] [volume id] [from] [output]", "Extract a file specified by a path in from to output");
+	command_examples(name, "Extract a file", "extract disk=0 volume=1 from=\"c:\\windows\\notepad.exe\" output = \"d:\\notepad.exe\"");
+	command_examples(name, "Extract SAM hive", "extract disk=0 volume=1 --sam output = \"d:\\sam\"");
+	command_examples(name, "Extract SYSTEM file", "extract disk=0 volume=1 --system output = \"d:\\system\"");
 }
 
 void print_help_streams(const char* name)
 {
-	std::cerr << "Streams command" << std::endl;
-	std::cerr << "---------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " streams [disk id] [volume id] [from/inode]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    List alternate data streams of a file from its path or inode." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: List ADS for c:\\random_file" << std::endl;
-	std::cerr << "    " << name << " streams disk=0 volume=1 from=\"c:\\random_file\"" << std::endl;
-	std::cerr << std::endl;
+	command_header("streams");
+	command_description(name, "streams [disk id] [volume id] [from/inode]", "List alternate data streams of a file from its path or inode");
+	command_examples(name, "Display the list ADS for c:\\random_file", "streams disk=0 volume=1 from=\"c:\\random_file\"");
 }
 
 void print_help_undelete(const char* name)
 {
-	std::cerr << "Undelete command" << std::endl;
-	std::cerr << "----------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " undelete [disk id] [volume id] ([inode] [output])" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    List deleted files for selected disk and volume." << std::endl;
-	std::cerr << "    Each entry is provided using a recoverable percent computed from overwritten sectors of the file" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: List deleted file for disk 0, volume 1" << std::endl;
-	std::cerr << "    " << name << " undelete disk=0 volume=1" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Extract deleted file with inode 41 for disk 2, volume 3 to restored.dat" << std::endl;
-	std::cerr << "    " << name << " undelete disk=2 volume=3 inode=41 output=restored.dat" << std::endl;
-	std::cerr << std::endl;
+	command_header("undelete");
+	command_description(name, "undelete [disk id] [volume id] ([inode] [output])", "List deleted files for selected disk and volume");
+	command_examples(name, "Display the list deleted file for disk 0, volume 1", "undelete disk=0 volume=1");
+	command_examples(name, "Extract deleted file with inode 41 for disk 2, volume 3 to restored.dat", "undelete disk=2 volume=3 inode=41 output=restored.dat");
 }
 
 void print_help_shell(const char* name)
 {
-	std::cerr << "Shell command" << std::endl;
-	std::cerr << "-------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " shell [disk id] [volume id]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Start a mini-shell for selected disk and volume." << std::endl;
-	std::cerr << "    Command: ls, cat, cd, stat" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Start a shell for disk 1, volume 1" << std::endl;
-	std::cerr << "    " << name << " shell disk=1 volume=1" << std::endl;
-	std::cerr << std::endl;
+	command_header("shell");
+	command_description(name, "shell [disk id] [volume id]", "Start a mini-shell for selected disk and volume");
+	command_examples(name, "Start a shell for disk 1, volume 1", "shell disk=1 volume=1");
 }
 
 void print_help_shadow(const char* name)
 {
-	std::cerr << "Shadow command" << std::endl;
-	std::cerr << "---------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " shadow [disk id] [volume id]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    List volume shadow copies from selected disk and volume." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Display volume shadow copies for disk 1, volume 2" << std::endl;
-	std::cerr << "    " << name << " shadow disk=1 volume=2" << std::endl;
-	std::cerr << std::endl;
+	command_header("shadow");
+	command_description(name, "shadow [disk id] [volume id]", "List volume shadow copies from selected disk and volume");
+	command_examples(name, "Display volume shadow copies for disk 1, volume 2", "shadow disk=1 volume=2");
 }
 
 void print_help_reparse(const char* name)
 {
-	std::cerr << "Reparse command" << std::endl;
-	std::cerr << "---------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " reparse [disk id] [volume id]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Parse reparse points from \\$Extend\\$Reparse for selected disk and volume." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Display reparse points for disk 1, volume 1" << std::endl;
-	std::cerr << "    " << name << " reparse disk=1 volume=1" << std::endl;
-	std::cerr << std::endl;
+	command_header("reparse");
+	command_description(name, "reparse [disk id] [volume id]", "Parse reparse points from \\$Extend\\$Reparse for selected disk and volume");
+	command_examples(name, "Display reparse points for disk 1, volume 1", "reparse disk=1 volume=1");
 }
 
 void print_help_image(const char* name)
 {
-	std::cerr << "Image command" << std::endl;
-	std::cerr << "---------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " image [disk id] [volume id] [output]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Create an image file of a disk or volume." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Create an image of physical drive 2 to z:\\backup.img" << std::endl;
-	std::cerr << "    " << name << " image disk=2 output=z:\\backup.img" << std::endl;
-	std::cerr << std::endl;
+	command_header("image");
+	command_description(name, "image [disk id] [volume id] [output]", "Create an image file of a disk or volume");
+	command_examples(name, "Create an image of physical drive 2 to z:\\backup.img", "image disk=2 output=z:\\backup.img");
 }
 
 void print_help_smart(const char* name)
 {
-	std::cerr << "SMART command" << std::endl;
-	std::cerr << "---------------" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    " << name << " smart [disk id]" << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Description:" << std::endl;
-	std::cerr << "    Retrieve S.M.A.R.T data for the specified disk." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "    Example: Display S.M.A.R.T data from physical drive 2" << std::endl;
-	std::cerr << "    " << name << " smart disk=2" << std::endl;
-	std::cerr << std::endl;
+	command_header("smart");
+	command_description(name, "smart [disk id]", "Retrieve SMART data for the specified disk");
+	command_examples(name, "Display SMART data from physical drive 2", "smart disk=2");
 }
 
 namespace commands

@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <cstring>
 
+bool equals(char* arg, const char* name) { return strncmp(arg, name, strlen(name)) == 0; }
+
 bool is_option(char* arg, const char* name) { return (strncmp(arg, name, strlen(name)) == 0) && (arg[strlen(name)] == '='); }
 
 bool is_number(const std::string& s)
@@ -62,12 +64,18 @@ void read_option_hexbuffer(char* arg, std::shared_ptr<Buffer<PBYTE>>* s)
 	*s = Buffer<PBYTE>::from_hex(hexbuf);
 }
 
+bool is_help(char* opt)
+{
+	return (equals(opt, "-h") || equals(opt, "--help") || equals(opt, "/?"));
+}
+
 std::shared_ptr<Options> parse_options(int argc, char** argv) {
 	std::shared_ptr<Options> ret = std::make_shared<Options>();
 
 	if (argc > 1)
 	{
-		ret->command = std::string(argv[1]);
+		if (is_help(argv[1])) ret->show_usage = true;
+		else ret->command = std::string(argv[1]);
 	}
 
 	for (int i = 2; i < argc; i++)
@@ -88,6 +96,7 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 		if (is_option(argv[i], "format")) { read_option_string(argv[i], ret->format); continue; }
 		if (!strncmp(argv[i], "--sam", 5)) { ret->sam = true; continue; }
 		if (!strncmp(argv[i], "--system", 8)) { ret->system = true; continue; }
+		if (is_help(argv[i])) { ret->show_usage = true; continue; }
 		if (ret->subcommand == "") { ret->subcommand = std::string(argv[i]); continue; }
 
 		std::cerr << std::endl << "[!] Invalid option: " << argv[i] << std::endl;
