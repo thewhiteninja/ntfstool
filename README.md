@@ -174,26 +174,40 @@ Current third-party libs:
 
 ### MBR
 <table>
-<tr><td>mbr disk=3</td></tr>
+<tr><td>mbr disk=2</td></tr>
 <tr><td>
 
-    Disk signature  : 9825a009
+    MBR from \\.\PhysicalDrive2
+    ---------------------------
+    
+    Disk signature  : e4589462
     Reserved bytes  : 0000
-
+    
     Partition table :
-    +--------------------------------------------------------------------------+
-    | Id | Boot | Type         | First sector | Last sector | Offset | Size    |
-    +--------------------------------------------------------------------------+
-    | 1  | No   | NTFS / exFAT | 0 2 0        | 254 63 64   | 1      | 1048575 |
-    +--------------------------------------------------------------------------+
-
+    +---------------------------------------------------------------------------------------------------+
+    | Id | Boot | Flags     | Filesystem   | First sector | Last sector | Offset | Sectors  | Size      |
+    +---------------------------------------------------------------------------------------------------+
+    | 1  | No   | Principal | NTFS / exFAT | 0 2 3        | 255 254 255 | 128    | 16771072 | 8.00 GiBs |
+    +---------------------------------------------------------------------------------------------------+
+    
     MBR signature  : 55aa
-
+    
     Strings:
-        No strings found
-
+        [63] : Invalid partition table
+        [7b] : Error loading operating system
+        [9a] : Missing operating system
+    
     Disassemble Bootstrap Code [y/N] ? y
-        Empty code
+    
+        0000 : 33c0           : xor ax, ax
+        0002 : 8ed0           : mov ss, ax
+        0004 : bc007c         : mov sp, 0x7c00
+        0007 : 8ec0           : mov es, ax
+        0009 : 8ed8           : mov ds, ax
+        000b : be007c         : mov si, 0x7c00
+        000e : bf0006         : mov di, 0x600
+        0011 : b90002         : mov cx, 0x200
+	... 
 </td></tr>
 </table>
 
