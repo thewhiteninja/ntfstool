@@ -24,10 +24,10 @@ public:
 
 	std::shared_ptr<Buffer<PBYTE>> masterkey = nullptr;
 
-	unsigned long inode = 0;
-	unsigned long fve_block = 0;
-	unsigned long disk = 0xffffffff;
-	unsigned long volume = 0xffffffff;
+	int64_t inode = -1;
+	int32_t fve_block = -1;
+	int32_t disk = -1;
+	int32_t volume = -1;
 
 	bool show_usage = false;
 	bool sam = false;
@@ -39,3 +39,8 @@ public:
 std::shared_ptr<Options> parse_options(int argc, char** argv);
 
 std::shared_ptr<Disk> get_disk(std::shared_ptr<Options> opts);
+
+
+void invalid_option(std::shared_ptr<Options> opts, std::string name, int64_t invalid_value, std::string error_msg = "");
+
+void invalid_option(std::shared_ptr<Options> opts, std::string name, std::string invalid_value, std::string error_msg = "");

@@ -330,6 +330,14 @@ namespace commands
 				{
 					print_bootsector(disk, volume);
 				}
+				else
+				{
+					invalid_option(opts, "volume", opts->volume);
+				}
+			}
+			else
+			{
+				invalid_option(opts, "disk", opts->disk);
 			}
 
 			std::cout.flags(flag_backup);

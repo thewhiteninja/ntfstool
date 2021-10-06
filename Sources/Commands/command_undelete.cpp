@@ -156,7 +156,6 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 						}
 					}
 				}
-
 				if (pattr != nullptr)
 				{
 					PMFT_RECORD_ATTRIBUTE_FILENAME psubattr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_FILENAME, pattr, pattr->Form.Resident.ValueOffset);
@@ -164,6 +163,7 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 					name.resize(psubattr->NameLength);
 					parent = psubattr->ParentDirectory.FileRecordNumber;
 				}
+
 				pattr = f->attribute_header($STANDARD_INFORMATION);
 				if (pattr != nullptr)
 				{
@@ -308,7 +308,7 @@ namespace commands
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					if (opts->inode != 0 && !opts->output.empty())
+					if (opts->inode >= 0 && !opts->output.empty())
 					{
 						extract_deleted_file(disk, volume, opts);
 					}
@@ -317,7 +317,16 @@ namespace commands
 						print_deleted_files(disk, volume, opts);
 					}
 				}
+				else
+				{
+					invalid_option(opts, "volume", opts->volume);
+				}
 			}
+			else
+			{
+				invalid_option(opts, "disk", opts->disk);
+			}
+
 			std::cout.flags(flag_backup);
 			return 0;
 		}

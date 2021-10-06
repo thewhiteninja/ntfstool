@@ -24,7 +24,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	}
 
 	std::cout << std::setfill('0');
-	utils::ui::title("USN Journal from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("USN Journals from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	DWORD cluster_size = ((PBOOT_SECTOR_NTFS)vol->bootsector())->bytePerSector * ((PBOOT_SECTOR_NTFS)vol->bootsector())->sectorPerCluster;
 
@@ -239,14 +239,23 @@ namespace commands
 				{
 					if (opts->output != "")
 					{
+						if (opts->format == "") opts->format = "raw";
+
 						print_usn_journal(disk, volume, opts->format, opts->output);
 					}
 					else
 					{
-						std::cerr << "[!] Invalid or missing output file";
-						return 1;
+						invalid_option(opts, "output", opts->output);
 					}
 				}
+				else
+				{
+					invalid_option(opts, "volume", opts->volume);
+				}
+			}
+			else
+			{
+				invalid_option(opts, "disk", opts->disk);
 			}
 
 			std::cout.flags(flag_backup);

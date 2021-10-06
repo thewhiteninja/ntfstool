@@ -133,8 +133,10 @@ int decrypt_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 	return 0;
 }
 
-namespace commands {
-	namespace bitdecrypt {
+namespace commands
+{
+	namespace bitdecrypt
+	{
 		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
@@ -147,16 +149,22 @@ namespace commands {
 				{
 					if (opts->output == "")
 					{
-						std::cerr << "[!] Invalid or missing output option" << std::endl;
-						return 1;
+						invalid_option(opts, "output", opts->output);
 					}
 					if (opts->fvek == "")
 					{
-						std::cerr << "[!] Invalid or missing fvek option" << std::endl;
-						return 1;
+						invalid_option(opts, "fvek", opts->fvek);
 					}
 					decrypt_volume(disk, volume, opts);
 				}
+				else
+				{
+					invalid_option(opts, "volume", opts->volume);
+				}
+			}
+			else
+			{
+				invalid_option(opts, "disk", opts->disk);
 			}
 
 			std::cout.flags(flag_backup);

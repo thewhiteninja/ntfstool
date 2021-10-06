@@ -10,6 +10,12 @@
 #include <memory>
 
 namespace commands {
+
+	namespace helpers
+	{
+		std::shared_ptr<MFTRecord> find_record(std::shared_ptr<NTFSExplorer> ex, std::shared_ptr<Options> opts);
+	}
+
 	namespace info
 	{
 		int dispatch(std::shared_ptr<Options> opts);
@@ -88,14 +94,17 @@ namespace commands {
 		int dispatch(std::shared_ptr<Options> opts);
 	}
 
-	namespace btree
-	{
-		int dispatch(std::shared_ptr<Options> opts);
-	}
-
 	namespace mft
 	{
-		int dispatch(std::shared_ptr<Options> opts);
+		namespace record
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
+
+		namespace btree
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
 
 		std::vector<std::string> print_attribute_index_root(PMFT_RECORD_ATTRIBUTE_INDEX_ROOT pAttribute, std::vector<std::shared_ptr<IndexEntry>> entries);
 

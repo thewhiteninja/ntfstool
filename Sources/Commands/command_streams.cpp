@@ -30,31 +30,9 @@ int list_streams(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+	std::shared_ptr<MFTRecord> record = commands::helpers::find_record(explorer, opts);
 
-	std::shared_ptr<MFTRecord> record = nullptr;
-
-	auto [filepath, stream_name] = utils::files::split_file_and_stream(opts->from);
-
-	if (opts->from != "")
-	{
-		std::cout << "[-] Source      : " << filepath << (stream_name == "" ? "" : ":" + stream_name) << std::endl;
-		record = explorer->mft()->record_from_path(filepath);
-	}
-	else
-	{
-		std::cout << "[-] Source      : Inode(" << opts->inode << ")" << std::endl;
-		record = explorer->mft()->record_from_number(opts->inode);
-	}
-
-	if (record == nullptr)
-	{
-		std::cout << "[!] Invalid or non-existent path" << std::endl;
-		return 2;
-	}
-	else
-	{
-		std::cout << "[-] Record Num  : " << record->header()->MFTRecordIndex << " (" << utils::format::hex(record->header()->MFTRecordIndex, true) << ")" << std::endl;
-	}
+	std::cout << "[-] Record Num  : " << record->header()->MFTRecordIndex << " (" << utils::format::hex(record->header()->MFTRecordIndex, true) << ")" << std::endl;
 
 	std::vector<std::string> ads_names = record->alternate_data_names();
 
@@ -100,14 +78,18 @@ namespace commands {
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					if (opts->from == "" && opts->inode == 0)
-					{
-						std::cerr << "[!] Invalid or missing from file/inode";
-						return 1;
-					}
 					list_streams(disk, volume, opts);
 				}
+				else
+				{
+					invalid_option(opts, "volume", opts->volume);
+				}
 			}
+			else
+			{
+				invalid_option(opts, "disk", opts->disk);
+			}
+
 			std::cout.flags(flag_backup);
 			return 0;
 		}

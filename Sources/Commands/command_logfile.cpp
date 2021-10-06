@@ -125,24 +125,22 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 		return 1;
 	}
 
-	utils::ui::title("$LogFile from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("LogFile from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
 	std::cout << "[+] Reading $LogFile record" << std::endl;
-
 	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_number(LOG_FILE_NUMBER);
 
 	ULONG64 total_size = record->datasize();
-
 	std::cout << "[+] $LogFile size : " << utils::format::size(total_size) << std::endl;
 
 	HANDLE houtput = CreateFileA(output.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (houtput == INVALID_HANDLE_VALUE)
 	{
-		std::cout << "[!] Error creating output file" << std::endl;
+		std::cout << "[!] Failed to create output file" << std::endl;
 		return 1;
 	}
 
@@ -319,14 +317,23 @@ namespace commands {
 				{
 					if (opts->output != "")
 					{
+						if (opts->format == "") opts->format = "raw";
+
 						print_logfile_records(disk, volume, opts->format, opts->output);
 					}
 					else
 					{
-						std::cerr << "[!] Invalid or missing output file";
-						return 1;
+						invalid_option(opts, "output", opts->output);
 					}
 				}
+				else
+				{
+					invalid_option(opts, "volume", opts->volume);
+				}
+			}
+			else
+			{
+				invalid_option(opts, "disk", opts->disk);
 			}
 
 			std::cout.flags(flag_backup);

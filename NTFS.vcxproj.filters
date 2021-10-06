@@ -326,6 +326,9 @@
     <ClCompile Include="Sources\EFS\pkcs12_backup.h">
       <Filter>Header Files\EFS</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Commands\commands.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">

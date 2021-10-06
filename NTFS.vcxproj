@@ -62,6 +62,7 @@
     <ClCompile Include="Sources\Bitlocker\decryption.cpp" />
     <ClCompile Include="Sources\Bitlocker\password.cpp" />
     <ClCompile Include="Sources\Bitlocker\recovery.cpp" />
+    <ClCompile Include="Sources\Commands\commands.cpp" />
     <ClCompile Include="Sources\Commands\command_bitdecrypt.cpp" />
     <ClCompile Include="Sources\Commands\command_bitlocker.cpp" />
     <ClCompile Include="Sources\Commands\command_btree.cpp" />

@@ -753,18 +753,7 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
-	std::shared_ptr<MFTRecord> record = nullptr;
-
-	auto [filepath, stream_name] = utils::files::split_file_and_stream(opts->from);
-
-	if (opts->from != "")
-	{
-		record = explorer->mft()->record_from_path(filepath);
-	}
-	else
-	{
-		record = explorer->mft()->record_from_number(opts->inode);
-	}
+	std::shared_ptr<MFTRecord> record = commands::helpers::find_record(explorer, opts);
 
 	utils::ui::title("MFT (inode:" + std::to_string(record->header()->MFTRecordIndex) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
@@ -777,21 +766,33 @@ namespace commands
 {
 	namespace mft
 	{
-		int dispatch(std::shared_ptr<Options> opts)
+		namespace record
 		{
-			std::ios_base::fmtflags flag_backup(std::cout.flags());
-
-			std::shared_ptr<Disk> disk = get_disk(opts);
-			if (disk != nullptr)
+			int dispatch(std::shared_ptr<Options> opts)
 			{
-				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
-				if (volume != nullptr)
+				std::ios_base::fmtflags flag_backup(std::cout.flags());
+
+				std::shared_ptr<Disk> disk = get_disk(opts);
+				if (disk != nullptr)
 				{
-					print_mft_info(disk, volume, opts);
+					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+					if (volume != nullptr)
+					{
+						print_mft_info(disk, volume, opts);
+					}
+					else
+					{
+						invalid_option(opts, "volume", opts->volume);
+					}
 				}
+				else
+				{
+					invalid_option(opts, "disk", opts->disk);
+				}
+
+				std::cout.flags(flag_backup);
+				return 0;
 			}
-			std::cout.flags(flag_backup);
-			return 0;
 		}
 	}
 }

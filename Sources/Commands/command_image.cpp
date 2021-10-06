@@ -106,7 +106,7 @@ int create_image(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const 
 		}
 		else
 		{
-			std::cerr << "[!] Create output file failed" << std::endl;
+			std::cerr << "[!] Creating output file failed" << std::endl;
 			return 1;
 		}
 
@@ -129,25 +129,22 @@ namespace commands
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 
-			std::shared_ptr<Disk> disk = nullptr;
-			if (opts->disk != 0xffffffff && (disk = get_disk(opts)) != nullptr)
+			std::shared_ptr<Disk> disk = get_disk(opts);
+			if (disk != nullptr)
 			{
-				std::shared_ptr<Volume> volume = nullptr;
-				if (opts->volume != 0xffffffff)
+				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+				if (opts->output != "")
 				{
-					volume = disk->volumes(opts->volume);
-					if (volume == nullptr)
-					{
-						std::cerr << "[!] Invalid volume option" << std::endl;
-						return 1;
-					}
+					create_image(disk, volume, opts->format, opts->output);
 				}
-				create_image(disk, volume, opts->format, opts->output);
+				else
+				{
+					invalid_option(opts, "output", opts->output);
+				}
 			}
 			else
 			{
-				std::cerr << "[!] Invalid or missing disk option" << std::endl;
-				return 1;
+				invalid_option(opts, "disk", opts->disk);
 			}
 
 			std::cout.flags(flag_backup);

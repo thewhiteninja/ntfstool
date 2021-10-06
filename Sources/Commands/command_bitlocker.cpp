@@ -539,12 +539,15 @@ int test_password(std::shared_ptr<Options> opts)
 			if (opts->password != "") print_test_bitlocker_password(disk, volume, opts);
 			else if (opts->recovery != "") print_test_bitlocker_recovery(disk, volume, opts);
 			else if (opts->bek != "") print_test_bitlocker_bek(disk, volume, opts);
-			else
-			{
-				std::cerr << "[!] Invalid or missing auth method (password, recovery or bek file)";
-				return 1;
-			}
 		}
+		else
+		{
+			invalid_option(opts, "volume", opts->volume);
+		}
+	}
+	else
+	{
+		invalid_option(opts, "disk", opts->disk);
 	}
 
 	std::cout.flags(flag_backup);
@@ -562,6 +565,10 @@ int print_bitlocker(std::shared_ptr<Options> opts)
 		if (volume != nullptr)
 		{
 			print_bitlocker_info(disk, volume);
+		}
+		else
+		{
+			invalid_option(opts, "volume", opts->volume);
 		}
 	}
 	else

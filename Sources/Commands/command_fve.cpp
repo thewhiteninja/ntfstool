@@ -255,13 +255,23 @@ namespace commands {
 				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 				if (volume != nullptr)
 				{
-					if ((opts->fve_block >= 0) && (opts->fve_block < 3)) print_bitlocker_vbr(disk, volume, opts->fve_block);
+					if ((opts->fve_block >= 0) && (opts->fve_block < 3))
+					{
+						print_bitlocker_vbr(disk, volume, opts->fve_block);
+					}
 					else
 					{
-						std::cerr << "[!] Invalid FVE block index [0-2]";
-						return 1;
+						invalid_option(opts, "fve_block", opts->fve_block);
 					}
 				}
+				else
+				{
+					invalid_option(opts, "volume", opts->volume);
+				}
+			}
+			else
+			{
+				invalid_option(opts, "disk", opts->disk);
 			}
 
 			std::cout.flags(flag_backup);

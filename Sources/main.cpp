@@ -12,11 +12,10 @@ int main(int argc, char** argv) {
 	install_crash_handler();
 
 	SetConsoleOutputCP(CP_UTF8);
-	std::cout << std::endl;
 
 	if (!utils::processes::elevated(GetCurrentProcess()))
 	{
-		std::cerr << "Administrator rights are required to read physical drives." << std::endl;
+		std::cerr << "Administrator rights are required to read physical drives" << std::endl;
 		return 1;
 	}
 
@@ -38,8 +37,8 @@ int main(int argc, char** argv) {
 			else if (opts->command == "vbr")				commands::vbr::dispatch(opts);
 			else if (opts->command == "image")				commands::image::dispatch(opts);
 			else if (opts->command == "undelete")			commands::undelete::dispatch(opts);
-			else if (opts->command == "mft")				commands::mft::dispatch(opts);
-			else if (opts->command == "btree")				commands::btree::dispatch(opts);
+			else if (opts->command == "mft.record")			commands::mft::record::dispatch(opts);
+			else if (opts->command == "mft.btree")			commands::mft::btree::dispatch(opts);
 			else if (opts->command == "shadow")				commands::shadow::dispatch(opts);
 			else if (opts->command == "logfile") 			commands::logfile::dispatch(opts);
 			else if (opts->command == "reparse") 			commands::reparse::dispatch(opts);
