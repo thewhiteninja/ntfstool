@@ -249,167 +249,148 @@ int show_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
-	std::shared_ptr<MFTRecord> key_file_record = nullptr;
+	std::shared_ptr<MFTRecord> key_file_record = commands::helpers::find_record(explorer, opts);
+	auto data = key_file_record->data();
 
-	std::cout << "[+] Reading key file record: ";
-	if (opts->from != "")
+	std::shared_ptr<KeyFile> key_file = std::make_shared<KeyFile>(data->data(), data->size());
+	if (!key_file->is_loaded())
 	{
-		std::cout << opts->from << std::endl;
-		key_file_record = explorer->mft()->record_from_path(opts->from);
-	}
-	else
-	{
-		std::cout << opts->inode << std::endl;
-		key_file_record = explorer->mft()->record_from_number(opts->inode);
+		std::cerr << "[!] Err: Failed to parse key file from record: " << opts->inode << std::endl;
+		return 3;
 	}
 
-	if (key_file_record == nullptr)
+	std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
+	tab->set_margin_left(4);
+	tab->set_interline(true);
+	tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
+	tab->add_header_line("Property");
+	tab->add_header_line("Value");
+
+	std::string date;
+	PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = key_file_record->attribute_header($STANDARD_INFORMATION);
+	if (stdinfo_att)
 	{
-		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
-		return 2;
+		PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION, stdinfo_att, stdinfo_att->Form.Resident.ValueOffset);
+		SYSTEMTIME st = { 0 };
+		utils::times::ull_to_local_systemtime(stdinfo->CreateTime, &st);
+		date = utils::times::display_systemtime(st);
 	}
-	else
-	{
-		auto data = key_file_record->data();
-		std::shared_ptr<KeyFile> key_file = std::make_shared<KeyFile>(data->data(), data->size());
-		if (!key_file->is_loaded())
+
+	int i = 0;
+	tab->add_item_line(std::to_string(i++));
+	tab->add_item_line("File");
+	tab->add_item_multiline(
 		{
-			std::cerr << "[!] Err: Failed to parse key file from record: " << opts->inode << std::endl;
-			return 3;
+			"Creation : " + date,
+			"Size     : " + utils::format::size(data->size())
 		}
+	);
 
-		std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
-		tab->set_margin_left(4);
-		tab->set_interline(true);
-		tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
-		tab->add_header_line("Property");
-		tab->add_header_line("Value");
+	tab->new_line();
 
-		std::string date;
-		PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = key_file_record->attribute_header($STANDARD_INFORMATION);
-		if (stdinfo_att)
-		{
-			PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION, stdinfo_att, stdinfo_att->Form.Resident.ValueOffset);
-			SYSTEMTIME st = { 0 };
-			utils::times::ull_to_local_systemtime(stdinfo->CreateTime, &st);
-			date = utils::times::display_systemtime(st);
-		}
+	tab->add_item_line(std::to_string(i++));
+	tab->add_item_line("Version");
+	tab->add_item_line(std::to_string(key_file->version()));
 
-		int i = 0;
+	tab->new_line();
+
+	tab->add_item_line(std::to_string(i++));
+	tab->add_item_line("Name");
+	tab->add_item_line(key_file->name());
+
+	tab->new_line();
+
+	tab->add_item_line(std::to_string(i++));
+	tab->add_item_line("Flags");
+	tab->add_item_line(utils::format::hex(key_file->flags(), true));
+
+	tab->new_line();
+
+	auto sign_public_key = key_file->sign_public_key();
+	if (sign_public_key)
+	{
 		tab->add_item_line(std::to_string(i++));
-		tab->add_item_line("File");
-		tab->add_item_multiline(
-			{
-				"Creation : " + date,
-				"Size     : " + utils::format::size(data->size())
+		tab->add_item_line("PublicKey Signature");
+		tab->add_item_line(utils::convert::to_hex(sign_public_key->data(), sign_public_key->size()));
+		tab->new_line();
+	}
+
+	auto sign_private_key = key_file->sign_private_key();
+	if (sign_private_key)
+	{
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("PrivateKey Signature");
+		tab->add_item_line(utils::convert::to_hex(sign_private_key->data(), sign_private_key->size()));
+		tab->new_line();
+	}
+
+	auto public_key = key_file->public_key();
+	if (public_key)
+	{
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("PublicKey");
+
+		auto magic = public_key->header()->Magic;
+		std::vector<std::string> cell =
+		{
+				"Magic       : " + utils::format::hex(magic, true) + " (" + ((char*)&magic)[0] + ((char*)&magic)[1] + ((char*)&magic)[2] + ((char*)&magic)[3] + ")",
+				"Size        : " + std::to_string(public_key->header()->Bitsize),
+				"Exponent    : " + std::to_string(public_key->header()->Exponent),
+		};
+		auto permissions_str = constants::efs::permissions(public_key->header()->Permissions);
+		for (int pi = 0; pi < permissions_str.size(); pi++)
+		{
+			if (pi == 0) {
+				cell.push_back("");
+				cell.push_back("Permissions : " + permissions_str[pi]);
 			}
-		);
-
-		tab->new_line();
-
-		tab->add_item_line(std::to_string(i++));
-		tab->add_item_line("Version");
-		tab->add_item_line(std::to_string(key_file->version()));
-
-		tab->new_line();
-
-		tab->add_item_line(std::to_string(i++));
-		tab->add_item_line("Name");
-		tab->add_item_line(key_file->name());
-
-		tab->new_line();
-
-		tab->add_item_line(std::to_string(i++));
-		tab->add_item_line("Flags");
-		tab->add_item_line(utils::format::hex(key_file->flags(), true));
-
-		tab->new_line();
-
-		auto sign_public_key = key_file->sign_public_key();
-		if (sign_public_key)
-		{
-			tab->add_item_line(std::to_string(i++));
-			tab->add_item_line("PublicKey Signature");
-			tab->add_item_line(utils::convert::to_hex(sign_public_key->data(), sign_public_key->size()));
-			tab->new_line();
-		}
-
-		auto sign_private_key = key_file->sign_private_key();
-		if (sign_private_key)
-		{
-			tab->add_item_line(std::to_string(i++));
-			tab->add_item_line("PrivateKey Signature");
-			tab->add_item_line(utils::convert::to_hex(sign_private_key->data(), sign_private_key->size()));
-			tab->new_line();
-		}
-
-		auto public_key = key_file->public_key();
-		if (public_key)
-		{
-			tab->add_item_line(std::to_string(i++));
-			tab->add_item_line("PublicKey");
-
-			auto magic = public_key->header()->Magic;
-			std::vector<std::string> cell =
+			else
 			{
-					"Magic       : " + utils::format::hex(magic, true) + " (" + ((char*)&magic)[0] + ((char*)&magic)[1] + ((char*)&magic)[2] + ((char*)&magic)[3] + ")",
-					"Size        : " + std::to_string(public_key->header()->Bitsize),
-					"Exponent    : " + std::to_string(public_key->header()->Exponent),
-			};
-			auto permissions_str = constants::efs::permissions(public_key->header()->Permissions);
-			for (int pi = 0; pi < permissions_str.size(); pi++)
-			{
-				if (pi == 0) {
-					cell.push_back("");
-					cell.push_back("Permissions : " + permissions_str[pi]);
-				}
-				else
-				{
-					cell.push_back("              " + permissions_str[pi]);
-				}
+				cell.push_back("              " + permissions_str[pi]);
 			}
-			cell.push_back("");
-			cell.push_back("Modulus     : " + utils::convert::to_hex(public_key->modulus()->data(), public_key->modulus()->size()));
-			tab->add_item_multiline(cell);
-			tab->new_line();
 		}
-
-		auto private_key = key_file->private_key();
-		if (private_key)
-		{
-			tab->add_item_line(std::to_string(i++));
-			tab->add_item_line("Encrypted PrivateKey");
-
-			auto cell = print_encrypted_private_key(private_key);
-			tab->add_item_multiline(cell);
-
-			tab->new_line();
-		}
-
-		auto hash = key_file->hash();
-		if (hash)
-		{
-			tab->add_item_line(std::to_string(i++));
-			tab->add_item_line("Hash");
-			tab->add_item_line(utils::convert::to_hex(hash->data(), hash->size()));
-			tab->new_line();
-		}
-
-		auto export_flag = key_file->export_flag();
-		if (export_flag)
-		{
-			tab->add_item_line(std::to_string(i++));
-			tab->add_item_line("ExportFlag");
-
-			auto cell = print_encrypted_private_key(export_flag);
-			tab->add_item_multiline(cell);
-
-			tab->new_line();
-		}
-
-		std::cout << "[+] Key" << std::endl;
-		tab->render(std::cout);
+		cell.push_back("");
+		cell.push_back("Modulus     : " + utils::convert::to_hex(public_key->modulus()->data(), public_key->modulus()->size()));
+		tab->add_item_multiline(cell);
+		tab->new_line();
 	}
+
+	auto private_key = key_file->private_key();
+	if (private_key)
+	{
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("Encrypted PrivateKey");
+
+		auto cell = print_encrypted_private_key(private_key);
+		tab->add_item_multiline(cell);
+
+		tab->new_line();
+	}
+
+	auto hash = key_file->hash();
+	if (hash)
+	{
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("Hash");
+		tab->add_item_line(utils::convert::to_hex(hash->data(), hash->size()));
+		tab->new_line();
+	}
+
+	auto export_flag = key_file->export_flag();
+	if (export_flag)
+	{
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("ExportFlag");
+
+		auto cell = print_encrypted_private_key(export_flag);
+		tab->add_item_multiline(cell);
+
+		tab->new_line();
+	}
+
+	std::cout << "[+] Key" << std::endl;
+	tab->render(std::cout);
+
 	return 0;
 }
 
@@ -531,7 +512,7 @@ namespace commands
 					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 					if (volume != nullptr)
 					{
-						if (opts->inode != 0 || opts->from != "")
+						if (opts->inode >= 0 || opts->from != "")
 						{
 							if (opts->masterkey != nullptr)
 							{
@@ -549,16 +530,12 @@ namespace commands
 					}
 					else
 					{
-						std::cerr << "[!] Invalid or missing volume option" << std::endl;
-						opts->subcommand = "efs.key";
-						commands::help::dispatch(opts);
+						invalid_option(opts, "volume", opts->volume);
 					}
 				}
 				else
 				{
-					std::cerr << "[!] Invalid or missing disk option" << std::endl;
-					opts->subcommand = "efs.key";
-					commands::help::dispatch(opts);
+					invalid_option(opts, "disk", opts->disk);
 				}
 
 				std::cout.flags(flag_backup);

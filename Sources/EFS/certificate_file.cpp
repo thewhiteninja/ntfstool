@@ -10,9 +10,19 @@ CertificateFile::CertificateFile(PBYTE data, DWORD size)
 	DER_ELEMENT e;
 	unsigned int pos = 0;
 
+	if (size > 2048)
+	{
+		return;
+	}
+
 	while (pos < size - 12)
 	{
 		memcpy_s(&e, 12, data + pos, 12);
+		if (e.Size != 1)
+		{
+			_fields.clear();
+			break;
+		}
 		_fields.insert(std::pair(e.Type, std::make_shared<Buffer<PBYTE>>(data + pos + 12, e.Size * e.Count)));
 		pos += 12 + e.Size * e.Count;
 	}

@@ -21,8 +21,8 @@ void usage(const char* binname)
 	std::cerr << "  mbr             : display master boot record" << std::endl;
 	std::cerr << "  gpt             : display GUID partition table" << std::endl;
 	std::cerr << "  vbr             : display volume boot record" << std::endl;
-	std::cerr << "  mft             : display master file table" << std::endl;
-	std::cerr << "  btree           : display index btree" << std::endl;
+	std::cerr << "  mft.record      : display master file table" << std::endl;
+	std::cerr << "  mft.btree       : display index btree" << std::endl;
 	std::cerr << "  extract         : extract a file" << std::endl;
 	std::cerr << "  bitlocker       : display bitlocker GUID/status and test password, recovery or BEK file" << std::endl;
 	std::cerr << "  bitdecrypt      : decrypt volume to an image file" << std::endl;
@@ -40,8 +40,8 @@ void usage(const char* binname)
 	std::cerr << "  smart           : display SMART data" << std::endl;
 	std::cerr << "  help            : display this message or command help" << std::endl;
 	std::cerr << std::endl;
-	std::cerr << "Help for a command?" << std::endl;
-	std::cerr << "    help [command]" << std::endl;
+	std::cerr << "Need help for a command?" << std::endl;
+	std::cerr << "  help [command]" << std::endl;
 	std::cerr << std::endl;
 }
 
@@ -105,21 +105,21 @@ void print_help_vbr(const char* name)
 	command_examples(name, "Display VBR for disk 0 and volume 2", "vbr disk=0 volume=2");
 }
 
-void print_help_mft(const char* name)
+void print_help_mft_record(const char* name)
 {
-	command_header("mft");
-	command_description(name, "mft [disk id] [volume id] (inode/from)", "Display MFT file record information and detailed attributes for selected disk, volume and inode/path");
-	command_examples(name, "Display MFT file record for disk 0, volume 2", "mft disk=0 volume=2");
-	command_examples(name, "Display MFT file record for disk 0, volume 2 and inode 5", "mft disk=0 volume=2 inode=5");
-	command_examples(name, "Display MFT File record for disk 0, volume 2 and file \"c:\\file.bin\"", "mft disk=0 volume=2 from=\"c:\\file.bin\"");
+	command_header("mft.record");
+	command_description(name, "mft.record [disk id] [volume id] (inode/from)", "Display MFT file record information and detailed attributes for selected disk, volume and inode/path");
+	command_examples(name, "Display MFT file record for disk 0, volume 2", "mft.record disk=0 volume=2");
+	command_examples(name, "Display MFT file record for disk 0, volume 2 and inode 5", "mft.record disk=0 volume=2 inode=5");
+	command_examples(name, "Display MFT File record for disk 0, volume 2 and file \"c:\\file.bin\"", "mft.record disk=0 volume=2 from=\"c:\\file.bin\"");
 }
 
-void print_help_btree(const char* name)
+void print_help_mft_btree(const char* name)
 {
-	command_header("btree");
-	command_description(name, "btree [disk id] [volume id] (inode/from)", "Display index B-tree nodes and detailed attributes for selected disk, volume and inode/path");
-	command_examples(name, "Display Index B-tree for disk 0, volume 2 and inode 5", "btree disk=0 volume=2 inode=5");
-	command_examples(name, "Display Index B-tree for disk 0, volume 2 and from \"c:\\file.bin\"", "btree disk=0 volume=2 from \"c:\\file.bin\"");
+	command_header("mft.btree");
+	command_description(name, "mft.btree [disk id] [volume id] (inode/from)", "Display index B-tree nodes and detailed attributes for selected disk, volume and inode/path");
+	command_examples(name, "Display Index B-tree for disk 0, volume 2 and inode 5", "mft.btree disk=0 volume=2 inode=5");
+	command_examples(name, "Display Index B-tree for disk 0, volume 2 and from \"c:\\file.bin\"", "mft.btree disk=0 volume=2 from \"c:\\file.bin\"");
 }
 
 void print_help_bitlocker(const char* name)
@@ -280,8 +280,8 @@ namespace commands
 				if (opts->subcommand == "mbr") { print_help_mbr(name.c_str()); return; }
 				if (opts->subcommand == "gpt") { print_help_gpt(name.c_str()); return; }
 				if (opts->subcommand == "vbr") { print_help_vbr(name.c_str()); return; }
-				if (opts->subcommand == "mft") { print_help_mft(name.c_str()); return; }
-				if (opts->subcommand == "btree") { print_help_btree(name.c_str()); return; }
+				if (opts->subcommand == "mft") { print_help_mft_record(name.c_str()); return; }
+				if (opts->subcommand == "btree") { print_help_mft_btree(name.c_str()); return; }
 				if (opts->subcommand == "extract") { print_help_extract(name.c_str()); return; }
 				if (opts->subcommand == "bitlocker") { print_help_bitlocker(name.c_str()); return; }
 				if (opts->subcommand == "bitdecrypt") { print_help_bitdecrypt(name.c_str()); return; }
@@ -299,6 +299,7 @@ namespace commands
 				if (opts->subcommand == "shell") { print_help_shell(name.c_str()); return; }
 				if (opts->subcommand == "smart") { print_help_smart(name.c_str()); return; }
 				if (opts->subcommand == "streams") { print_help_streams(name.c_str()); return; }
+
 				usage(name.c_str());
 			}
 		}

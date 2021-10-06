@@ -43,7 +43,7 @@ void print_disks_short(std::vector<std::shared_ptr<Disk>> disks) {
 }
 
 void print_hardware_disk(std::shared_ptr<Disk> disk) {
-	utils::ui::title(disk->name());
+	utils::ui::title("Info for disk: " + disk->name());
 
 	std::cout << "    Model       : " << disk->product_id() << std::endl;
 	std::cout << "    Version     : " << disk->product_version() << std::endl;
@@ -129,7 +129,7 @@ void hash_file_sha256(std::string filename, PBYTE output)
 }
 
 void print_image_disk(std::shared_ptr<Disk> disk) {
-	utils::ui::title(disk->name());
+	utils::ui::title("Info for image: " + disk->name());
 
 	HANDLE hDisk = CreateFileA(disk->name().c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (hDisk != INVALID_HANDLE_VALUE)
@@ -218,7 +218,7 @@ void print_image_disk(std::shared_ptr<Disk> disk) {
 }
 
 void print_hardware_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
-	utils::ui::title("PhysicalDrive:" + std::to_string(disk->index()) + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Info for PhysicalDrive:" + std::to_string(disk->index()) + " > Volume:" + std::to_string(vol->index()));
 
 	if (vol->serial_number())
 	{
@@ -261,7 +261,7 @@ void print_hardware_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> v
 }
 
 void print_image_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
-	utils::ui::title("Image: " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Info for image: " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	if (vol->filesystem().length() > 0)
 	{
@@ -288,7 +288,7 @@ void print_image_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 
 int print_disks(std::shared_ptr<Options> opts)
 {
-	if ((opts->image == "") && (opts->disk == 0xffffffff))
+	if ((opts->image == "") && (opts->disk == -1))
 	{
 		print_disks_short(core::win::disks::list());
 		return 0;
@@ -299,6 +299,10 @@ int print_disks(std::shared_ptr<Options> opts)
 	{
 		if (opts->image != "") print_image_disk(disk);
 		else print_hardware_disk(disk);
+	}
+	else
+	{
+		invalid_option(opts, "disk", opts->disk);
 	}
 
 	return 0;
@@ -323,7 +327,16 @@ int print_partitions(std::shared_ptr<Options> opts)
 				print_hardware_volume(disk, volume);
 			}
 		}
+		else
+		{
+			invalid_option(opts, "volume", opts->volume);
+		}
 	}
+	else
+	{
+		invalid_option(opts, "disk", opts->disk);
+	}
+
 	std::cout.flags(flag_backup);
 	return 0;
 }
@@ -334,7 +347,7 @@ namespace commands
 	{
 		int dispatch(std::shared_ptr<Options> opts)
 		{
-			if ((opts->disk != 0xffffffff || opts->image != "") && opts->volume != 0xffffffff)
+			if ((opts->disk != -1 || opts->image != "") && opts->volume != -1)
 			{
 				print_partitions(opts);
 			}

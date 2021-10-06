@@ -19,69 +19,49 @@ int decrypt_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, s
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
-	std::shared_ptr<MFTRecord> masterkey_file_record = nullptr;
+	std::shared_ptr<MFTRecord> masterkey_file_record = commands::helpers::find_record(explorer, opts);
+	auto data = masterkey_file_record->data();
 
-	std::cout << "[+] Reading key file record: ";
-	if (opts->from != "")
+	std::shared_ptr<MasterKeyFile> masterkey_file = std::make_shared<MasterKeyFile>(data->data(), data->size());
+	if (!masterkey_file->is_loaded())
 	{
-		std::cout << opts->from << std::endl;
-		masterkey_file_record = explorer->mft()->record_from_path(opts->from);
-	}
-	else
-	{
-		std::cout << opts->inode << std::endl;
-		masterkey_file_record = explorer->mft()->record_from_number(opts->inode);
+		std::cerr << "[!] Err: Failed to parse masterkey file from record: " << opts->inode << std::endl;
+		return 3;
 	}
 
-	if (masterkey_file_record == nullptr)
+	auto master_key = masterkey_file->master_key();
+	if (master_key)
 	{
-		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
-		return 2;
-	}
-	else
-	{
-		auto data = masterkey_file_record->data();
-		std::shared_ptr<MasterKeyFile> masterkey_file = std::make_shared<MasterKeyFile>(data->data(), data->size());
-		if (!masterkey_file->is_loaded())
+		std::cout << "[-] Masterkey" << std::endl;
+		std::cout << "    Encryption Algorithm : " << constants::efs::enc_algorithm(master_key->header()->Enc_algorithm) << std::endl;
+		std::cout << "    Hash Algorithm       : " << constants::efs::hash_algorithm(master_key->header()->Hash_algorithm) << std::endl;
+		std::cout << "    Rounds               : " << std::to_string(master_key->header()->Rounds) << std::endl;
+		std::cout << "    Salt                 : " << utils::convert::to_hex(master_key->header()->Salt, 16) << std::endl;
+
+		std::cout << "[+] Decrypting masterkey" << std::endl;
+		auto res = master_key->decrypt_with_password(opts->sid, opts->password);
+		if (res == nullptr)
 		{
-			std::cerr << "[!] Err: Failed to parse masterkey file from record: " << opts->inode << std::endl;
-			return 3;
-		}
-
-		auto master_key = masterkey_file->master_key();
-		if (master_key)
-		{
-			std::cout << "[-] Masterkey" << std::endl;
-			std::cout << "    Encryption Algorithm : " << constants::efs::enc_algorithm(master_key->header()->Enc_algorithm) << std::endl;
-			std::cout << "    Hash Algorithm       : " << constants::efs::hash_algorithm(master_key->header()->Hash_algorithm) << std::endl;
-			std::cout << "    Rounds               : " << std::to_string(master_key->header()->Rounds) << std::endl;
-			std::cout << "    Salt                 : " << utils::convert::to_hex(master_key->header()->Salt, 16) << std::endl;
-
-			std::cout << "[+] Decrypting masterkey" << std::endl;
-			auto res = master_key->decrypt_with_password(opts->sid, opts->password);
-			if (res == nullptr)
-			{
-				std::cout << "[!] Failed to decrypt. Check SID or password." << std::endl;
-			}
-			else
-			{
-				std::cout << "[+] Clear masterkey (" << res->size() * 4 << "bits):" << std::endl;
-
-				int i, size = res->size();
-				for (i = 0; i < size; i += 32)
-				{
-					std::cout << "    " << utils::convert::to_hex(res->data() + i, min(32, size - i)) << std::endl;
-				}
-			}
+			std::cout << "[!] Failed to decrypt. Check SID or password." << std::endl;
 		}
 		else
 		{
-			std::cerr << "[!] Err: No masterkey in specified file." << std::endl;
-			return 3;
-		}
+			std::cout << "[+] Clear masterkey (" << res->size() * 4 << "bits):" << std::endl;
 
-		return 0;
+			int i, size = res->size();
+			for (i = 0; i < size; i += 32)
+			{
+				std::cout << "    " << utils::convert::to_hex(res->data() + i, min(32, size - i)) << std::endl;
+			}
+		}
 	}
+	else
+	{
+		std::cerr << "[!] Err: No masterkey in specified file." << std::endl;
+		return 3;
+	}
+
+	return 0;
 }
 
 
@@ -99,155 +79,136 @@ int show_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
-	std::shared_ptr<MFTRecord> masterkey_file_record = nullptr;
+	std::shared_ptr<MFTRecord> masterkey_file_record = commands::helpers::find_record(explorer, opts);
 
-	std::cout << "[+] Reading key file record: ";
-	if (opts->from != "")
+	auto data = masterkey_file_record->data();
+	std::shared_ptr<MasterKeyFile> masterkey_file = std::make_shared<MasterKeyFile>(data->data(), data->size());
+	if (!masterkey_file->is_loaded())
 	{
-		std::cout << opts->from << std::endl;
-		masterkey_file_record = explorer->mft()->record_from_path(opts->from);
-	}
-	else
-	{
-		std::cout << opts->inode << std::endl;
-		masterkey_file_record = explorer->mft()->record_from_number(opts->inode);
+		std::cerr << "[!] Err: Failed to parse masterkey file from record: " << opts->inode << std::endl;
+		return 3;
 	}
 
-	if (masterkey_file_record == nullptr)
+	std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
+	tab->set_margin_left(4);
+	tab->set_interline(true);
+	tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
+	tab->add_header_line("Property");
+	tab->add_header_line("Value");
+
+	std::string date;
+	PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = masterkey_file_record->attribute_header($STANDARD_INFORMATION);
+	if (stdinfo_att)
 	{
-		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
-		return 2;
+		PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION, stdinfo_att, stdinfo_att->Form.Resident.ValueOffset);
+		SYSTEMTIME st = { 0 };
+		utils::times::ull_to_local_systemtime(stdinfo->CreateTime, &st);
+		date = utils::times::display_systemtime(st);
 	}
-	else
-	{
-		auto data = masterkey_file_record->data();
-		std::shared_ptr<MasterKeyFile> masterkey_file = std::make_shared<MasterKeyFile>(data->data(), data->size());
-		if (!masterkey_file->is_loaded())
+
+	int i = 0;
+	tab->add_item_line(std::to_string(i++));
+	tab->add_item_line("File");
+	tab->add_item_multiline(
 		{
-			std::cerr << "[!] Err: Failed to parse masterkey file from record: " << opts->inode << std::endl;
-			return 3;
+			"Creation : " + date,
+			"Size     : " + utils::format::size(data->size())
 		}
+	);
 
-		std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
-		tab->set_margin_left(4);
-		tab->set_interline(true);
-		tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
-		tab->add_header_line("Property");
-		tab->add_header_line("Value");
+	tab->new_line();
 
-		std::string date;
-		PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = masterkey_file_record->attribute_header($STANDARD_INFORMATION);
-		if (stdinfo_att)
-		{
-			PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION, stdinfo_att, stdinfo_att->Form.Resident.ValueOffset);
-			SYSTEMTIME st = { 0 };
-			utils::times::ull_to_local_systemtime(stdinfo->CreateTime, &st);
-			date = utils::times::display_systemtime(st);
-		}
+	tab->add_item_line(std::to_string(i++));
+	tab->add_item_line("Version");
+	tab->add_item_line(std::to_string(masterkey_file->version()));
 
-		int i = 0;
+	tab->new_line();
+
+	tab->add_item_line(std::to_string(i++));
+	tab->add_item_line("GUID");
+	tab->add_item_line(masterkey_file->guid());
+
+	tab->new_line();
+
+	tab->add_item_line(std::to_string(i++));
+	tab->add_item_line("Policy");
+	tab->add_item_line(utils::format::hex(masterkey_file->policy(), true));
+
+	tab->new_line();
+
+	auto master_key = masterkey_file->master_key();
+	if (master_key)
+	{
 		tab->add_item_line(std::to_string(i++));
-		tab->add_item_line("File");
+		tab->add_item_line("MasterKey");
 		tab->add_item_multiline(
 			{
-				"Creation : " + date,
-				"Size     : " + utils::format::size(data->size())
+				"Version  : " + std::to_string(master_key->header()->Version),
+				"Salt     : " + utils::convert::to_hex(master_key->header()->Salt, 16),
+				"Rounds   : " + std::to_string(master_key->header()->Rounds),
+				"Hash Alg : " + constants::efs::hash_algorithm(master_key->header()->Hash_algorithm),
+				"Enc Alg  : " + constants::efs::enc_algorithm(master_key->header()->Enc_algorithm),
+				"Enc Key  : " + utils::convert::to_hex(master_key->key()->data(), master_key->key()->size())
 			}
 		);
 
 		tab->new_line();
-
-		tab->add_item_line(std::to_string(i++));
-		tab->add_item_line("Version");
-		tab->add_item_line(std::to_string(masterkey_file->version()));
-
-		tab->new_line();
-
-		tab->add_item_line(std::to_string(i++));
-		tab->add_item_line("GUID");
-		tab->add_item_line(masterkey_file->guid());
-
-		tab->new_line();
-
-		tab->add_item_line(std::to_string(i++));
-		tab->add_item_line("Policy");
-		tab->add_item_line(utils::format::hex(masterkey_file->policy(), true));
-
-		tab->new_line();
-
-		auto master_key = masterkey_file->master_key();
-		if (master_key)
-		{
-			tab->add_item_line(std::to_string(i++));
-			tab->add_item_line("MasterKey");
-			tab->add_item_multiline(
-				{
-					"Version  : " + std::to_string(master_key->header()->Version),
-					"Salt     : " + utils::convert::to_hex(master_key->header()->Salt, 16),
-					"Rounds   : " + std::to_string(master_key->header()->Rounds),
-					"Hash Alg : " + constants::efs::hash_algorithm(master_key->header()->Hash_algorithm),
-					"Enc Alg  : " + constants::efs::enc_algorithm(master_key->header()->Enc_algorithm),
-					"Enc Key  : " + utils::convert::to_hex(master_key->key()->data(), master_key->key()->size())
-				}
-			);
-
-			tab->new_line();
-		}
-
-		auto backup_key = masterkey_file->backup_key();
-		if (backup_key)
-		{
-			tab->add_item_line(std::to_string(i++));
-			tab->add_item_line("BackupKey");
-			tab->add_item_multiline(
-				{
-					"Version  : " + std::to_string(backup_key->header()->Version),
-					"Salt     : " + utils::convert::to_hex(backup_key->header()->Salt, 16),
-					"Rounds   : " + std::to_string(backup_key->header()->Rounds),
-					"Hash Alg : " + constants::efs::hash_algorithm(backup_key->header()->Hash_algorithm),
-					"Enc Alg  : " + constants::efs::enc_algorithm(backup_key->header()->Enc_algorithm),
-					"Enc Key  : " + utils::convert::to_hex(backup_key->key()->data(), backup_key->key()->size())
-				}
-			);
-
-			tab->new_line();
-		}
-
-		auto domain_key = masterkey_file->domain_key();
-		if (domain_key)
-		{
-			tab->add_item_line(std::to_string(i++));
-			tab->add_item_line("DomainKey");
-			tab->add_item_multiline(
-				{
-					"Version     : " + std::to_string(domain_key->header()->Version),
-					"GUID        : " + utils::id::guid_to_string(domain_key->header()->Guid),
-					"Secret      : " + utils::convert::to_hex(domain_key->secret()->data(), domain_key->secret()->size()),
-					"AccessCheck : " + utils::convert::to_hex(domain_key->access_check()->data(), domain_key->access_check()->size())
-				}
-			);
-
-			tab->new_line();
-		}
-
-		auto credhist = masterkey_file->credential_history();
-		if (credhist)
-		{
-			tab->add_item_line(std::to_string(i++));
-			tab->add_item_line("CredHist");
-			tab->add_item_multiline(
-				{
-					"Version  : " + std::to_string(credhist->header()->Version),
-					"GUID     : " + utils::id::guid_to_string(credhist->header()->Guid)
-				}
-			);
-
-			tab->new_line();
-		}
-
-		std::cout << "[+] MasterKey" << std::endl;
-		tab->render(std::cout);
 	}
+
+	auto backup_key = masterkey_file->backup_key();
+	if (backup_key)
+	{
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("BackupKey");
+		tab->add_item_multiline(
+			{
+				"Version  : " + std::to_string(backup_key->header()->Version),
+				"Salt     : " + utils::convert::to_hex(backup_key->header()->Salt, 16),
+				"Rounds   : " + std::to_string(backup_key->header()->Rounds),
+				"Hash Alg : " + constants::efs::hash_algorithm(backup_key->header()->Hash_algorithm),
+				"Enc Alg  : " + constants::efs::enc_algorithm(backup_key->header()->Enc_algorithm),
+				"Enc Key  : " + utils::convert::to_hex(backup_key->key()->data(), backup_key->key()->size())
+			}
+		);
+
+		tab->new_line();
+	}
+
+	auto domain_key = masterkey_file->domain_key();
+	if (domain_key)
+	{
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("DomainKey");
+		tab->add_item_multiline(
+			{
+				"Version     : " + std::to_string(domain_key->header()->Version),
+				"GUID        : " + utils::id::guid_to_string(domain_key->header()->Guid),
+				"Secret      : " + utils::convert::to_hex(domain_key->secret()->data(), domain_key->secret()->size()),
+				"AccessCheck : " + utils::convert::to_hex(domain_key->access_check()->data(), domain_key->access_check()->size())
+			}
+		);
+
+		tab->new_line();
+	}
+
+	auto credhist = masterkey_file->credential_history();
+	if (credhist)
+	{
+		tab->add_item_line(std::to_string(i++));
+		tab->add_item_line("CredHist");
+		tab->add_item_multiline(
+			{
+				"Version  : " + std::to_string(credhist->header()->Version),
+				"GUID     : " + utils::id::guid_to_string(credhist->header()->Guid)
+			}
+		);
+
+		tab->new_line();
+	}
+
+	std::cout << "[+] MasterKey" << std::endl;
+	tab->render(std::cout);
+
 	return 0;
 }
 
@@ -415,7 +376,7 @@ namespace commands
 					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 					if (volume != nullptr)
 					{
-						if (opts->inode != 0 || opts->from != "")
+						if (opts->inode >= 0 || opts->from != "")
 						{
 							if (opts->password != "" && opts->sid != "")
 							{
@@ -433,16 +394,12 @@ namespace commands
 					}
 					else
 					{
-						std::cerr << "[!] Invalid or missing volume option" << std::endl;
-						opts->subcommand = "efs.masterkey";
-						commands::help::dispatch(opts);
+						invalid_option(opts, "volume", opts->volume);
 					}
 				}
 				else
 				{
-					std::cerr << "[!] Invalid or missing disk option" << std::endl;
-					opts->subcommand = "efs.masterkey";
-					commands::help::dispatch(opts);
+					invalid_option(opts, "disk", opts->disk);
 				}
 
 				std::cout.flags(flag_backup);

@@ -26,23 +26,7 @@ int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 	}
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
-
-	std::shared_ptr<MFTRecord> record = nullptr;
-
-	auto [filepath, stream_name] = utils::files::split_file_and_stream(opts->from);
-
-	if (opts->from != "")
-	{
-		record = explorer->mft()->record_from_path(filepath);
-	}
-	else
-	{
-		record = explorer->mft()->record_from_number(opts->inode);
-	}
-
-	if (record == nullptr)
-		return 2;
-
+	std::shared_ptr<MFTRecord> record = commands::helpers::find_record(explorer, opts);
 	PMFT_RECORD_HEADER record_header = record->header();
 
 	if (!(record_header->flag & MFT_RECORD_IS_DIRECTORY))
@@ -197,23 +181,49 @@ int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 
 namespace commands
 {
-	namespace btree
+	namespace mft
 	{
-		int dispatch(std::shared_ptr<Options> opts)
+		namespace btree
 		{
-			std::ios_base::fmtflags flag_backup(std::cout.flags());
-
-			std::shared_ptr<Disk> disk = get_disk(opts);
-			if (disk != nullptr)
+			int dispatch(std::shared_ptr<Options> opts)
 			{
-				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
-				if (volume != nullptr)
+				std::ios_base::fmtflags flag_backup(std::cout.flags());
+
+				std::shared_ptr<Disk> disk = get_disk(opts);
+				if (disk != nullptr)
 				{
-					print_btree_info(disk, volume, opts);
+					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+					if (volume != nullptr)
+					{
+						if (opts->from != "")
+						{
+							print_btree_info(disk, volume, opts);
+						}
+						else
+						{
+							if (opts->inode >= 0)
+							{
+								print_btree_info(disk, volume, opts);
+							}
+							else
+							{
+								invalid_option(opts, "inode", opts->inode);
+							}
+						}
+					}
+					else
+					{
+						invalid_option(opts, "volume", opts->volume);
+					}
 				}
+				else
+				{
+					invalid_option(opts, "disk", opts->disk);
+				}
+
+				std::cout.flags(flag_backup);
+				return 0;
 			}
-			std::cout.flags(flag_backup);
-			return 0;
 		}
 	}
 }

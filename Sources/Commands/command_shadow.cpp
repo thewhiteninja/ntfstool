@@ -157,6 +157,14 @@ namespace commands
 				{
 					print_volumeshadow(disk, volume);
 				}
+				else
+				{
+					invalid_option(opts, "volume", opts->volume);
+				}
+			}
+			else
+			{
+				invalid_option(opts, "disk", opts->disk);
 			}
 
 			std::cout.flags(flag_backup);

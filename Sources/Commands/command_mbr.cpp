@@ -125,7 +125,8 @@ namespace commands
 {
 	namespace mbr
 	{
-		int dispatch(std::shared_ptr<Options> opts) {
+		int dispatch(std::shared_ptr<Options> opts)
+		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());
 
 			std::shared_ptr<Disk> disk = get_disk(opts);
@@ -133,6 +134,10 @@ namespace commands
 			if (disk != nullptr)
 			{
 				print_mbr(disk);
+			}
+			else
+			{
+				invalid_option(opts, "disk", opts->disk);
 			}
 
 			std::cout.flags(flag_backup);

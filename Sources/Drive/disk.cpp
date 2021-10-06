@@ -377,10 +377,6 @@ std::shared_ptr<Volume> Disk::volumes(DWORD index) const
 			break;
 		}
 	}
-	if (volume == nullptr)
-	{
-		std::cerr << "[!] Invalid or missing volume index";
-	}
 	return volume;
 }
 

@@ -36,7 +36,7 @@ int backup_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 
 	std::vector<std::tuple<std::shared_ptr<MasterKeyFile>, std::string>> user_masterkeys_and_sid;
 
-	std::cout << "[+] Searching for certificates" << std::endl;
+	std::cout << "[+] Looking for certificates" << std::endl;
 
 	for (auto user_dir : user_dirs)
 	{
@@ -75,7 +75,7 @@ int backup_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 		return 0;
 	}
 
-	std::cout << "[+] Finding corresponding private keys" << std::endl;
+	std::cout << "[+] Looking for corresponding private keys" << std::endl;
 
 	for (auto user_dir : user_dirs)
 	{
@@ -125,7 +125,7 @@ int backup_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 		return 0;
 	}
 
-	std::cout << "[+] Finding corresponding masterkeys" << std::endl;
+	std::cout << "[+] Looking for corresponding masterkeys" << std::endl;
 
 	for (auto user_dir : user_dirs)
 	{
@@ -271,23 +271,17 @@ namespace commands
 						}
 						else
 						{
-							std::cerr << "[!] Invalid or missing password option." << std::endl;
-							opts->subcommand = "efs.backup";
-							commands::help::dispatch(opts);
+							invalid_option(opts, "password", opts->password);
 						}
 					}
 					else
 					{
-						std::cerr << "[!] Invalid or missing volume option" << std::endl;
-						opts->subcommand = "efs.backup";
-						commands::help::dispatch(opts);
+						invalid_option(opts, "volume", opts->volume);
 					}
 				}
 				else
 				{
-					std::cerr << "[!] Invalid or missing disk option" << std::endl;
-					opts->subcommand = "efs.backup";
-					commands::help::dispatch(opts);
+					invalid_option(opts, "disk", opts->disk);
 				}
 
 				std::cout.flags(flag_backup);

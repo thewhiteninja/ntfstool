@@ -17,7 +17,8 @@
 #include <memory>
 #include <iterator>
 
-int print_reparse(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output) {
+int print_reparse(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output)
+{
 	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
 	{
 		std::cerr << "[!] NTFS volume required" << std::endl;
@@ -128,6 +129,14 @@ namespace commands {
 				{
 					print_reparse(disk, volume, opts->format, opts->output);
 				}
+				else
+				{
+					invalid_option(opts, "volume", opts->volume);
+				}
+			}
+			else
+			{
+				invalid_option(opts, "disk", opts->disk);
 			}
 
 			std::cout.flags(flag_backup);
