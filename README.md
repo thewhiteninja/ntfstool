@@ -7,43 +7,48 @@
 [![v1.3](https://img.shields.io/badge/Version-1.3-ff5733.svg)](#)
 [![Build](https://ci.appveyor.com/api/projects/status/a3cn5dpdv146tdji?svg=true)](https://ci.appveyor.com/project/thewhiteninja/ntfstool)
 
-
+<img align="right" width="100" height="100" src="https://cdn-icons-png.flaticon.com/512/3850/3850133.png">
 
 <br />
 
-NTFSTool is a forensic tool to play with disks and NTFS volumes.
-It supports reading partition info (mbr, partition table, vbr) but also information on bitlocker encrypted partition (fve).
-See examples below to see some of the features!
+NTFSTool is a forensic tool focused on NTFS volumes.
+It supports reading partition info (mbr, partition table, vbr) but also information on bitlocker encrypted volume, EFS encrypted files and more.
+
+See below for some [examples](#examples) of the features!
+
 
 ## Features
 
 ### Forensics
 
-NTFSTool displays the complete structure of master boot record, volume boot record, partition table and MFT file record.
-It is also possible to dump any file (even hidden [$mft][8]) or parse [$usnjrnl][6], [$logfile][7] including file from Alternate Data Stream ([ADS][5]).
+NTFSTool displays the complete structure of master boot record, volume boot record, partition table and [MFT][8] file record.
+It is also possible to dump any file (even $mft or [SAM][9]) or parse [USN journals][6], [LogFile][7] including streams from Alternate Data Stream ([ADS][5]).
 The undelete command will search for any file record marked as "not in use" and allow you to retrieve the file (or part of the file if it was already rewritten).
-It support input from image file or live disks. You can also use tools like [OSFMount][3] to mount your disk image.
-Sparse and compressed files are also (partially) supported. 
+It support input from image file or live disk but you can also use tools like [OSFMount][3] to mount your disk image.
+Sparse and compressed files are also supported. 
 
 [3]: https://www.osforensics.com/tools/mount-disk-images.html
 [5]: https://docs.microsoft.com/en-us/archive/blogs/askcore/alternate-data-streams-in-ntfs
 [6]: https://docs.microsoft.com/en-gb/windows/win32/fileio/change-journal-records
 [7]: https://dfir.ru/2019/02/16/how-the-logfile-works/
 [8]: https://en.wikipedia.org/wiki/NTFS#Master_File_Table
+[9]: https://en.wikipedia.org/wiki/Security_Account_Manager
+
 
 ### Bitlocker support
 
-For bitlocked partition, it can display FVE records, check a password and support 3 formats (bek, password, recovery key), extract VMK and FVEK.
-There is no bruteforcing feature because GPU-based cracking is better (see [Bitcracker][1] and [Hashcat][2]).
+For bitlocked partition, it can display FVE records, check a password and key (bek, password, recovery key), extract VMK and FVEK.
+There is no bruteforce feature because GPU-based cracking is better (see [Bitcracker][1] and [Hashcat][2]) but you can get the hash for these tools.
 
 [1]: https://arxiv.org/pdf/1901.01337
 [2]: https://hashcat.net/hashcat/
 
 ### EFS support
 
-In the current version, masterkeys and private keys and certificates can be listed, displayed and decrypted using needed inputs (sid, password).
+In the current version, masterkeys, private keys and certificates can be listed, displayed and decrypted using needed inputs (SID, password).
 Certificates with private keys can be exported using the backup command.
 Reinmport the backup on another machine to be able to read your encrypted file again!
+
 More information on [Mimikatz Wiki][4] 
 
 [4]: https://github.com/gentilkiwi/mimikatz/wiki/howto-~-decrypt-EFS-files#installing-the-pfx
@@ -52,12 +57,12 @@ Decryption of EFS encrypted files is coming!
 
 ### Shell
 
-There is a limited shell with few commands (exit, cd, ls , cat , pwd, cp).
+There is a limited shell with few commands (exit, cd, ls, cat, pwd, cp).
 
 ## Help & Examples
 
-the help command displays some examples for each command.
-Options can be entered as decimal or hex number with "0x" prefix.
+Help command displays description and examples for each command.
+Options can be entered as decimal or hex number with "0x" prefix (ex: inode).
 
     ntfstool help [command]
     
@@ -90,14 +95,14 @@ Options can be entered as decimal or hex number with "0x" prefix.
 
 ## Limitations
 
-- Some unsupported cases
+- Some unsupported cases. WIP.
 - No documentation :no_mouth:.
 
 Feel free to open an issue or ask for a new feature!
 
 ## Build
     
-Vcpkg is the best way to install and use them.
+Vcpkg is the best way to install required third-party libs.
 
 Install vcpkg as described here: [vcpkg#getting-started](https://github.com/microsoft/vcpkg#getting-started)
 
@@ -108,16 +113,16 @@ Integrate it to your VisualStudio env:
 
     vcpkg integrate install
 
-At build time, VisualStudio will detect the vcpkg.json file and install required packages automatically.
+At build time, VisualStudio will detect the `vcpkg.json` file and install required packages automatically.
 
-Current external libs:
+Current third-party libs:
 - [openssl](https://www.openssl.org/): OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
 - [nlohmann-json](https://github.com/nlohmann/json): JSON for Modern C++
 - [distorm](https://github.com/gdabah/distorm): Powerful Disassembler Library For x86/AMD64
 - [cppcoro](https://github.com/lewissbaker/cppcoro): A library of C++ coroutine abstractions for the coroutines TS.
 
 
-## Output examples
+## Examples
 
 ### Info
 <table>
