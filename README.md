@@ -11,8 +11,8 @@
 
 <br />
 
-NTFSTool is a forensic tool focused on NTFS volumes.
-It supports reading partition info (mbr, partition table, vbr) but also information on bitlocker encrypted volume, EFS encrypted files and more.
+NTFSTool is a forensic tool focused on [NTFS][10] volumes.
+It supports reading partition info (mbr, partition table, vbr) but also information on master file table, bitlocker encrypted volume, EFS encrypted files and more.
 
 See below for some [examples](#examples) of the features!
 
@@ -28,12 +28,12 @@ It support input from image file or live disk but you can also use tools like [O
 Sparse and compressed files are also supported. 
 
 [3]: https://www.osforensics.com/tools/mount-disk-images.html
-[5]: https://docs.microsoft.com/en-us/archive/blogs/askcore/alternate-data-streams-in-ntfs
+[5]: https://www.sans.org/white-papers/1503/
 [6]: https://docs.microsoft.com/en-gb/windows/win32/fileio/change-journal-records
 [7]: https://dfir.ru/2019/02/16/how-the-logfile-works/
 [8]: https://en.wikipedia.org/wiki/NTFS#Master_File_Table
 [9]: https://en.wikipedia.org/wiki/Security_Account_Manager
-
+[10]: https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc781134(v=ws.10)?redirectedfrom=MSDN
 
 ### Bitlocker support
 
@@ -74,8 +74,8 @@ Options can be entered as decimal or hex number with "0x" prefix (ex: inode).
 | [vbr](#vbr)  | Display VBR structure and code for a specidifed volume (ntfs, fat32, fat1x, bitlocker supported) |
 | [extract](#extract)  | Extract a file from a volume. |
 | [image](#image)  | Create an image file of a disk or volume. |
-| [mft](#mft)  | Display FILE record details for a specified MFT inode. Almost all attribute types supported |
-| [btree](#btree)  | Display VCN content and Btree index for an inode |
+| [mft.record](#mft-record)  | Display FILE record details for a specified MFT inode. Almost all attribute types supported |
+| [mft.btree](#mft-btree)  | Display VCN content and Btree index for an inode |
 | [bitlocker](#bitlocker)  | Display detailed information and hash ($bitlocker$) for all VMK. It is possible to test a password or recovery key. If it is correct, the decrypted VMK and FVEK is displayed. |
 | [bitdecrypt](#bitdecrypt)  | Decrypt a volume to a file using password, recovery key or bek. |
 | [efs.backup](#efs-backup)  | Export EFS keys in PKCS12 (pfx) format. |
@@ -365,9 +365,9 @@ Current third-party libs:
 </table>
 
 
-### MFT
+### MFT-record
 <table>
-<tr><td>mft disk=2 volume=1 inode=5 (root folder)</td></tr>
+<tr><td>mft.record disk=2 volume=1 inode=5 (root folder)</td></tr>
 <tr><td>
   
     Signature         : FILE
@@ -463,9 +463,9 @@ Current third-party libs:
 </td></tr>
 </table>
 
-### Btree
+### MFT-btree
 <table>
-<tr><td>btree disk=0 volume=1 inode=5 (root folder)</td></tr>
+<tr><td>mft.btree disk=0 volume=1 inode=5 (root folder)</td></tr>
 <tr><td>
 
 	B-tree index (inode:5) from \\.\PhysicalDrive3 > Volume:1

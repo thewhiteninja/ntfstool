@@ -65,7 +65,7 @@ int decrypt_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 			break;
 		default:
 			decrypt_sector_fn = nullptr;
-			std::cerr << "[!] Decryption algorithm invalid or not implemented" << std::endl;
+			std::cerr << "[!] Invalid or not implemented decryption algorithm (" << utils::format::hex(vol->bitlocker().metadata[0].header.algorithm, true) << ")" << std::endl;
 			return 1;
 		}
 
