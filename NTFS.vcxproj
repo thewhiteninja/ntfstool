@@ -67,6 +67,7 @@
     <ClCompile Include="Sources\Commands\command_bitlocker.cpp" />
     <ClCompile Include="Sources\Commands\command_btree.cpp" />
     <ClCompile Include="Sources\Commands\command_efs_backup.cpp" />
+    <ClCompile Include="Sources\Commands\command_efs_certificate.cpp" />
     <ClCompile Include="Sources\Commands\command_efs_key.cpp" />
     <ClCompile Include="Sources\Commands\command_efs_masterkey.cpp" />
     <ClCompile Include="Sources\Commands\command_extract.cpp" />
@@ -90,7 +91,6 @@
     <ClCompile Include="Sources\Drive\reader.cpp" />
     <ClCompile Include="Sources\Drive\volume.cpp" />
     <ClCompile Include="Sources\EFS\certificate_file.cpp" />
-    <ClCompile Include="Sources\EFS\command_efs_certificate.cpp" />
     <ClCompile Include="Sources\EFS\key_file.cpp" />
     <ClCompile Include="Sources\EFS\masterkey_file.cpp" />
     <ClCompile Include="Sources\EFS\pkcs12_backup.h" />
