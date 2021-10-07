@@ -20,7 +20,6 @@ int main(int argc, char** argv) {
 	}
 
 	std::shared_ptr<Options> opts = parse_options(argc, argv);
-	std::string basename = utils::files::basename(argv[0]);
 
 	if (opts->show_usage)
 	{
