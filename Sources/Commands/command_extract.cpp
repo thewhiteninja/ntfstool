@@ -37,11 +37,45 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 
 	std::cout << "[-] Destination : " << opts->output << std::endl;
 
-	std::cout << "[+] Writing file" << std::endl;
+	PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = nullptr;
+	PMFT_RECORD_ATTRIBUTE_HEADER stdinfo_att = record->attribute_header($STANDARD_INFORMATION);
+	if (stdinfo_att)
+	{
+		stdinfo = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION, stdinfo_att, stdinfo_att->Form.Resident.ValueOffset);
+	}
+	if (stdinfo)
+	{
+		if (stdinfo->u.Permission.encrypted)
+		{
+			std::cout << "[!] Extracting encrypted data (not readable)" << std::endl;
+		}
+	}
 
-	ULONG64 written = record->data_to_file(utils::strings::from_string(opts->output), stream_name);
+	std::cout << "[+] Extracting file" << std::endl;
+	std::wstring output_filename = utils::strings::from_string(opts->output);
 
+	ULONG64 written = record->data_to_file(output_filename, stream_name);
 	std::cout << "[+] " << written << " bytes (" + utils::format::size(written) << ") written" << std::endl;
+
+	if (stdinfo)
+	{
+		HANDLE hFile = CreateFileW(output_filename.c_str(), FILE_WRITE_ATTRIBUTES, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL,
+			OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+		if (hFile != INVALID_HANDLE_VALUE)
+		{
+			if (!SetFileTime(hFile, (FILETIME*)&stdinfo->CreateTime, (FILETIME*)&stdinfo->ReadTime, (FILETIME*)&stdinfo->AlterTime))
+			{
+				std::cerr << "[!] Failed to set file time" << std::endl;
+			}
+			CloseHandle(hFile);
+		}
+
+		if (!SetFileAttributesW(output_filename.c_str(), stdinfo->u.dword_part))
+		{
+			std::cerr << "[!] Failed to set attributes" << std::endl;
+		}
+	}
+
 
 	return 0;
 }
