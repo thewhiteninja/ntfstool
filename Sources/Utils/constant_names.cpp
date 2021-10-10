@@ -822,6 +822,18 @@ std::string constants::efs::cert_prop_keyspec(DWORD k)
 	}
 }
 
+std::string constants::efs::export_flag(DWORD f)
+{
+	std::string ret;
+
+	if (f & NCRYPT_ALLOW_EXPORT_FLAG) ret += "ALLOW_EXPORT_FLAG";
+	if (f & NCRYPT_ALLOW_PLAINTEXT_EXPORT_FLAG) ret += "PLAINTEXT_EXPORT_FLAG";
+	if (f & NCRYPT_ALLOW_ARCHIVING_FLAG) ret += "ALLOW_ARCHIVING_FLAG";
+	if (f & NCRYPT_ALLOW_PLAINTEXT_ARCHIVING_FLAG) ret += "PLAINTEXT_ARCHIVING_FLAG";
+
+	return ret;
+}
+
 std::string constants::efs::cert_prop_id(DWORD p)
 {
 	switch (p)

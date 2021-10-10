@@ -34,7 +34,8 @@
     <ClInclude Include="Sources\Drive\vbr.h" />
     <ClInclude Include="Sources\Drive\volume.h" />
     <ClInclude Include="Sources\EFS\certificate_file.h" />
-    <ClInclude Include="Sources\EFS\export_flag.h" />
+    <ClInclude Include="Sources\EFS\export_flags.h" />
+    <ClInclude Include="Sources\EFS\export_flags_enc.h" />
     <ClInclude Include="Sources\EFS\fek.h" />
     <ClInclude Include="Sources\EFS\key_file.h" />
     <ClInclude Include="Sources\EFS\masterkey_file.h" />
@@ -94,6 +95,7 @@
     <ClCompile Include="Sources\Drive\reader.cpp" />
     <ClCompile Include="Sources\Drive\volume.cpp" />
     <ClCompile Include="Sources\EFS\certificate_file.cpp" />
+    <ClCompile Include="Sources\EFS\export_flags_enc.cpp" />
     <ClCompile Include="Sources\EFS\key_file.cpp" />
     <ClCompile Include="Sources\EFS\masterkey_file.cpp" />
     <ClCompile Include="Sources\EFS\pkcs12_archive.cpp" />
