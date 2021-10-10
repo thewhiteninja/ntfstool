@@ -45,19 +45,18 @@ There is no bruteforce feature because GPU-based cracking is better (see [Bitcra
 
 ### EFS support
 
-In the current version, masterkeys, private keys and certificates can be listed, displayed and decrypted using needed inputs (SID, password).
+Masterkeys, private keys and certificates can be listed, displayed and decrypted using needed inputs (SID, password).
 Certificates with private keys can be exported using the backup command.
 Reinmport the backup on another machine to be able to read your encrypted file again!
+Or you can use the `efs.decrypt` command to decrypt a file using the backup key.
 
 More information on [Mimikatz Wiki][4] 
 
 [4]: https://github.com/gentilkiwi/mimikatz/wiki/howto-~-decrypt-EFS-files#installing-the-pfx
 
-Decryption of EFS encrypted files is coming!
-
 ### Shell
 
-There is a limited shell with few commands (exit, cd, ls, cat, pwd, cp).
+There is a limited shell with few commands (exit, cd, ls, cat, pwd, cp, quit, rec).
 
 ## Help & Examples
 
