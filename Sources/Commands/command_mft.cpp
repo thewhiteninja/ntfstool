@@ -263,7 +263,7 @@ void print_efs_entry(std::vector<std::string>& ret, PMFT_RECORD_ATTRIBUTE_EFS_AR
 		ret.push_back("");
 		if (entry->Type == MFT_ATTRIBUTE_EFS_CONTAINER)
 		{
-
+			ret.push_back("EFS Container not implemented");
 		}
 		else if (entry->Type == MFT_ATTRIBUTE_EFS_CERTIFICATE)
 		{
@@ -745,11 +745,7 @@ int commands::mft::print_mft_info_details(std::shared_ptr<MFTRecord> record, ULO
 
 int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 

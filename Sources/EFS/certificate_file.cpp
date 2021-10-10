@@ -54,6 +54,7 @@ CertificateFile::CertificateFile(PBYTE data, DWORD size)
 
 int CertificateFile::export_to_PEM(std::string name)
 {
+	int ret = 1;
 	for (auto element : _fields)
 	{
 		DWORD prop_id = std::get<0>(element);
@@ -64,25 +65,28 @@ int CertificateFile::export_to_PEM(std::string name)
 			X509* x = d2i_X509(NULL, &bufder, std::get<1>(element)->size());
 			if (x)
 			{
-				FILE* fp = nullptr;
-				fopen_s(&fp, (name + ".pem").c_str(), "wb");
-				if (!fp)
+				BIO* out = BIO_new_file((name + ".pem").c_str(), "wb");
+				if (out)
 				{
-					return 1;
+					if (!PEM_write_bio_X509(out, x))
+					{
+						ret = 3;
+					}
+					else
+					{
+						ret = 0;
+					}
+					BIO_free(out);
 				}
 				else
 				{
-					if (!PEM_write_X509(fp, x))
-					{
-						return 2;
-					}
-					fclose(fp);
+					ret = 2;
 				}
 				X509_free(x);
 			}
 		}
 	}
-	return 0;
+	return ret;
 }
 
 X509* CertificateFile::export_to_X509()

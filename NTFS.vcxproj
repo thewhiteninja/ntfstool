@@ -35,8 +35,10 @@
     <ClInclude Include="Sources\Drive\volume.h" />
     <ClInclude Include="Sources\EFS\certificate_file.h" />
     <ClInclude Include="Sources\EFS\export_flag.h" />
+    <ClInclude Include="Sources\EFS\fek.h" />
     <ClInclude Include="Sources\EFS\key_file.h" />
     <ClInclude Include="Sources\EFS\masterkey_file.h" />
+    <ClInclude Include="Sources\EFS\pkcs12_archive.h" />
     <ClInclude Include="Sources\EFS\private_key.h" />
     <ClInclude Include="Sources\EFS\private_key_enc.h" />
     <ClInclude Include="Sources\EFS\public_key.h" />
@@ -68,6 +70,7 @@
     <ClCompile Include="Sources\Commands\command_btree.cpp" />
     <ClCompile Include="Sources\Commands\command_efs_backup.cpp" />
     <ClCompile Include="Sources\Commands\command_efs_certificate.cpp" />
+    <ClCompile Include="Sources\Commands\command_efs_decrypt.cpp" />
     <ClCompile Include="Sources\Commands\command_efs_key.cpp" />
     <ClCompile Include="Sources\Commands\command_efs_masterkey.cpp" />
     <ClCompile Include="Sources\Commands\command_extract.cpp" />
@@ -93,7 +96,7 @@
     <ClCompile Include="Sources\EFS\certificate_file.cpp" />
     <ClCompile Include="Sources\EFS\key_file.cpp" />
     <ClCompile Include="Sources\EFS\masterkey_file.cpp" />
-    <ClCompile Include="Sources\EFS\pkcs12_backup.h" />
+    <ClCompile Include="Sources\EFS\pkcs12_archive.cpp" />
     <ClCompile Include="Sources\EFS\private_key.cpp" />
     <ClCompile Include="Sources\EFS\private_key_enc.cpp" />
     <ClCompile Include="Sources\EFS\public_key.cpp" />

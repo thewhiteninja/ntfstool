@@ -6,16 +6,12 @@
 #include <EFS/private_key.h>
 #include <EFS/masterkey_file.h>
 #include <EFS/key_file.h>
-#include <EFS/pkcs12_backup.h>
+#include <EFS/pkcs12_archive.h>
 
 
 int backup_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("Backup certificates and keys from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
@@ -214,7 +210,7 @@ int backup_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 				auto decrypted_private_key = keyfile->private_key()->decrypt_with_masterkey(masterkey);
 				if (decrypted_private_key != nullptr)
 				{
-					std::shared_ptr<PKCS12Backup> pkcs12 = std::make_shared<PKCS12Backup>(cert, decrypted_private_key);
+					std::shared_ptr<PKCS12Archive> pkcs12 = std::make_shared<PKCS12Archive>(cert, decrypted_private_key);
 					if (opts->output == "")
 					{
 						opts->output = cert->hash();

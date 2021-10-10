@@ -14,6 +14,7 @@
 #include "ntfs_reader.h"
 
 #include "Utils/buffer.h"
+#include "Utils/utils.h"
 
 #include <cppcoro/generator.hpp>
 
@@ -50,17 +51,76 @@ public:
 	PMFT_RECORD_ATTRIBUTE_HEADER attribute_header(DWORD type, std::string name = "", int index = 0);
 
 	template<typename T>
-	std::shared_ptr<Buffer<T>> attribute_data(PMFT_RECORD_ATTRIBUTE_HEADER attr);
+	std::shared_ptr<Buffer<T>> attribute_data(PMFT_RECORD_ATTRIBUTE_HEADER pAttributeData, bool real_size = true)
+	{
+		std::shared_ptr<Buffer<T>> ret = nullptr;
+
+		if (pAttributeData->FormCode == RESIDENT_FORM)
+		{
+			ret = std::make_shared<Buffer<T>>(pAttributeData->Form.Resident.ValueLength);
+			memcpy_s(ret->data(), ret->size(), POINTER_ADD(LPBYTE, pAttributeData, pAttributeData->Form.Resident.ValueOffset), pAttributeData->Form.Resident.ValueLength);
+		}
+		else if (pAttributeData->FormCode == NON_RESIDENT_FORM)
+		{
+			ULONGLONG readSize = 0;
+			ULONGLONG filesize = pAttributeData->Form.Nonresident.FileSize;
+
+			ret = std::make_shared<Buffer<T>>(pAttributeData->Form.Nonresident.AllocatedLength);
+
+			bool err = false;
+
+			std::vector<MFT_DATARUN> runList = read_dataruns(pAttributeData);
+			for (const MFT_DATARUN& run : runList)
+			{
+				if (err) break; //-V547
+
+				if (run.offset == 0)
+				{
+					for (ULONGLONG i = 0; i < run.length; i++)
+					{
+						readSize += min(filesize - readSize, _reader->sizes.cluster_size);
+					}
+				}
+				else
+				{
+					_reader->seek(run.offset * _reader->sizes.cluster_size);
+
+					if (!_reader->read(POINTER_ADD(PBYTE, ret->data(), DWORD(readSize)), static_cast<DWORD>(run.length) * _reader->sizes.cluster_size))
+					{
+						std::cout << "[!] ReadFile failed" << std::endl;
+						err = true;
+						break;
+					}
+					else
+					{
+						readSize += min(filesize - readSize, static_cast<DWORD>(run.length) * _reader->sizes.cluster_size);
+					}
+				}
+			}
+			if (readSize != filesize)
+			{
+
+				std::cout << "[!] Invalid read file size" << std::endl;
+				ret = nullptr;
+			}
+			if (real_size)
+			{
+				ret->shrink(static_cast<DWORD>(filesize));
+			}
+		}
+
+		return ret;
+	}
 
 	std::wstring filename();
 
-	ULONG64 datasize(std::string stream_name = "");
+	ULONG64 datasize(std::string stream_name = "", bool real_size = true);
 
-	std::shared_ptr<Buffer<PBYTE>> data(std::string stream_name = "");
+	std::shared_ptr<Buffer<PBYTE>> data(std::string stream_name = "", bool real_size = true);
 
-	ULONG64 data_to_file(std::wstring dest_filename, std::string stream_name = "");
+	ULONG64 data_to_file(std::wstring dest_filename, std::string stream_name = "", bool real_size = true);
 
-	cppcoro::generator<std::pair<PBYTE, DWORD>> process_data(std::string stream_name = "", DWORD blocksize = 1024 * 1024);
+	cppcoro::generator<std::pair<PBYTE, DWORD>> process_data(std::string stream_name = "", DWORD blocksize = 1024 * 1024, bool real_size = true);
 
 	std::vector<std::string> alternate_data_names();
 

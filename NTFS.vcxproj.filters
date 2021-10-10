@@ -168,6 +168,12 @@
     <ClInclude Include="Sources\EFS\certificate_file.h">
       <Filter>Header Files\EFS</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\EFS\pkcs12_archive.h">
+      <Filter>Header Files\EFS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\EFS\fek.h">
+      <Filter>Header Files\EFS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -320,14 +326,17 @@
     <ClCompile Include="Sources\Commands\command_efs_backup.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\EFS\pkcs12_backup.h">
-      <Filter>Header Files\EFS</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\Commands\commands.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_efs_certificate.cpp">
       <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_efs_decrypt.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\EFS\pkcs12_archive.cpp">
+      <Filter>Source Files\EFS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

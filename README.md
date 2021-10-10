@@ -4,7 +4,7 @@
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-brightgreen.svg?tyle=flat-square)](#)
 [![x64](https://img.shields.io/badge/Windows-64_bit-0078d7.svg)](#)
 [![x86](https://img.shields.io/badge/Windows-32_bit-0078d7.svg)](#)
-[![v1.3](https://img.shields.io/badge/Version-1.3-ff5733.svg)](#)
+[![v1.4](https://img.shields.io/badge/Version-1.4-ff5733.svg)](#)
 [![Build](https://ci.appveyor.com/api/projects/status/a3cn5dpdv146tdji?svg=true)](https://ci.appveyor.com/project/thewhiteninja/ntfstool)
 
 <img align="right" width="100" height="100" src="https://cdn-icons-png.flaticon.com/512/3850/3850133.png">
@@ -79,6 +79,7 @@ Options can be entered as decimal or hex number with "0x" prefix (ex: inode).
 | [bitlocker](#bitlocker)  | Display detailed information and hash ($bitlocker$) for all VMK. It is possible to test a password or recovery key. If it is correct, the decrypted VMK and FVEK is displayed. |
 | [bitdecrypt](#bitdecrypt)  | Decrypt a volume to a file using password, recovery key or bek. |
 | [efs.backup](#efs-backup)  | Export EFS keys in PKCS12 (pfx) format. |
+| [efs.decrypt](#efs-decrypt)  | Decrypt EFS encrypted file using keys in PKCS12 (pfx) format. |
 | [efs.certificate](#efs-certificate)  | List, display and export system certificates (SystemCertificates/My/Certificates). |
 | [efs.key](#efs-key)  | List, display, decrypt and export private keys (Crypto/RSA). |
 | [efs.masterkey](#efs-masterkey)  | List, display and decrypt masterkeys (Protect). |
@@ -707,6 +708,34 @@ Current third-party libs:
 </td></tr>
 </table>
 
+
+### EFS-decrypt
+<table>
+<tr><td>efs.decrypt efs.decrypt disk=0 volume=4 from=c:\cat.png pfx=z:\my_backup.pfx password=backup output=c:\socute.png</td></tr>
+<tr><td>
+
+    Decrypt EFS file from \\.\PhysicalDrive0 > Volume:4
+    ---------------------------------------------------
+
+    [+] Loading PKCS12 input file
+    [-] KeyID : 86598de9ed5dbdd00aa2ff467ed71f1f28acf61b
+    [-] Reading record: 13525
+    [+] Parsing $EFS streams
+    [-] 1 data decryption field(s) found
+    [+] Decrypting FEK
+    [-] FEK
+        +----------------------------------------------------------------------------------+
+        | Property      | Value                                                            |
+        +----------------------------------------------------------------------------------+
+        | Entropy       | 32                                                               |
+        | Algorithm     | CALG_AES_256                                                     |
+        | Key (256bits) | 5BBBB8A7F9DD9B9FFFDE9E62370254979F32A9CFFDDB74212A0C1AEECCD75B4A |
+        +----------------------------------------------------------------------------------+
+    [+] Decrypting file
+    [-] Decrypted file written to c:\socute.png (1.94 MiB)
+</td></tr>
+</table>
+
 ### EFS-certificate
 <table>
 <tr><td>efs.certificate disk=0 volume=4</td></tr>
@@ -810,7 +839,7 @@ Current third-party libs:
         |    |                                          |      ff:0c                                                                 |
         +----------------------------------------------------------------------------------------------------------------------------+
 </td></tr>
-<tr><td>efs.certificate disk=0 volume=4 inode=0xb5a4 output=mycert format=pem</td></tr>
+<tr><td>efs.certificate disk=0 volume=4 inode=0xb5a4 output=mycert</td></tr>
 <tr><td>
 	
     Display certificate from \\.\PhysicalDrive0 > Volume:4
@@ -997,7 +1026,7 @@ Current third-party libs:
 	    |    |                  | F39FC063F1F20323E3220229E29FA42D |
 	    +----------------------------------------------------------+
 </td></tr>
-<tr><td> efs.key disk=0 volume=4 inode=742107 masterkey=34...eb output=mykey format=pem</td></tr>
+<tr><td> efs.key disk=0 volume=4 inode=742107 masterkey=34...eb output=mykey</td></tr>
 <tr><td>
 	
 	Decrypt key from \\.\PhysicalDrive0 > Volume:4

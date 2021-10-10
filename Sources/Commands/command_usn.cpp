@@ -16,12 +16,9 @@
 #include <iomanip>
 #include <memory>
 
-int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output) {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output)
+{
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("USN Journals from " + disk->name() + " > Volume:" + std::to_string(vol->index()));

@@ -13,6 +13,8 @@ namespace commands {
 
 	namespace helpers
 	{
+		int is_ntfs(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol);
+
 		std::shared_ptr<MFTRecord> find_record(std::shared_ptr<NTFSExplorer> ex, std::shared_ptr<Options> opts);
 	}
 
@@ -36,6 +38,10 @@ namespace commands {
 			int dispatch(std::shared_ptr<Options> opts);
 		}
 		namespace backup
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
+		namespace decrypt
 		{
 			int dispatch(std::shared_ptr<Options> opts);
 		}

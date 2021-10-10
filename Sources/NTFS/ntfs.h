@@ -541,7 +541,6 @@ typedef struct {
 		struct {
 			DWORD cert_thumbprint_header_size;
 			DWORD cert_thumbprint_header_offset;
-
 		};
 	};
 } MFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY, * PMFT_RECORD_ATTRIBUTE_EFS_DATA_DECRYPTION_ENTRY;

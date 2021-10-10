@@ -5,15 +5,9 @@
 #include "EFS/certificate_file.h"
 
 
-const std::vector<std::string> format = { "pem" };
-
 int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("Display certificate from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
@@ -126,29 +120,13 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 	}
 	else
 	{
-		if (opts->format == "")
+		if (certificate_file->export_to_PEM(opts->output) == 0)
 		{
-			opts->format = format[0];
+			std::cout << "[+] Certificate exported to " << opts->output << ".pem" << std::endl;
 		}
 		else
 		{
-			opts->format = utils::strings::lower(opts->format);
-		}
-
-		if (std::find(format.begin(), format.end(), opts->format) == format.end())
-		{
-			std::cerr << "[!] Invalid output format (" << opts->format << ")" << std::endl;
-		}
-		else
-		{
-			if (certificate_file->export_to_PEM(opts->output) == 0)
-			{
-				std::cout << "[+] Certificate exported to " << opts->output << ".pem" << std::endl;
-			}
-			else
-			{
-				std::cerr << "[!] Unable to export the certificate" << std::endl;
-			}
+			std::cerr << "[!] Unable to export the certificate" << std::endl;
 		}
 	}
 
@@ -157,11 +135,7 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 
 int list_certificates(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("List certificates from " + disk->name() + " > Volume:" + std::to_string(vol->index()));

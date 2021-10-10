@@ -15,6 +15,7 @@
 #include "Utils/utils.h"
 #include "Utils/constant_names.h"
 #include "Utils/table.h"
+#include <Commands/commands.h>
 
 bool valid_record(PMFT_RECORD_HEADER ph)
 {
@@ -257,11 +258,7 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 
 int extract_deleted_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("Extract deleted file from " + disk->name() + " > Volume:" + std::to_string(vol->index()));

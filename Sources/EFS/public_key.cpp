@@ -13,6 +13,8 @@ PublicKey::PublicKey(PBYTE data, DWORD size)
 
 int PublicKey::export_to_PEM(std::string filename)
 {
+	int ret = 1;
+
 	RSA* rsa = RSA_new();
 	BIGNUM* n, * e;
 
@@ -27,25 +29,25 @@ int PublicKey::export_to_PEM(std::string filename)
 
 		RSA_set0_key(rsa, n, e, 0);
 
-		FILE* fp = nullptr;
-		fopen_s(&fp, (filename + ".pub.pem").c_str(), "wb");
-		if (!fp)
+		BIO* out = BIO_new_file((filename + ".pub.pem").c_str(), "wb");
+		if (out)
 		{
-			return 1;
+			if (!PEM_write_bio_RSA_PUBKEY(out, rsa))
+			{
+				ret = 3;
+			}
+			else
+			{
+				ret = 0;
+			}
+			BIO_free(out);
 		}
 		else
 		{
-			if (!PEM_write_RSA_PUBKEY(fp, rsa))
-			{
-				return 2;
-			}
-			fclose(fp);
+			ret = 2;
 		}
 		RSA_free(rsa);
 	}
-	else
-	{
-		return 3;
-	}
-	return 0;
+
+	return ret;
 }

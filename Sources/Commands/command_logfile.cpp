@@ -118,12 +118,9 @@ void print_record_log(HANDLE outputfile, PRECORD_LOG rl, const std::string& form
 	if (!FAILED(SizeTToDWord(to_write.size(), &write_size)))  WriteFile(outputfile, to_write.c_str(), write_size, &written, NULL);
 }
 
-int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output) {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output)
+{
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	utils::ui::title("LogFile from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 

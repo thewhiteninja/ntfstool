@@ -18,12 +18,9 @@
 
 #include <vss.h>
 
-int print_volumeshadow(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+int print_volumeshadow(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
+{
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("Volume Shadow from " + disk->name() + " > Volume:" + std::to_string(vol->index()));

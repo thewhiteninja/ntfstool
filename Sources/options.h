@@ -21,6 +21,7 @@ public:
 	std::string bek;
 	std::string fvek;
 	std::string image;
+	std::string pfx;
 
 	std::shared_ptr<Buffer<PBYTE>> masterkey = nullptr;
 
