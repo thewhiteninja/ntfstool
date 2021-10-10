@@ -51,7 +51,7 @@ uint64_t MFTRecord::raw_address(PMFT_RECORD_ATTRIBUTE_HEADER pAttr, uint64_t off
 	return 0;
 }
 
-ULONG64 MFTRecord::datasize(std::string stream_name)
+ULONG64 MFTRecord::datasize(std::string stream_name, bool real_size)
 {
 	if (_record->data()->flag & FILE_RECORD_FLAG_DIR)
 	{
@@ -67,7 +67,8 @@ ULONG64 MFTRecord::datasize(std::string stream_name)
 		}
 		else
 		{
-			return pAttribute->Form.Nonresident.FileSize;
+			if (real_size) return pAttribute->Form.Nonresident.FileSize;
+			else return pAttribute->Form.Nonresident.AllocatedLength;
 		}
 	}
 	else
@@ -93,7 +94,7 @@ ULONG64 MFTRecord::datasize(std::string stream_name)
 								std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttr->recordNumber & 0xffffffffffff);
 								if (extRecordHeader != nullptr)
 								{
-									return extRecordHeader->datasize();
+									return extRecordHeader->datasize(stream_name, real_size);
 								}
 								else
 								{
@@ -283,68 +284,6 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 	return ret;
 }
 
-template<typename T>
-std::shared_ptr<Buffer<T>> MFTRecord::attribute_data(PMFT_RECORD_ATTRIBUTE_HEADER pAttributeData)
-{
-	std::shared_ptr<Buffer<T>> ret = nullptr;
-
-	if (pAttributeData->FormCode == RESIDENT_FORM)
-	{
-		ret = std::make_shared<Buffer<T>>(pAttributeData->Form.Resident.ValueLength);
-		memcpy_s(ret->data(), ret->size(), POINTER_ADD(LPBYTE, pAttributeData, pAttributeData->Form.Resident.ValueOffset), pAttributeData->Form.Resident.ValueLength);
-	}
-	else if (pAttributeData->FormCode == NON_RESIDENT_FORM)
-	{
-		ULONGLONG readSize = 0;
-		ULONGLONG filesize = pAttributeData->Form.Nonresident.FileSize;
-
-		ret = std::make_shared<Buffer<T>>(pAttributeData->Form.Nonresident.AllocatedLength);
-
-		bool err = false;
-
-		std::vector<MFT_DATARUN> runList = read_dataruns(pAttributeData);
-		for (const MFT_DATARUN& run : runList)
-		{
-			if (err) break; //-V547
-
-			if (run.offset == 0)
-			{
-				for (ULONGLONG i = 0; i < run.length; i++)
-				{
-					readSize += min(filesize - readSize, _reader->sizes.cluster_size);
-				}
-			}
-			else
-			{
-				_reader->seek(run.offset * _reader->sizes.cluster_size);
-
-				if (!_reader->read(POINTER_ADD(PBYTE, ret->data(), DWORD(readSize)), static_cast<DWORD>(run.length) * _reader->sizes.cluster_size))
-				{
-					std::cout << "[!] ReadFile failed" << std::endl;
-					err = true;
-					break;
-				}
-				else
-				{
-					readSize += min(filesize - readSize, static_cast<DWORD>(run.length) * _reader->sizes.cluster_size);
-				}
-			}
-		}
-		if (readSize != filesize)
-		{
-
-			std::cout << "[!] Invalid read file size" << std::endl;
-			ret = nullptr;
-		}
-		else
-		{
-			ret->shrink(static_cast<DWORD>(filesize));
-		}
-	}
-
-	return ret;
-}
-
 std::vector<MFT_DATARUN> MFTRecord::read_dataruns(PMFT_RECORD_ATTRIBUTE_HEADER pAttribute)
 {
 	std::vector<MFT_DATARUN> result;
@@ -429,14 +368,14 @@ PMFT_RECORD_ATTRIBUTE_HEADER MFTRecord::attribute_header(DWORD type, std::string
 	return nullptr;
 }
 
-ULONG64 MFTRecord::data_to_file(std::wstring dest_filename, std::string stream_name)
+ULONG64 MFTRecord::data_to_file(std::wstring dest_filename, std::string stream_name, bool real_size)
 {
 	ULONG64 written_bytes = 0ULL;
 
 	HANDLE output = CreateFileW(dest_filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (output != INVALID_HANDLE_VALUE)
 	{
-		for (auto data_block : process_data(stream_name))
+		for (auto data_block : process_data(stream_name, real_size))
 		{
 			DWORD written_block;
 			if (!WriteFile(output, data_block.first, data_block.second, &written_block, NULL))
@@ -458,7 +397,7 @@ ULONG64 MFTRecord::data_to_file(std::wstring dest_filename, std::string stream_n
 	return written_bytes;
 }
 
-cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string stream_name, DWORD block_size)
+cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string stream_name, DWORD block_size, bool real_size)
 {
 	PMFT_RECORD_ATTRIBUTE_HEADER pAttributeData = attribute_header($DATA, stream_name);
 	if (pAttributeData != NULL)
@@ -471,7 +410,10 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 			if (pAttributeData->Form.Resident.ValueOffset + pAttributeData->Form.Resident.ValueLength <= pAttributeData->RecordLength)
 			{
 				PBYTE data = POINTER_ADD(PBYTE, pAttributeData, pAttributeData->Form.Resident.ValueOffset);
-				co_yield std::pair<PBYTE, DWORD>(data, pAttributeData->Form.Resident.ValueLength);
+				for (DWORD offset = 0; offset < pAttributeData->Form.Resident.ValueLength; offset += block_size)
+				{
+					co_yield std::pair<PBYTE, DWORD>(data + offset, min(block_size, pAttributeData->Form.Resident.ValueLength - offset));
+				}
 			}
 			else
 			{
@@ -567,7 +509,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 					}
 				}
 			}
-			else if (pAttributeData->FormCode == NON_RESIDENT_FORM)
+			else
 			{
 				Buffer<PBYTE> buffer(block_size);
 
@@ -599,7 +541,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 								break;
 							}
 							fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, block_size));
-							co_yield std::pair<PBYTE, DWORD>(buffer.data(), fixed_blocksize);
+							co_yield std::pair<PBYTE, DWORD>(buffer.data(), !real_size ? fixed_blocksize : block_size);
 							writeSize += fixed_blocksize;
 						}
 					}
@@ -643,7 +585,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 
 						for (std::pair<PBYTE, DWORD> b : extRecordHeader->process_data(stream_name, block_size))
 						{
-							if (filesize_left < b.second)
+							if (filesize_left < b.second && !real_size)
 							{
 								b.second = static_cast<DWORD>(filesize_left);
 							}
@@ -669,21 +611,21 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 	}
 }
 
-std::shared_ptr<Buffer<PBYTE>> MFTRecord::data(std::string stream_name)
+std::shared_ptr<Buffer<PBYTE>> MFTRecord::data(std::string stream_name, bool real_size)
 {
 	std::shared_ptr<Buffer<PBYTE>> ret = nullptr;
 
 	PMFT_RECORD_ATTRIBUTE_HEADER pAttributeData = attribute_header($DATA, stream_name);
 	if (pAttributeData != NULL)
 	{
-		return attribute_data<PBYTE>(pAttributeData);
+		return attribute_data<PBYTE>(pAttributeData, real_size);
 	}
 	else
 	{
 		PMFT_RECORD_ATTRIBUTE_HEADER pAttributeList = attribute_header($ATTRIBUTE_LIST);
 		if (pAttributeList != NULL)
 		{
-			std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE>> attribute_list_data = attribute_data<PMFT_RECORD_ATTRIBUTE>(pAttributeList);
+			std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE>> attribute_list_data = attribute_data<PMFT_RECORD_ATTRIBUTE>(pAttributeList, real_size);
 			if (attribute_list_data != nullptr)
 			{
 				DWORD offset = 0;

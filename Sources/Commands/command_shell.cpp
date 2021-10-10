@@ -79,11 +79,8 @@ std::string clean_disk_name(std::shared_ptr<Disk> disk)
 
 int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
+
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 	std::shared_ptr<MFTRecord> current_dir_record = explorer->mft()->record_from_number(ROOT_FILE_NAME_INDEX_NUMBER);
 	std::string current_dir = "\\";

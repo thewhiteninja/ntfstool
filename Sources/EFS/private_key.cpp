@@ -38,8 +38,9 @@ PrivateKey::PrivateKey(PBYTE data, DWORD size)
 
 int PrivateKey::export_private_to_PEM(std::string filename)
 {
-	RSA* rsa = RSA_new();
+	int ret = 1;
 
+	RSA* rsa = RSA_new();
 	if (rsa != nullptr)
 	{
 		BIGNUM* p, * q, * n, * e, * d, * dmp1, * dmq1, * iqmp;
@@ -67,33 +68,33 @@ int PrivateKey::export_private_to_PEM(std::string filename)
 		RSA_set0_key(rsa, n, e, d);
 		RSA_set0_crt_params(rsa, dmp1, dmq1, iqmp);
 
-		FILE* fp = nullptr;
-		fopen_s(&fp, (filename + ".priv.pem").c_str(), "wb");
-		if (!fp)
+		BIO* out = BIO_new_file((filename + ".priv.pem").c_str(), "wb");
+		if (out)
 		{
-			return 1;
+			if (!PEM_write_bio_RSAPrivateKey(out, rsa, nullptr, nullptr, 0, nullptr, nullptr))
+			{
+				ret = 3;
+			}
+			else
+			{
+				ret = 0;
+			}
+			BIO_free(out);
 		}
 		else
 		{
-			if (!PEM_write_RSAPrivateKey(fp, rsa, nullptr, nullptr, 0, nullptr, nullptr))
-			{
-				return 2;
-			}
-			fclose(fp);
+			ret = 2;
 		}
 		RSA_free(rsa);
 	}
-	else
-	{
-		return 3;
-	}
-	return 0;
+	return ret;
 }
 
 int PrivateKey::export_public_to_PEM(std::string filename)
 {
-	RSA* rsa = RSA_new();
+	int ret = 1;
 
+	RSA* rsa = RSA_new();
 	if (rsa != nullptr)
 	{
 		BIGNUM* n, * e;
@@ -107,27 +108,27 @@ int PrivateKey::export_public_to_PEM(std::string filename)
 
 		RSA_set0_key(rsa, n, e, nullptr);
 
-		FILE* fp = nullptr;
-		fopen_s(&fp, (filename + ".pub.pem").c_str(), "wb");
-		if (!fp)
+		BIO* out = BIO_new_file((filename + ".pub.pem").c_str(), "wb");
+		if (out)
 		{
-			return 1;
+			if (!PEM_write_bio_RSA_PUBKEY(out, rsa))
+			{
+				ret = 3;
+			}
+			else
+			{
+				ret = 0;
+			}
+			BIO_free(out);
 		}
 		else
 		{
-			if (!PEM_write_RSA_PUBKEY(fp, rsa))
-			{
-				return 2;
-			}
-			fclose(fp);
+			ret = 2;
 		}
 		RSA_free(rsa);
 	}
-	else
-	{
-		return 3;
-	}
-	return 0;
+
+	return ret;
 }
 
 RSA* PrivateKey::export_private_to_RSA()

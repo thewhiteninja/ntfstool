@@ -7,11 +7,7 @@
 
 int decrypt_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("Decrypt masterkey from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
@@ -25,7 +21,7 @@ int decrypt_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, s
 	std::shared_ptr<MasterKeyFile> masterkey_file = std::make_shared<MasterKeyFile>(data->data(), data->size());
 	if (!masterkey_file->is_loaded())
 	{
-		std::cerr << "[!] Err: Failed to parse masterkey file from record: " << opts->inode << std::endl;
+		std::cerr << "[!] Failed to parse masterkey file from record: " << opts->inode << std::endl;
 		return 3;
 	}
 
@@ -57,7 +53,7 @@ int decrypt_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, s
 	}
 	else
 	{
-		std::cerr << "[!] Err: No masterkey in specified file." << std::endl;
+		std::cerr << "[!] No masterkey in specified file." << std::endl;
 		return 3;
 	}
 
@@ -67,11 +63,7 @@ int decrypt_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, s
 
 int show_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("Display masterkey from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
@@ -85,7 +77,7 @@ int show_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 	std::shared_ptr<MasterKeyFile> masterkey_file = std::make_shared<MasterKeyFile>(data->data(), data->size());
 	if (!masterkey_file->is_loaded())
 	{
-		std::cerr << "[!] Err: Failed to parse masterkey file from record: " << opts->inode << std::endl;
+		std::cerr << "[!] Failed to parse masterkey file from record: " << opts->inode << std::endl;
 		return 3;
 	}
 
@@ -214,11 +206,7 @@ int show_masterkey(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 
 int list_masterkeys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("List masterkeys from " + disk->name() + " > Volume:" + std::to_string(vol->index()));

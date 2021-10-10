@@ -6,15 +6,9 @@
 #include <EFS/key_file.h>
 #include <EFS/private_key.h>
 
-const std::vector<std::string> format = { "pem" };
-
 int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("Decrypt key from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
@@ -22,180 +16,143 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
+	std::shared_ptr<MFTRecord> key_file_record = commands::helpers::find_record(explorer, opts);
 
-	std::shared_ptr<MFTRecord> key_file_record = nullptr;
-
-	std::cout << "[+] Reading key file record: ";
-	if (opts->from != "")
+	auto data = key_file_record->data();
+	std::shared_ptr<KeyFile> key_file = std::make_shared<KeyFile>(data->data(), data->size());
+	if (!key_file->is_loaded())
 	{
-		std::cout << opts->from << std::endl;
-		key_file_record = explorer->mft()->record_from_path(opts->from);
-	}
-	else
-	{
-		std::cout << opts->inode << std::endl;
-		key_file_record = explorer->mft()->record_from_number(opts->inode);
+		std::cerr << "[!] Failed to parse key file from record: " << opts->inode << std::endl;
+		return 3;
 	}
 
-	if (key_file_record == nullptr)
+	auto key = key_file->private_key();
+	if (key)
 	{
-		std::cerr << "[!] Err: Failed to read record: " << opts->inode << std::endl;
-		return 2;
-	}
-	else
-	{
-		auto data = key_file_record->data();
-		std::shared_ptr<KeyFile> key_file = std::make_shared<KeyFile>(data->data(), data->size());
-		if (!key_file->is_loaded())
+		std::cout << "[-] Key" << std::endl;
+		std::cout << "    Encryption Algorithm : " << constants::efs::enc_algorithm(key->header()->EncryptionAlgorithm) << std::endl;
+		std::cout << "    Hash Algorithm       : " << constants::efs::hash_algorithm(key->header()->HashAlgorithm) << std::endl;
+		std::cout << "    Salt                 : " << utils::convert::to_hex(key->salt()->data(), key->salt()->size()) << std::endl;
+
+		std::cout << "[+] Decrypting key" << std::endl;
+		std::shared_ptr<PrivateKey> res = key->decrypt_with_masterkey(opts->masterkey);
+		if (res == nullptr)
 		{
-			std::cerr << "[!] Err: Failed to parse key file from record: " << opts->inode << std::endl;
-			return 3;
-		}
-
-		auto key = key_file->private_key();
-		if (key)
-		{
-			std::cout << "[-] Key" << std::endl;
-			std::cout << "    Encryption Algorithm : " << constants::efs::enc_algorithm(key->header()->EncryptionAlgorithm) << std::endl;
-			std::cout << "    Hash Algorithm       : " << constants::efs::hash_algorithm(key->header()->HashAlgorithm) << std::endl;
-			std::cout << "    Salt                 : " << utils::convert::to_hex(key->salt()->data(), key->salt()->size()) << std::endl;
-
-			std::cout << "[+] Decrypting key" << std::endl;
-			std::shared_ptr<PrivateKey> res = key->decrypt_with_masterkey(opts->masterkey);
-			if (res == nullptr)
-			{
-				std::cout << "[!] Failed to decrypt. Check masterkey." << std::endl;
-			}
-			else
-			{
-				if (opts->output != "")
-				{
-					if (opts->format == "")
-					{
-						opts->format = format[0];
-					}
-					else
-					{
-						opts->format = utils::strings::lower(opts->format);
-					}
-
-					if (std::find(format.begin(), format.end(), opts->format) == format.end())
-					{
-						std::cerr << "[!] Err: Invalid output format. (" << opts->format << ")" << std::endl;
-					}
-					else
-					{
-						if (res->export_public_to_PEM(opts->output) == 0)
-						{
-							std::cout << "[+] Public key exported to " << opts->output << ".pub.pem" << "." << std::endl;
-						}
-						else
-						{
-							std::cerr << "[!] Err: Unable to export the public key." << std::endl;
-						}
-						if (res->export_private_to_PEM(opts->output) == 0)
-						{
-							std::cout << "[+] Private key exported to " << opts->output << ".priv.pem" << "." << std::endl;
-						}
-						else
-						{
-							std::cerr << "[!] Err: Unable to export the private key." << std::endl;
-						}
-					}
-				}
-				else
-				{
-
-					std::cout << "[+] Clear key (" << res->header()->Bitsize << "bits):" << std::endl;
-
-					std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
-					tab->set_margin_left(4);
-					tab->set_interline(true);
-					tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
-					tab->add_header_line("Property");
-					tab->add_header_line("Value");
-
-					int i = 0;
-					tab->add_item_line(std::to_string(i++));
-					tab->add_item_line("Magic");
-					std::string magic_str = { ((char*)(&res->header()->Magic))[0],((char*)(&res->header()->Magic))[1],((char*)(&res->header()->Magic))[2],((char*)(&res->header()->Magic))[3] };
-					tab->add_item_line(magic_str);
-
-					tab->new_line();
-
-					tab->add_item_line(std::to_string(i++));
-					tab->add_item_line("Bitsize");
-					tab->add_item_line(std::to_string(res->header()->Bitsize));
-
-					tab->new_line();
-
-					tab->add_item_line(std::to_string(i++));
-					tab->add_item_line("Permissions");
-					tab->add_item_multiline(constants::efs::permissions(res->header()->Permissions));
-
-					tab->new_line();
-
-					tab->add_item_line(std::to_string(i++));
-					tab->add_item_line("Exponent");
-					tab->add_item_line(std::to_string(res->header()->Exponent));
-
-					tab->new_line();
-
-					tab->add_item_line(std::to_string(i++));
-					tab->add_item_line("Modulus");
-					tab->add_item_line(utils::convert::to_hex(res->modulus()->data(), res->modulus()->size()));
-
-					tab->new_line();
-
-					tab->add_item_line(std::to_string(i++));
-					tab->add_item_line("Prime1");
-					tab->add_item_line(utils::convert::to_hex(res->prime1()->data(), res->prime1()->size()));
-
-					tab->new_line();
-
-					tab->add_item_line(std::to_string(i++));
-					tab->add_item_line("Prime2");
-					tab->add_item_line(utils::convert::to_hex(res->prime2()->data(), res->prime2()->size()));
-
-					tab->new_line();
-
-					tab->add_item_line(std::to_string(i++));
-					tab->add_item_line("Exponent1");
-					tab->add_item_line(utils::convert::to_hex(res->exponent1()->data(), res->exponent1()->size()));
-
-					tab->new_line();
-
-					tab->add_item_line(std::to_string(i++));
-					tab->add_item_line("Exponent2");
-					tab->add_item_line(utils::convert::to_hex(res->exponent2()->data(), res->exponent2()->size()));
-
-					tab->new_line();
-
-					tab->add_item_line(std::to_string(i++));
-					tab->add_item_line("Coefficient");
-					tab->add_item_line(utils::convert::to_hex(res->coefficient()->data(), res->coefficient()->size()));
-
-					tab->new_line();
-
-					tab->add_item_line(std::to_string(i++));
-					tab->add_item_line("Private Exponent");
-					tab->add_item_line(utils::convert::to_hex(res->private_exponent()->data(), res->private_exponent()->size()));
-
-					tab->new_line();
-
-					tab->render(std::cout);
-				}
-			}
+			std::cout << "[!] Failed to decrypt. Check masterkey." << std::endl;
 		}
 		else
 		{
-			std::cerr << "[!] Err: No key in specified file." << std::endl;
-			return 3;
-		}
+			if (opts->output != "")
+			{
+				if (res->export_public_to_PEM(opts->output) == 0)
+				{
+					std::cout << "[+] Public key exported to " << opts->output << ".pub.pem" << "." << std::endl;
+				}
+				else
+				{
+					std::cerr << "[!] Unable to export the public key." << std::endl;
+				}
+				if (res->export_private_to_PEM(opts->output) == 0)
+				{
+					std::cout << "[+] Private key exported to " << opts->output << ".priv.pem" << "." << std::endl;
+				}
+				else
+				{
+					std::cerr << "[!] Unable to export the private key." << std::endl;
+				}
+			}
+			else
+			{
+				std::cout << "[+] Clear key (" << res->header()->Bitsize << "bits):" << std::endl;
 
-		return 0;
+				std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
+				tab->set_margin_left(4);
+				tab->set_interline(true);
+				tab->add_header_line("Id", utils::ui::TableAlign::RIGHT);
+				tab->add_header_line("Property");
+				tab->add_header_line("Value");
+
+				int i = 0;
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Magic");
+				std::string magic_str = { ((char*)(&res->header()->Magic))[0],((char*)(&res->header()->Magic))[1],((char*)(&res->header()->Magic))[2],((char*)(&res->header()->Magic))[3] };
+				tab->add_item_line(magic_str);
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Bitsize");
+				tab->add_item_line(std::to_string(res->header()->Bitsize));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Permissions");
+				tab->add_item_multiline(constants::efs::permissions(res->header()->Permissions));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Exponent");
+				tab->add_item_line(std::to_string(res->header()->Exponent));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Modulus");
+				tab->add_item_line(utils::convert::to_hex(res->modulus()->data(), res->modulus()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Prime1");
+				tab->add_item_line(utils::convert::to_hex(res->prime1()->data(), res->prime1()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Prime2");
+				tab->add_item_line(utils::convert::to_hex(res->prime2()->data(), res->prime2()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Exponent1");
+				tab->add_item_line(utils::convert::to_hex(res->exponent1()->data(), res->exponent1()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Exponent2");
+				tab->add_item_line(utils::convert::to_hex(res->exponent2()->data(), res->exponent2()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Coefficient");
+				tab->add_item_line(utils::convert::to_hex(res->coefficient()->data(), res->coefficient()->size()));
+
+				tab->new_line();
+
+				tab->add_item_line(std::to_string(i++));
+				tab->add_item_line("Private Exponent");
+				tab->add_item_line(utils::convert::to_hex(res->private_exponent()->data(), res->private_exponent()->size()));
+
+				tab->new_line();
+
+				tab->render(std::cout);
+			}
+		}
 	}
+	else
+	{
+		std::cerr << "[!] No key in specified file." << std::endl;
+		return 3;
+	}
+
+	return 0;
 }
+
 
 std::vector<std::string> print_encrypted_private_key(std::shared_ptr<PrivateKeyEnc> private_key)
 {
@@ -237,11 +194,7 @@ std::vector<std::string> print_encrypted_private_key(std::shared_ptr<PrivateKeyE
 
 int show_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("Display key from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
@@ -255,7 +208,7 @@ int show_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 	std::shared_ptr<KeyFile> key_file = std::make_shared<KeyFile>(data->data(), data->size());
 	if (!key_file->is_loaded())
 	{
-		std::cerr << "[!] Err: Failed to parse key file from record: " << opts->inode << std::endl;
+		std::cerr << "[!] Failed to parse key file from record: " << opts->inode << std::endl;
 		return 3;
 	}
 
@@ -396,11 +349,7 @@ int show_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 
 int list_keys(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	if ((vol->filesystem() != "NTFS") && (vol->filesystem() != "Bitlocker"))
-	{
-		std::cerr << "[!] NTFS volume required" << std::endl;
-		return 1;
-	}
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
 	utils::ui::title("List keys from " + disk->name() + " > Volume:" + std::to_string(vol->index()));

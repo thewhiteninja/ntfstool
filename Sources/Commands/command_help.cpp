@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <memory>
 
-#define VERSION "1.35"
+#define VERSION "1.4"
 
 void usage(const char* binname)
 {
@@ -28,6 +28,7 @@ void usage(const char* binname)
 	std::cerr << "  bitdecrypt      : decrypt volume to an image file" << std::endl;
 	std::cerr << "  fve             : display FVE metadata" << std::endl;
 	std::cerr << "  efs.backup      : Export EFS keys from a volume" << std::endl;
+	std::cerr << "  efs.decrypt     : Decrypt EFS encrypted file from backup key" << std::endl;
 	std::cerr << "  efs.certificate : list, display and export system certificates" << std::endl;
 	std::cerr << "  efs.key         : list, display, decrypt and export private keys" << std::endl;
 	std::cerr << "  efs.masterkey   : list, display and decrypt masterkeys" << std::endl;
@@ -181,6 +182,14 @@ void print_help_efs_backup(const char* name)
 	command_examples(name, "Export EFS keys for disk 1, volume 2 using password:123456", "efs.backup disk=1 volume=2 password=123456");
 }
 
+void print_help_efs_decrypt(const char* name)
+{
+	command_header("efs.decrypt");
+	command_description(name, "efs.decrypt [disk id] [volume id] [inode|from] [pfx] [password] (output)", "Decrypt file from inode or path using pfx archive (protected by password) to output");
+	command_examples(name, "Decrypt EFS file inode:1234 for disk 1 and volume 2 using backup.pfx protected by password 123456 to mydecryptedfile",
+		"efs.decrypt disk=1 volume=2 inode=1234 pfx=backup.pfx password=123456 output=mydecryptedfile");
+}
+
 void print_help_efs_key(const char* name)
 {
 	command_header("efs.key");
@@ -188,7 +197,7 @@ void print_help_efs_key(const char* name)
 	command_examples(name, "List keys for disk 1, volume 2", "efs.key disk=1 volume=2");
 	command_examples(name, "Display a key for disk 1, volume 2 and inode 0x1337", "efs.key disk=1 volume=2 inode=0x1337");
 	command_examples(name, "Decrypt a key for inode 0x1337 with masterkey", "efs.key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321");
-	command_examples(name, "Export a key to mykey.pem (format in [pem])", "efs.key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321 output=mykey format=pem");
+	command_examples(name, "Export a key to mykey.pem", "efs.key disk=1 volume=2 inode=0x1337 masterkey=DEADBEEF123...321 output=mykey");
 }
 
 void print_help_efs_certificate(const char* name)
@@ -197,7 +206,7 @@ void print_help_efs_certificate(const char* name)
 	command_description(name, "efs.certificate [disk id] [volume id] [inode|from] (output) (format)", "List and display certificate on a volume");
 	command_examples(name, "List certificates for disk 1, volume 2", "efs.certificate disk=1 volume=2");
 	command_examples(name, "Display a certificate for disk 1, volume 2 and inode 0x1337", "efs.certificate disk=1 volume=2 inode=0x1337");
-	command_examples(name, "Export a certificate to mycert.pem (format in [pem])", "efs.certificate disk=1 volume=2 inode=0x1337 output=mycert format=pem");
+	command_examples(name, "Export a certificate to mycert.pem", "efs.certificate disk=1 volume=2 inode=0x1337 output=mycert");
 }
 
 void print_help_extract(const char* name)
@@ -291,10 +300,11 @@ namespace commands
 				if (opts->subcommand == "logfile") { print_help_logfile(name.c_str()); return; }
 				if (opts->subcommand == "reparse") { print_help_reparse(name.c_str()); return; }
 				if (opts->subcommand == "usn") { print_help_usn(name.c_str()); return; }
+				if (opts->subcommand == "efs.backup") { print_help_efs_backup(name.c_str()); return; }
 				if (opts->subcommand == "efs.certificate") { print_help_efs_certificate(name.c_str()); return; }
+				if (opts->subcommand == "efs.decrypt") { print_help_efs_decrypt(name.c_str()); return; }
 				if (opts->subcommand == "efs.key") { print_help_efs_key(name.c_str()); return; }
 				if (opts->subcommand == "efs.masterkey") { print_help_efs_masterkey(name.c_str()); return; }
-				if (opts->subcommand == "efs.backup") { print_help_efs_backup(name.c_str()); return; }
 				if (opts->subcommand == "undelete") { print_help_undelete(name.c_str()); return; }
 				if (opts->subcommand == "shell") { print_help_shell(name.c_str()); return; }
 				if (opts->subcommand == "smart") { print_help_smart(name.c_str()); return; }
