@@ -42,6 +42,18 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 		}
 		else
 		{
+			std::cout << "[+] Key successfully decrypted" << std::endl;
+			auto export_flags_enc = key_file->export_flags();
+			std::shared_ptr<ExportFlags> export_flags = export_flags_enc->decrypt_with_masterkey(opts->masterkey);
+			if (export_flags == nullptr)
+			{
+				std::cerr << "[!] Failed to decrypt export flags. Check the masterkey" << std::endl;
+			}
+			else
+			{
+				std::cout << "[+] Export flags         : " << utils::format::hex(export_flags->flags()) << (export_flags->flags() ? (" (" + constants::efs::export_flag(export_flags->flags()) + ")") : "") << std::endl;
+			}
+
 			if (opts->output != "")
 			{
 				if (res->export_public_to_PEM(opts->output) == 0)
@@ -63,7 +75,7 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 			}
 			else
 			{
-				std::cout << "[+] Clear key (" << res->header()->Bitsize << "bits):" << std::endl;
+				std::cout << "[+] Clear key (" << res->header()->Bitsize << "bits) :" << std::endl;
 
 				std::shared_ptr<utils::ui::Table> tab = std::make_shared<utils::ui::Table>();
 				tab->set_margin_left(4);
@@ -86,11 +98,13 @@ int decrypt_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::sh
 
 				tab->new_line();
 
+				/*
 				tab->add_item_line(std::to_string(i++));
 				tab->add_item_line("Permissions");
 				tab->add_item_multiline(constants::efs::permissions(res->header()->Permissions));
 
 				tab->new_line();
+				*/
 
 				tab->add_item_line(std::to_string(i++));
 				tab->add_item_line("Exponent");
@@ -290,6 +304,7 @@ int show_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 				"Size        : " + std::to_string(public_key->header()->Bitsize),
 				"Exponent    : " + std::to_string(public_key->header()->Exponent),
 		};
+		/*
 		auto permissions_str = constants::efs::permissions(public_key->header()->Permissions);
 		for (int pi = 0; pi < permissions_str.size(); pi++)
 		{
@@ -302,6 +317,7 @@ int show_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 				cell.push_back("              " + permissions_str[pi]);
 			}
 		}
+		*/
 		cell.push_back("");
 		cell.push_back("Modulus     : " + utils::convert::to_hex(public_key->modulus()->data(), public_key->modulus()->size()));
 		tab->add_item_multiline(cell);
@@ -329,7 +345,7 @@ int show_key(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 		tab->new_line();
 	}
 
-	auto export_flag = key_file->export_flag();
+	auto export_flag = key_file->export_flags();
 	if (export_flag)
 	{
 		tab->add_item_line(std::to_string(i++));

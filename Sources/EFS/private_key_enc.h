@@ -33,7 +33,7 @@ typedef struct {
 
 class PrivateKeyEnc
 {
-private:
+protected:
 	PRIVATEKEY_ENC_BLOB _header;
 
 	std::string _description;

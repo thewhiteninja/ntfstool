@@ -156,9 +156,6 @@
     <ClInclude Include="Sources\EFS\private_key_enc.h">
       <Filter>Header Files\EFS</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\EFS\export_flag.h">
-      <Filter>Header Files\EFS</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\EFS\public_key.h">
       <Filter>Header Files\EFS</Filter>
     </ClInclude>
@@ -172,6 +169,12 @@
       <Filter>Header Files\EFS</Filter>
     </ClInclude>
     <ClInclude Include="Sources\EFS\fek.h">
+      <Filter>Header Files\EFS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\EFS\export_flags.h">
+      <Filter>Header Files\EFS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\EFS\export_flags_enc.h">
       <Filter>Header Files\EFS</Filter>
     </ClInclude>
   </ItemGroup>
@@ -336,6 +339,9 @@
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\EFS\pkcs12_archive.cpp">
+      <Filter>Source Files\EFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\EFS\export_flags_enc.cpp">
       <Filter>Source Files\EFS</Filter>
     </ClCompile>
   </ItemGroup>

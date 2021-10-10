@@ -7,7 +7,7 @@
 
 #include "Utils/utils.h"
 #include <EFS/private_key_enc.h>
-#include <EFS/export_flag.h>
+#include <EFS/export_flags_enc.h>
 #include <EFS/public_key.h>
 
 #pragma pack(push, 1)
@@ -44,7 +44,7 @@ private:
 	std::shared_ptr<PrivateKeyEnc> _private_key = nullptr;
 	std::shared_ptr<Buffer<PBYTE>> _hmac = nullptr;
 	std::shared_ptr<Buffer<PBYTE>> _sign_export_flag = nullptr;
-	std::shared_ptr<ExportFlagEnc> _export_flag = nullptr;
+	std::shared_ptr<ExportFlagsEnc> _export_flag = nullptr;
 
 	void _load_keyfile();
 
@@ -75,5 +75,5 @@ public:
 
 	std::shared_ptr<Buffer<PBYTE>> sign_export_flag() { return _sign_export_flag; }
 
-	std::shared_ptr<ExportFlagEnc> export_flag() { return _export_flag; }
+	std::shared_ptr<ExportFlagsEnc> export_flags() { return _export_flag; }
 };

@@ -46,7 +46,7 @@ void KeyFile::_load_keyfile()
 	}
 	if (_buf->data()->ExExportFlagLen)
 	{
-		_export_flag = std::make_shared<ExportFlagEnc>(_buf->data()->Data + offset, _buf->data()->ExExportFlagLen);
+		_export_flag = std::make_shared<ExportFlagsEnc>(_buf->data()->Data + offset, _buf->data()->ExExportFlagLen);
 		offset += _buf->data()->ExExportFlagLen;
 	}
 }

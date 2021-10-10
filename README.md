@@ -57,6 +57,7 @@ More information on [Mimikatz Wiki][4]
 ### Shell
 
 There is a limited shell with few commands (exit, cd, ls, cat, pwd, cp, quit, rec).
+Command `rec` shows the MFT record details.
 
 ## Help & Examples
 
@@ -975,7 +976,9 @@ Current third-party libs:
 	    Hash Algorithm       : CALG_SHA_512
 	    Salt                 : ABABD5324CCE0254BC726C33F5A777D38BC4D75CACC2360EF3276EB4DC42FF6A
 	[+] Decrypting key
-	[+] Clear key (2048bits):
+    [+] Key successfully decrypted
+    [+] Export flags         : 00000001 (ALLOW_EXPORT_FLAG)
+	[+] Clear key (2048bits) :
 	    +----------------------------------------------------------+
 	    | Id | Property         | Value                            |
 	    +----------------------------------------------------------+
@@ -983,42 +986,33 @@ Current third-party libs:
 	    +----------------------------------------------------------+
 	    |  1 | Bitsize          | 2048                             |
 	    +----------------------------------------------------------+
-	    |  2 | Permissions      | CRYPT_ENCRYPT                    |
-	    |    |                  | CRYPT_DECRYPT                    |
-	    |    |                  | CRYPT_EXPORT                     |
-	    |    |                  | CRYPT_READ                       |
-	    |    |                  | CRYPT_WRITE                      |
-	    |    |                  | CRYPT_MAC                        |
-	    |    |                  | CRYPT_EXPORT_KEY                 |
-	    |    |                  | CRYPT_IMPORT_KEY                 |
+	    |  2 | Exponent         | 65537                            |
 	    +----------------------------------------------------------+
-	    |  3 | Exponent         | 65537                            |
-	    +----------------------------------------------------------+
-	    |  4 | Modulus          | 96883F07FF78DA8354D037A94F897BD7 |
+	    |  3 | Modulus          | 96883F07FF78DA8354D037A94F897BD7 |
                                       ...
 	    |    |                  | FA77A3D04DD10D044761E65355B335B5 |
 	    +----------------------------------------------------------+
-	    |  5 | Prime1           | C02F585644ED6326FF82368B0AD9ECD4 |
+	    |  4 | Prime1           | C02F585644ED6326FF82368B0AD9ECD4 |
                                       ...
 	    |    |                  | 65F7DE6D173FEBEF95BE491FB222E07B |
 	    +----------------------------------------------------------+
-	    |  6 | Prime2           | C884376BBC50C2A14C495894FBF980DE |
+	    |  5 | Prime2           | C884376BBC50C2A14C495894FBF980DE |
                                       ...
 	    |    |                  | 6759E812B6385B9151EBED8DCD65238F |
 	    +----------------------------------------------------------+
-	    |  7 | Exponent1        | 0E33B17876918051427271EB667AE238 |
+	    |  6 | Exponent1        | 0E33B17876918051427271EB667AE238 |
                                       ...
 	    |    |                  | 69349EF83ACE9B75D20004D155CDA3FF |
 	    +----------------------------------------------------------+
-	    |  8 | Exponent2        | 5BF265077E1EFA60C47E8DA423B751A4 |
+	    |  7 | Exponent2        | 5BF265077E1EFA60C47E8DA423B751A4 |
                                       ...
 	    |    |                  | E7008F2EA5684A74E4BFEEFAAB48C979 |
 	    +----------------------------------------------------------+
-	    |  9 | Coefficient      | 7D68AA3844F096959C23BD59E4BE3147 |
+	    |  8 | Coefficient      | 7D68AA3844F096959C23BD59E4BE3147 |
                                       ...
 	    |    |                  | 592ABC1BEDEBA6F5B4BDE3D0F9BEF7C5 |
 	    +----------------------------------------------------------+
-	    | 10 | Private Exponent | 2462A061AD85A7C3B0DF7764CC5DDDFA |
+	    |  9 | Private Exponent | 2462A061AD85A7C3B0DF7764CC5DDDFA |
 	    |    |                  | 40D83B3FBF0D9D016C419E6B6744AD73 |
                                       ...
 	    |    |                  | 47685BDEB0FABDC21AF5CABBA13D138D |
@@ -1038,8 +1032,9 @@ Current third-party libs:
 	    Hash Algorithm       : CALG_SHA_512
 	    Salt                 : ABABD5324CCE0254BC726C33F5A777D38BC4D75CACC2360EF3276EB4DC42FF6A
 	[+] Decrypting key
+    [+] Key successfully decrypted
 	[+] Public key exported to mykey.pub.pem.	    
-        [+] Private key exported to mykey.priv.pem.	    
+    [+] Private key exported to mykey.priv.pem.	    
 </td></tr>
 </table>
 

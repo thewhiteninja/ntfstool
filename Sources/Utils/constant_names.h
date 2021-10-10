@@ -82,6 +82,8 @@ namespace constants {
 		std::string cert_prop_flags(DWORD f);
 
 		std::string cert_prop_keyspec(DWORD k);
+
+		std::string export_flag(DWORD f);
 	}
 
 	namespace bitlocker
