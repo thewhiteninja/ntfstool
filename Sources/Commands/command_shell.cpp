@@ -57,11 +57,11 @@ const std::map<std::string, std::string> help_strings = {
 
 void help(std::string cmd)
 {
-	std::cout << "= Commands" << std::endl;
+	std::cout << "- Commands" << std::endl;
 
 	for (auto command : help_strings)
 	{
-		std::cout << "    " << command.first << "\t\t: " << command.second << std::endl;
+		std::cout << "    " << std::setw(4) << command.first << " : " << command.second << std::endl;
 	}
 }
 
