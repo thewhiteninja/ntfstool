@@ -27,15 +27,15 @@ std::shared_ptr<Buffer<PEFS_FEK>> decrypt_fek(RSA* private_key, std::shared_ptr<
 	return nullptr;
 }
 
-void decrypt_block(std::pair<PBYTE, DWORD> block, std::shared_ptr<Buffer<PEFS_FEK>> fek, DWORD64 index)
+void decrypt_block(std::pair<PBYTE, DWORD> block, std::shared_ptr<Buffer<PEFS_FEK>> fek, DWORD64 index, ULONG32 cluster_size)
 {
 	EVP_CIPHER_CTX* pctx = EVP_CIPHER_CTX_new();
 	unsigned char iv[16];
 
 	memcpy_s(iv, 16, EFS_IV, 16);
 
-	((DWORD64*)iv)[0] += (index * 512);
-	((DWORD64*)iv)[1] += (index * 512);
+	((DWORD64*)iv)[0] += (index * cluster_size);
+	((DWORD64*)iv)[1] += (index * cluster_size);
 
 	int outl = block.second;
 	EVP_DecryptInit(pctx, utils::crypto::cryptoapi::encryption_to_evp(fek->data()->Algorithm), fek->data()->Key, iv);
@@ -44,7 +44,7 @@ void decrypt_block(std::pair<PBYTE, DWORD> block, std::shared_ptr<Buffer<PEFS_FE
 	EVP_CIPHER_CTX_free(pctx);
 }
 
-int decrypt_file(std::shared_ptr<MFTRecord> record, std::shared_ptr<Buffer<PEFS_FEK>> fek, std::shared_ptr<Options> opts)
+int decrypt_file(std::shared_ptr<MFTRecord> record, std::shared_ptr<Buffer<PEFS_FEK>> fek, std::shared_ptr<Options> opts, ULONG32 cluster_size)
 {
 	int ret = 0;
 	if (opts->output == "")
@@ -59,11 +59,11 @@ int decrypt_file(std::shared_ptr<MFTRecord> record, std::shared_ptr<Buffer<PEFS_
 		DWORD res_write = 0;
 		DWORD index_block = 0;
 		DWORD64 clear_size = record->datasize();
-		for (auto data_block : record->process_data("", 512, true))
+		for (auto data_block : record->process_data("", cluster_size, true))
 		{
-			if (data_block.second == 512)
+			if (data_block.second == cluster_size)
 			{
-				decrypt_block(data_block, fek, index_block);
+				decrypt_block(data_block, fek, index_block, cluster_size);
 
 				int need_to_write = static_cast<int>(min(clear_size - written_bytes, data_block.second));
 				if (need_to_write)
@@ -194,7 +194,7 @@ int load_key_and_decrypt_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume
 							table = nullptr;
 
 							std::cout << "[+] Decrypting file" << std::endl;
-							if (!decrypt_file(record, decrypted_fek, opts))
+							if (!decrypt_file(record, decrypted_fek, opts, explorer->reader()->sizes.cluster_size))
 							{
 								std::cout << "[-] Decrypted file written to " << opts->output << " (" << utils::format::size(record->datasize()) << ")" << std::endl;
 							}
