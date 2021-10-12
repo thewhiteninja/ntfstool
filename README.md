@@ -14,6 +14,8 @@
 NTFSTool is a forensic tool focused on [NTFS][10] volumes.
 It supports reading partition info (mbr, partition table, vbr) but also information on master file table, bitlocker encrypted volume, EFS encrypted files and more.
 
+Download the lastest binaries in the [latest](https://github.com/thewhiteninja/ntfstool/releases/tag/latest) release or on [AppVeyor](https://ci.appveyor.com/project/thewhiteninja/ntfstool).
+
 See below for some [examples](#examples) of the features!
 
 
@@ -47,8 +49,9 @@ There is no bruteforce feature because GPU-based cracking is better (see [Bitcra
 
 Masterkeys, private keys and certificates can be listed, displayed and decrypted using needed inputs (SID, password).
 Certificates with private keys can be exported using the backup command.
+
 Reinmport the backup on another machine to be able to read your encrypted file again!
-Or you can use the `efs.decrypt` command to decrypt a file using the backup key.
+Or you can use the `efs.decrypt` command to decrypt a file using the backed-up key.
 
 More information on [Mimikatz Wiki][4] 
 
@@ -57,11 +60,13 @@ More information on [Mimikatz Wiki][4]
 ### Shell
 
 There is a limited shell with few commands (exit, cd, ls, cat, pwd, cp, quit, rec).
+
 Command `rec` shows the MFT record details.
 
 ## Help & Examples
 
 Help command displays description and examples for each command.
+
 Options can be entered as decimal or hex number with "0x" prefix (ex: inode).
 
     ntfstool help [command]
@@ -178,9 +183,6 @@ Current third-party libs:
 <tr><td>mbr disk=2</td></tr>
 <tr><td>
 
-    MBR from \\.\PhysicalDrive2
-    ---------------------------
-    
     Disk signature  : e4589462
     Reserved bytes  : 0000
     
@@ -298,7 +300,7 @@ Current third-party libs:
         7c60 : 45             : inc bp
         7c61 : 2d4653         : sub ax, 0x5346
         7c64 : 2d0002         : sub ax, 0x200
-        [...]
+        ...
 </td></tr>
 </table>
 
@@ -308,60 +310,42 @@ Current third-party libs:
 <tr><td>extract disk=3 volume=1 from=\bob.txt output=d:\bob.txt</td></tr>
 <tr><td>
 
-    Extract file from \\.\PhysicalDrive3 > Volume:1
-    -----------------------------------------------
-
     [+] Opening \\?\Volume{00023d5d-0000-0000-0002-000000000000}\
     [-] Source      : \bob.txt
     [-] Destination : d:\bob.txt
     [-] Record Num  : 47 (0000002fh)
     [+] File extracted (42 bytes written)
-    
 </td></tr>
 <tr><td>extract disk=0 volume=4 --system output=d:\system</td></tr>
 <tr><td>
-
-    Extract file from \\.\PhysicalDrive0 > Volume:4
-    -----------------------------------------------
 
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [-] Source      : c:\windows\system32\config\system
     [-] Destination : d:\system
     [-] Record Num  : 623636 (00098414h)
     [+] File extracted (19398656 bytes written)
-    
 </td></tr>
 </table>
-
-
 
 ### Image
 <table>
 <tr><td>image disk=2 volume=2 output=d:\imagevol.raw</td></tr>
 <tr><td>
 
-    Image from \\.\PhysicalDrive2 > Volume:2
-    ----------------------------------------
-
     [+] Opening \\?\Volume{f095dd1d-f302-4d17-bf68-7cc8c1de3965}\
     [-] Size     : 33520128 (31.97 MiBs)
     [-] BlockSize: 4096
     [+] Copying  : [################################] 100% 0s
     [+] Done
-    
 </td></tr>
 <tr><td>image disk=2 output=d:\image.raw</td></tr>
 <tr><td>
     
-    Image from \\.\PhysicalDrive2
-    -----------------------------
-
     [+] Opening \\.\PhysicalDrive2
     [-] Size     : 67108864 (64.00 MiBs)
     [-] BlockSize: 4096
     [+] Copying  : [################################] 100% 0s
     [+] Done
-    
 </td></tr>
 </table>
 
@@ -469,106 +453,102 @@ Current third-party libs:
 <tr><td>mft.btree disk=0 volume=1 inode=5 (root folder)</td></tr>
 <tr><td>
 
-	B-tree index (inode:5) from \\.\PhysicalDrive3 > Volume:1
-	---------------------------------------------------------
-
-	Attributes:
-	-----------
-
-	+-------------------------------------------------------------------------------------------+
-	| Id | Type              | Non-resident | Length | Overview                                 |
-	+-------------------------------------------------------------------------------------------+
-	| 1  | $INDEX_ROOT       | False        | 56     | Attribute Type          : Filename       |
-	|    |                   |              |        | Collation Rule          : 1              |
-	|    |                   |              |        | Index Alloc Entry Size  : 4096           |
-	|    |                   |              |        | Cluster/Index Record    : 1              |
-	|    |                   |              |        | -----                                    |
-	|    |                   |              |        | First Entry Offset      : 16             |
-	|    |                   |              |        | Index Entries Size      : 40             |
-	|    |                   |              |        | Index Entries Allocated : 40             |
-	|    |                   |              |        | Flags                   : Large Index    |
-	+-------------------------------------------------------------------------------------------+
-	| 2  | $INDEX_ALLOCATION | True         | 20480  | First VCN               : 0x000000000000 |
-	|    |                   |              |        | Last VCN                : 0x000000000004 |
-	+-------------------------------------------------------------------------------------------+
-
-	$INDEX_ALLOCATION entries:
-	--------------------------
-
-	+--------------------------------------------------------------------------------------------+
-	| VCN           | Raw address   | Size          | Entries                                    |
-	+--------------------------------------------------------------------------------------------+
-	| 000000000000h | 000000024000h | 000000001000h | 000000000004: $AttrDef                     |
-	|               |               |               | 000000000008: $BadClus                     |
-	|               |               |               | 000000000006: $Bitmap                      |
-	                                          ....
-	|               |               |               | 000000000009: $Secure                      |
-	|               |               |               | 00000000000a: $UpCase                      |
-	|               |               |               | 000000000003: $Volume                      |
-	+--------------------------------------------------------------------------------------------+
-	| 000000000001h | 000000025000h | 000000001000h | 000000000098: randomfile - Copie (5).accdb |
-	|               |               |               | 000000000097: randomfile - Copie (5).bat   |
-	|               |               |               | 000000000095: randomfile - Copie (5).psd   |
-	|               |               |               | 000000000096: randomfile - Copie (5).txt   |
-	|               |               |               | 00000000009b: randomfile - Copie (6).accdb |
-                                                  ....
-	|               |               |               | 000000000083: randomfile.accdb             |
-	|               |               |               | 000000000082: randomfile.bat               |
-	|               |               |               | 000000000084: randomfile.psd               |
-	|               |               |               | 000000000081: randomfile.txt               |
-	|               |               |               | 000000000024: System Volume Information    |
-	+--------------------------------------------------------------------------------------------+
-	| 000000000002h | 0000007d6000h | 000000001000h |                                            |
-	+--------------------------------------------------------------------------------------------+
-	| 000000000003h | 0000007d7000h | 000000001000h | 000000000005: .                            |
-	|               |               |               | 000000000092: randomfile - Copie (4).txt   |
-	+--------------------------------------------------------------------------------------------+
-	| 000000000004h | 0000007d8000h | 000000001000h | 000000000027: random folder                |
-	|               |               |               | 00000000008c: randomfile - Copie (2).accdb |
-	|               |               |               | 00000000008b: randomfile - Copie (2).bat   |
-	|               |               |               | 000000000089: randomfile - Copie (2).psd   |
-	                                          ....
-	|               |               |               | 00000000008e: randomfile - Copie (3).txt   |
-	|               |               |               | 000000000094: randomfile - Copie (4).accdb |
-	|               |               |               | 000000000093: randomfile - Copie (4).bat   |
-	|               |               |               | 000000000091: randomfile - Copie (4).psd   |
-	+--------------------------------------------------------------------------------------------+
-
-	B-tree index:
-	-------------
-
-	Root
-	|- 000000000000:
-	|---- VCN: 3
-		 |- 000000000005: .
-		 |---- VCN: 0
-			  |- 000000000004: $AttrDef
-			  |- 000000000008: $BadClus
-			  |- 000000000006: $Bitmap
-	                                      ....
-			  |- 000000000009: $Secure
-			  |- 00000000000a: $UpCase
-			  |- 000000000003: $Volume
-		 |- 000000000092: randomfile - Copie (4).txt
-		 |---- VCN: 4
-			  |- 000000000027: random folder
-			  |- 00000000008c: randomfile - Copie (2).accdb
-			  |- 00000000008b: randomfile - Copie (2).bat
-			  |- 000000000089: randomfile - Copie (2).psd
-	                                      ....
-			  |- 000000000094: randomfile - Copie (4).accdb
-			  |- 000000000093: randomfile - Copie (4).bat
-			  |- 000000000091: randomfile - Copie (4).psd
-		 |- 000000000000 (*)
-		 |---- VCN: 1
-			  |- 000000000098: randomfile - Copie (5).accdb
-			  |- 000000000097: randomfile - Copie (5).bat
-			  |- 000000000095: randomfile - Copie (5).psd
-	                                      ....
-			  |- 000000000084: randomfile.psd
-			  |- 000000000081: randomfile.txt
-			  |- 000000000024: System Volume Information
+    Attributes:
+    -----------
     
+    +-------------------------------------------------------------------------------------------+
+    | Id | Type              | Non-resident | Length | Overview                                 |
+    +-------------------------------------------------------------------------------------------+
+    | 1  | $INDEX_ROOT       | False        | 56     | Attribute Type          : Filename       |
+    |    |                   |              |        | Collation Rule          : 1              |
+    |    |                   |              |        | Index Alloc Entry Size  : 4096           |
+    |    |                   |              |        | Cluster/Index Record    : 1              |
+    |    |                   |              |        | -----                                    |
+    |    |                   |              |        | First Entry Offset      : 16             |
+    |    |                   |              |        | Index Entries Size      : 40             |
+    |    |                   |              |        | Index Entries Allocated : 40             |
+    |    |                   |              |        | Flags                   : Large Index    |
+    +-------------------------------------------------------------------------------------------+
+    | 2  | $INDEX_ALLOCATION | True         | 20480  | First VCN               : 0x000000000000 |
+    |    |                   |              |        | Last VCN                : 0x000000000004 |
+    +-------------------------------------------------------------------------------------------+
+    
+    $INDEX_ALLOCATION entries:
+    --------------------------
+    
+    +--------------------------------------------------------------------------------------------+
+    | VCN           | Raw address   | Size          | Entries                                    |
+    +--------------------------------------------------------------------------------------------+
+    | 000000000000h | 000000024000h | 000000001000h | 000000000004: $AttrDef                     |
+    |               |               |               | 000000000008: $BadClus                     |
+    |               |               |               | 000000000006: $Bitmap                      |
+    										  ....
+    |               |               |               | 000000000009: $Secure                      |
+    |               |               |               | 00000000000a: $UpCase                      |
+    |               |               |               | 000000000003: $Volume                      |
+    +--------------------------------------------------------------------------------------------+
+    | 000000000001h | 000000025000h | 000000001000h | 000000000098: randomfile - Copie (5).accdb |
+    |               |               |               | 000000000097: randomfile - Copie (5).bat   |
+    |               |               |               | 000000000095: randomfile - Copie (5).psd   |
+    |               |               |               | 000000000096: randomfile - Copie (5).txt   |
+    |               |               |               | 00000000009b: randomfile - Copie (6).accdb |
+    											  ....
+    |               |               |               | 000000000083: randomfile.accdb             |
+    |               |               |               | 000000000082: randomfile.bat               |
+    |               |               |               | 000000000084: randomfile.psd               |
+    |               |               |               | 000000000081: randomfile.txt               |
+    |               |               |               | 000000000024: System Volume Information    |
+    +--------------------------------------------------------------------------------------------+
+    | 000000000002h | 0000007d6000h | 000000001000h |                                            |
+    +--------------------------------------------------------------------------------------------+
+    | 000000000003h | 0000007d7000h | 000000001000h | 000000000005: .                            |
+    |               |               |               | 000000000092: randomfile - Copie (4).txt   |
+    +--------------------------------------------------------------------------------------------+
+    | 000000000004h | 0000007d8000h | 000000001000h | 000000000027: random folder                |
+    |               |               |               | 00000000008c: randomfile - Copie (2).accdb |
+    |               |               |               | 00000000008b: randomfile - Copie (2).bat   |
+    |               |               |               | 000000000089: randomfile - Copie (2).psd   |
+    										  ....
+    |               |               |               | 00000000008e: randomfile - Copie (3).txt   |
+    |               |               |               | 000000000094: randomfile - Copie (4).accdb |
+    |               |               |               | 000000000093: randomfile - Copie (4).bat   |
+    |               |               |               | 000000000091: randomfile - Copie (4).psd   |
+    +--------------------------------------------------------------------------------------------+
+    
+    B-tree index:
+    -------------
+    
+    Root
+    |- 000000000000:
+    |---- VCN: 3
+    	 |- 000000000005: .
+    	 |---- VCN: 0
+    		  |- 000000000004: $AttrDef
+    		  |- 000000000008: $BadClus
+    		  |- 000000000006: $Bitmap
+    									  ....
+    		  |- 000000000009: $Secure
+    		  |- 00000000000a: $UpCase
+    		  |- 000000000003: $Volume
+    	 |- 000000000092: randomfile - Copie (4).txt
+    	 |---- VCN: 4
+    		  |- 000000000027: random folder
+    		  |- 00000000008c: randomfile - Copie (2).accdb
+    		  |- 00000000008b: randomfile - Copie (2).bat
+    		  |- 000000000089: randomfile - Copie (2).psd
+    									  ....
+    		  |- 000000000094: randomfile - Copie (4).accdb
+    		  |- 000000000093: randomfile - Copie (4).bat
+    		  |- 000000000091: randomfile - Copie (4).psd
+    	 |- 000000000000 (*)
+    	 |---- VCN: 1
+    		  |- 000000000098: randomfile - Copie (5).accdb
+    		  |- 000000000097: randomfile - Copie (5).bat
+    		  |- 000000000095: randomfile - Copie (5).psd
+    									  ....
+    		  |- 000000000084: randomfile.psd
+    		  |- 000000000081: randomfile.txt
+    		  |- 000000000024: System Volume Information
 </td></tr>
 </table>
 
@@ -689,9 +669,6 @@ Current third-party libs:
 <table>
 <tr><td>efs.backup disk=0 volume=4 password=123456</td></tr>
 <tr><td>
-	
-    Backup certificates and keys from \\.\PhysicalDrive0 > Volume:4
-    ---------------------------------------------------------------
     
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [+] Listing user directories
@@ -713,9 +690,6 @@ Current third-party libs:
 <table>
 <tr><td>efs.decrypt efs.decrypt disk=0 volume=4 from=c:\cat.png pfx=z:\my_backup.pfx password=backup output=c:\socute.png</td></tr>
 <tr><td>
-
-    Decrypt EFS file from \\.\PhysicalDrive0 > Volume:4
-    ---------------------------------------------------
 
     [+] Loading PKCS12 input file
     [-] KeyID : 86598de9ed5dbdd00aa2ff467ed71f1f28acf61b
@@ -740,9 +714,6 @@ Current third-party libs:
 <table>
 <tr><td>efs.certificate disk=0 volume=4</td></tr>
 <tr><td>
-	
-    List certificates from \\.\PhysicalDrive0 > Volume:4
-    ----------------------------------------------------
 
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [+] Listing user directories
@@ -776,74 +747,65 @@ Current third-party libs:
 <tr><td>efs.certificate disk=0 volume=4 inode=0xb5a4</td></tr>
 <tr><td>
 	
-    Display certificate from \\.\PhysicalDrive0 > Volume:4
-    ------------------------------------------------------
-    
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [+] Reading certificate file record: 46500
     [+] Certificate
-        +----------------------------------------------------------------------------------------------------------------------------+
-        | Id | Property                                 | Value                                                                      |
-        +----------------------------------------------------------------------------------------------------------------------------+
-        |  0 | File                                     | Creation : 2021-03-03 18:02:33                                             |
-        |    |                                          | Size     : 824.00 bytes                                                    |
-        +----------------------------------------------------------------------------------------------------------------------------+
-        |  1 | CERT_SHA1_HASH_PROP_ID                   | 14A67663C51C66FF5CAD89B4DC34495864338C67                                   |
-        +----------------------------------------------------------------------------------------------------------------------------+
-        |  2 | CERT_FRIENDLY_NAME_PROP_ID               | APNS certificate                                                           |
-        +----------------------------------------------------------------------------------------------------------------------------+
-        |  3 | CERT_KEY_IDENTIFIER_PROP_ID              | 82B87AE4F2251242252A2644D98169F34F909CA8                                   |
-        +----------------------------------------------------------------------------------------------------------------------------+
-        |  4 | CERT_SUBJECT_PUBLIC_KEY_MD5_HASH_PROP_ID | DB532C4794A15E5D0392C7C605FCBCA8                                           |
-        +----------------------------------------------------------------------------------------------------------------------------+
-        |  5 | CERT_CERTIFICATE_FILE                    | Data:                                                                      |
-        |    |                                          |     Version: 3 (0x2)                                                       |
-        |    |                                          |     Serial Number:                                                         |
-        |    |                                          |         01:20:cb:ab:28:8a:97:ee:99:cc                                      |
-        |    |                                          |     Signature Algorithm: sha1WithRSAEncryption                             |
-        |    |                                          |     Issuer: C=US, O=Apple Inc., OU=Apple iPhone, CN=Apple iPhone Device CA |
-        |    |                                          |     Validity                                                               |
-        |    |                                          |         Not Before: Mar  3 15:57:33 2021 GMT                               |
-        |    |                                          |         Not After : Mar  3 16:02:33 2022 GMT                               |
-        |    |                                          |     Subject: CN=1A6032AA-91A2-4B1D-B6AF-5509FC173686                       |
-        |    |                                          |     Subject Public Key Info:                                               |
-        |    |                                          |         Public Key Algorithm: rsaEncryption                                |
-        |    |                                          |             RSA Public-Key: (1024 bit)                                     |
-        |    |                                          |             Modulus:                                                       |
-        |    |                                          |                 00:a2:75:db:69:8d:c9:b3:fd:96:4d:28:b9:43:94:              |
-        |    |                                          |                 db:7d:73:53:88:c9:79:e9:fa:de:e4:12:14:2c:de:              |
+        +-------------------------------------------------------------------------------------------------------------------------------+
+        | Id | Property                                 | Value                                                                         |
+        +-------------------------------------------------------------------------------------------------------------------------------+
+        |  0 | File                                     | Creation : 2021-03-03 18:02:33                                                |
+        |    |                                          | Size     : 824.00 bytes                                                       |
+        +-------------------------------------------------------------------------------------------------------------------------------+
+        |  1 | CERT_SHA1_HASH_PROP_ID                   | 14A67663C51C66FF5CAD89B4DC34495864338C67                                      |
+        +-------------------------------------------------------------------------------------------------------------------------------+
+        |  2 | CERT_FRIENDLY_NAME_PROP_ID               | APNS certificate                                                              |
+        +-------------------------------------------------------------------------------------------------------------------------------+
+        |  3 | CERT_KEY_IDENTIFIER_PROP_ID              | 82B87AE4F2251242252A2644D98169F34F909CA8                                      |
+        +-------------------------------------------------------------------------------------------------------------------------------+
+        |  4 | CERT_SUBJECT_PUBLIC_KEY_MD5_HASH_PROP_ID | DB532C4794A15E5D0392C7C605FCBCA8                                              |
+        +-------------------------------------------------------------------------------------------------------------------------------+
+        |  5 | CERT_CERTIFICATE_FILE                    | Data:                                                                         |
+        |    |                                          |     Version: 3 (0x2)                                                          |
+        |    |                                          |     Serial Number:                                                            |
+        |    |                                          |         01:20:cb:ab:28:8a:97:ee:99:cc                                         |
+        |    |                                          |     Signature Algorithm: sha1WithRSAEncryption                                |
+        |    |                                          |     Issuer: C=US, O=Apple Inc., OU=Apple iPhone, CN=Apple iPhone Device CA    |
+        |    |                                          |     Validity                                                                  |
+        |    |                                          |         Not Before: Mar  3 15:57:33 2021 GMT                                  |
+        |    |                                          |         Not After : Mar  3 16:02:33 2022 GMT                                  |
+        |    |                                          |     Subject: CN=1A6032AA-91A2-4B1D-B6AF-5509FC173686                          |
+        |    |                                          |     Subject Public Key Info:                                                  |
+        |    |                                          |         Public Key Algorithm: rsaEncryption                                   |
+        |    |                                          |             RSA Public-Key: (1024 bit)                                        |
+        |    |                                          |             Modulus:                                                          |
+        |    |                                          |                 00:a2:75:db:69:8d:c9:b3:fd:96:4d:28:b9:43:94:                 |
+        |    |                                          |                 db:7d:73:53:88:c9:79:e9:fa:de:e4:12:14:2c:de:                 |
                                                                ...
-        |    |                                          |                 a7:6b:d0:01:9e:dc:66:27:ef:2e:20:7e:e5:2a:42:              |
-        |    |                                          |                 9e:6f:85:9c:b6:8f:be:d3:05                                 |
-        |    |                                          |             Exponent: 65537 (0x10001)                                      |
-        |    |                                          |     X509v3 extensions:                                                     |
-        |    |                                          |         X509v3 Authority Key Identifier:                                   |
-        |    |                                          |             keyid:B2:FE:21:23:44:86:95:6A:79:D5:81:26:8E:73:10:D           |
-        |    |                                          | 8:A7:4C:8E:74                                                              |
-        |    |                                          |         X509v3 Subject Key Identifier:                                     |
-        |    |                                          |             82:B8:7A:E4:F2:25:12:42:25:2A:26:44:D9:81:69:F3:4F:9           |
-        |    |                                          | 0:9C:A8                                                                    |
-        |    |                                          |         X509v3 Basic Constraints: critical                                 |
-        |    |                                          |             CA:FALSE                                                       |
-        |    |                                          |         X509v3 Key Usage: critical                                         |
-        |    |                                          |             Digital Signature, Key Encipherment                            |
-        |    |                                          |         X509v3 Extended Key Usage: critical                                |
-        |    |                                          |             TLS Web Server Authentication, TLS Web Client Authen           |
-        |    |                                          | tication                                                                   |
-        |    |                                          |         1.2.840.113635.100.6.10.6:                                         |
-        |    |                                          |             ..                                                             |
-        |    |                                          | Signature Algorithm: sha1WithRSAEncryption                                 |
-        |    |                                          |      28:54:6c:d9:4e:97:f5:dd:1f:79:4a:6a:74:42:ad:6e:a1:11:                |
+        |    |                                          |                 a7:6b:d0:01:9e:dc:66:27:ef:2e:20:7e:e5:2a:42:                 |
+        |    |                                          |                 9e:6f:85:9c:b6:8f:be:d3:05                                    |
+        |    |                                          |             Exponent: 65537 (0x10001)                                         |
+        |    |                                          |     X509v3 extensions:                                                        |
+        |    |                                          |         X509v3 Authority Key Identifier:                                      |
+        |    |                                          |             keyid:B2:FE:21:23:44:86:95:6A:79:D5:81:26:8E:73:10:D8:A7:4C:8E:74 |
+        |    |                                          |         X509v3 Subject Key Identifier:                                        |
+        |    |                                          |             82:B8:7A:E4:F2:25:12:42:25:2A:26:44:D9:81:69:F3:4F:90:9C:A8       |
+        |    |                                          |         X509v3 Basic Constraints: critical                                    |
+        |    |                                          |             CA:FALSE                                                          |
+        |    |                                          |         X509v3 Key Usage: critical                                            |
+        |    |                                          |             Digital Signature, Key Encipherment                               |
+        |    |                                          |         X509v3 Extended Key Usage: critical                                   |
+        |    |                                          |             TLS Web Server Authentication, TLS Web Client Authentication      |
+        |    |                                          |         1.2.840.113635.100.6.10.6:                                            |
+        |    |                                          |             ..                                                                |
+        |    |                                          | Signature Algorithm: sha1WithRSAEncryption                                    |
+        |    |                                          |      28:54:6c:d9:4e:97:f5:dd:1f:79:4a:6a:74:42:ad:6e:a1:11:                   |
                                                                ...
-        |    |                                          |      27:58:3b:d5:1e:c3:71:af:6b:bd:fe:5d:ad:4d:bd:82:fa:53:                |
-        |    |                                          |      ff:0c                                                                 |
-        +----------------------------------------------------------------------------------------------------------------------------+
+        |    |                                          |      27:58:3b:d5:1e:c3:71:af:6b:bd:fe:5d:ad:4d:bd:82:fa:53:                   |
+        |    |                                          |      ff:0c                                                                    |
+        +-------------------------------------------------------------------------------------------------------------------------------+
 </td></tr>
 <tr><td>efs.certificate disk=0 volume=4 inode=0xb5a4 output=mycert</td></tr>
 <tr><td>
-	
-    Display certificate from \\.\PhysicalDrive0 > Volume:4
-    ------------------------------------------------------
     
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [+] Reading certificate file record: 46500
@@ -856,9 +818,6 @@ Current third-party libs:
 <tr><td>efs.key disk=0 volume=4</td></tr>
 <tr><td>
 	
-	List keys from \\.\PhysicalDrive0 > Volume:4
-	--------------------------------------------
-
 	[+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}
 	[+] Listing user directories: 
 	    8 directories found
@@ -877,13 +836,10 @@ Current third-party libs:
 	|    |       | Size   : 4.00 KiBs                   |                                        |                     |
 	+------------------------------------------------------------------------------------------------------------------+
 	|  2 | User1 | Name   : 002a02ec680e...9a0a8d52ca67 | {3A3E1CF2-5AC2-4717-8006-D7C0F2936435} | 2019-06-26 15:50:50 |
-                                                                ..........
+                                                           ..........
 </td></tr>
 <tr><td>efs.key disk=0 volume=4 inode=742107</td></tr>
 <tr><td>
-	
-	Display key from \\.\PhysicalDrive0 > Volume:4
-	----------------------------------------------
 
 	[+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
 	[+] Reading key file record: 742107
@@ -966,19 +922,16 @@ Current third-party libs:
 <tr><td> efs.key disk=0 volume=4 inode=742107 masterkey=34fac126105ce30...178c5bff4979eb</td></tr>
 <tr><td>
 	
-	Decrypt key from \\.\PhysicalDrive0 > Volume:4
-	----------------------------------------------
-
-	[+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
-	[+] Reading key file record: 742107
-	[-] Key
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [+] Reading key file record: 742107
+    [-] Key
 	    Encryption Algorithm : CALG_AES_256
 	    Hash Algorithm       : CALG_SHA_512
 	    Salt                 : ABABD5324CCE0254BC726C33F5A777D38BC4D75CACC2360EF3276EB4DC42FF6A
-	[+] Decrypting key
+    [+] Decrypting key
     [+] Key successfully decrypted
     [+] Export flags         : 00000001 (ALLOW_EXPORT_FLAG)
-	[+] Clear key (2048bits) :
+    [+] Clear key (2048bits) :
 	    +----------------------------------------------------------+
 	    | Id | Property         | Value                            |
 	    +----------------------------------------------------------+
@@ -1022,18 +975,15 @@ Current third-party libs:
 <tr><td> efs.key disk=0 volume=4 inode=742107 masterkey=34...eb output=mykey</td></tr>
 <tr><td>
 	
-	Decrypt key from \\.\PhysicalDrive0 > Volume:4
-	----------------------------------------------
-
-	[+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
-	[+] Reading key file record: 742107
-	[-] Key
-	    Encryption Algorithm : CALG_AES_256
-	    Hash Algorithm       : CALG_SHA_512
-	    Salt                 : ABABD5324CCE0254BC726C33F5A777D38BC4D75CACC2360EF3276EB4DC42FF6A
-	[+] Decrypting key
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [+] Reading key file record: 742107
+    [-] Key
+        Encryption Algorithm : CALG_AES_256
+        Hash Algorithm       : CALG_SHA_512
+        Salt                 : ABABD5324CCE0254BC726C33F5A777D38BC4D75CACC2360EF3276EB4DC42FF6A
+    [+] Decrypting key
     [+] Key successfully decrypted
-	[+] Public key exported to mykey.pub.pem.	    
+    [+] Public key exported to mykey.pub.pem.	    
     [+] Private key exported to mykey.priv.pem.	    
 </td></tr>
 </table>
@@ -1043,9 +993,6 @@ Current third-party libs:
 <tr><td>efs.masterkey disk=0 volume=4</td></tr>
 <tr><td>
 	
-    List masterkeys from \\.\PhysicalDrive0 > Volume:4
-    --------------------------------------------------
-
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [+] Listing user directories
         8 directories found
@@ -1084,9 +1031,6 @@ Current third-party libs:
 <tr><td>efs.masterkey disk=0 volume=4 inode=0x80544</td></tr>
 <tr><td>
 	
-    Display masterkey from \\.\PhysicalDrive0 > Volume:4
-    ----------------------------------------------------
-
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [+] Reading masterkey file record: 525636
     [+] MasterKey
@@ -1137,9 +1081,6 @@ Current third-party libs:
 <tr><td> efs.masterkey disk=0 volume=4 inode=0x80544 sid="S-1-5-21-1521398...3175218-1001" password="ntfst00l"</td></tr>
 <tr><td>
 	
-    Decrypt masterkey from \\.\PhysicalDrive0 > Volume:4
-    ----------------------------------------------------
-
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [+] Reading masterkey file record: 525636
     [-] Masterkey
@@ -1422,9 +1363,6 @@ Current third-party libs:
 <tr><td>streams disk=0 volume=4 from=c:\test.pdf</td></tr>
 <tr><td>
   
-    Listing streams from \\.\PhysicalDrive0 > Volume:4
-    --------------------------------------------------
-
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [-] Source      : c:\test.pdf
     [-] Record Num  : 13525 (000034d5h)
@@ -1470,7 +1408,6 @@ Current third-party libs:
     [+] Reading file record : 41
     [+] Extracting $RAV85W4.jpg to restored_kitten.jpg
     [+] 5219 bytes written
-
 </td></tr>
 </table>
 
@@ -1521,6 +1458,8 @@ Current third-party libs:
     ReferrerUrl=https://www.7-zip.org/download.html
     HostUrl=https://www.7-zip.org/a/7z1900-x64.exe
 
+    disk4:volume1:> cp kitten3.jpg z:\custestkitten.jpg
+    1 file copied
     disk4:volume1:> exit
     
 </td></tr>
