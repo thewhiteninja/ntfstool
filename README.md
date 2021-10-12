@@ -482,7 +482,7 @@ Current third-party libs:
     | 000000000000h | 000000024000h | 000000001000h | 000000000004: $AttrDef                     |
     |               |               |               | 000000000008: $BadClus                     |
     |               |               |               | 000000000006: $Bitmap                      |
-    										  ....
+    						...
     |               |               |               | 000000000009: $Secure                      |
     |               |               |               | 00000000000a: $UpCase                      |
     |               |               |               | 000000000003: $Volume                      |
@@ -492,7 +492,7 @@ Current third-party libs:
     |               |               |               | 000000000095: randomfile - Copie (5).psd   |
     |               |               |               | 000000000096: randomfile - Copie (5).txt   |
     |               |               |               | 00000000009b: randomfile - Copie (6).accdb |
-    											  ....
+    						...
     |               |               |               | 000000000083: randomfile.accdb             |
     |               |               |               | 000000000082: randomfile.bat               |
     |               |               |               | 000000000084: randomfile.psd               |
@@ -508,7 +508,7 @@ Current third-party libs:
     |               |               |               | 00000000008c: randomfile - Copie (2).accdb |
     |               |               |               | 00000000008b: randomfile - Copie (2).bat   |
     |               |               |               | 000000000089: randomfile - Copie (2).psd   |
-    										  ....
+    						...
     |               |               |               | 00000000008e: randomfile - Copie (3).txt   |
     |               |               |               | 000000000094: randomfile - Copie (4).accdb |
     |               |               |               | 000000000093: randomfile - Copie (4).bat   |
@@ -526,7 +526,7 @@ Current third-party libs:
     		  |- 000000000004: $AttrDef
     		  |- 000000000008: $BadClus
     		  |- 000000000006: $Bitmap
-    									  ....
+    		  ....
     		  |- 000000000009: $Secure
     		  |- 00000000000a: $UpCase
     		  |- 000000000003: $Volume
@@ -536,7 +536,7 @@ Current third-party libs:
     		  |- 00000000008c: randomfile - Copie (2).accdb
     		  |- 00000000008b: randomfile - Copie (2).bat
     		  |- 000000000089: randomfile - Copie (2).psd
-    									  ....
+    		  ....
     		  |- 000000000094: randomfile - Copie (4).accdb
     		  |- 000000000093: randomfile - Copie (4).bat
     		  |- 000000000091: randomfile - Copie (4).psd
@@ -545,7 +545,7 @@ Current third-party libs:
     		  |- 000000000098: randomfile - Copie (5).accdb
     		  |- 000000000097: randomfile - Copie (5).bat
     		  |- 000000000095: randomfile - Copie (5).psd
-    									  ....
+    		  ....
     		  |- 000000000084: randomfile.psd
     		  |- 000000000081: randomfile.txt
     		  |- 000000000024: System Volume Information
@@ -750,59 +750,59 @@ Current third-party libs:
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [+] Reading certificate file record: 46500
     [+] Certificate
-        +-------------------------------------------------------------------------------------------------------------------------------+
-        | Id | Property                                 | Value                                                                         |
-        +-------------------------------------------------------------------------------------------------------------------------------+
-        |  0 | File                                     | Creation : 2021-03-03 18:02:33                                                |
-        |    |                                          | Size     : 824.00 bytes                                                       |
-        +-------------------------------------------------------------------------------------------------------------------------------+
-        |  1 | CERT_SHA1_HASH_PROP_ID                   | 14A67663C51C66FF5CAD89B4DC34495864338C67                                      |
-        +-------------------------------------------------------------------------------------------------------------------------------+
-        |  2 | CERT_FRIENDLY_NAME_PROP_ID               | APNS certificate                                                              |
-        +-------------------------------------------------------------------------------------------------------------------------------+
-        |  3 | CERT_KEY_IDENTIFIER_PROP_ID              | 82B87AE4F2251242252A2644D98169F34F909CA8                                      |
-        +-------------------------------------------------------------------------------------------------------------------------------+
-        |  4 | CERT_SUBJECT_PUBLIC_KEY_MD5_HASH_PROP_ID | DB532C4794A15E5D0392C7C605FCBCA8                                              |
-        +-------------------------------------------------------------------------------------------------------------------------------+
-        |  5 | CERT_CERTIFICATE_FILE                    | Data:                                                                         |
-        |    |                                          |     Version: 3 (0x2)                                                          |
-        |    |                                          |     Serial Number:                                                            |
-        |    |                                          |         01:20:cb:ab:28:8a:97:ee:99:cc                                         |
-        |    |                                          |     Signature Algorithm: sha1WithRSAEncryption                                |
-        |    |                                          |     Issuer: C=US, O=Apple Inc., OU=Apple iPhone, CN=Apple iPhone Device CA    |
-        |    |                                          |     Validity                                                                  |
-        |    |                                          |         Not Before: Mar  3 15:57:33 2021 GMT                                  |
-        |    |                                          |         Not After : Mar  3 16:02:33 2022 GMT                                  |
-        |    |                                          |     Subject: CN=1A6032AA-91A2-4B1D-B6AF-5509FC173686                          |
-        |    |                                          |     Subject Public Key Info:                                                  |
-        |    |                                          |         Public Key Algorithm: rsaEncryption                                   |
-        |    |                                          |             RSA Public-Key: (1024 bit)                                        |
-        |    |                                          |             Modulus:                                                          |
-        |    |                                          |                 00:a2:75:db:69:8d:c9:b3:fd:96:4d:28:b9:43:94:                 |
-        |    |                                          |                 db:7d:73:53:88:c9:79:e9:fa:de:e4:12:14:2c:de:                 |
-                                                               ...
-        |    |                                          |                 a7:6b:d0:01:9e:dc:66:27:ef:2e:20:7e:e5:2a:42:                 |
-        |    |                                          |                 9e:6f:85:9c:b6:8f:be:d3:05                                    |
-        |    |                                          |             Exponent: 65537 (0x10001)                                         |
-        |    |                                          |     X509v3 extensions:                                                        |
-        |    |                                          |         X509v3 Authority Key Identifier:                                      |
-        |    |                                          |             keyid:B2:FE:21:23:44:86:95:6A:79:D5:81:26:8E:73:10:D8:A7:4C:8E:74 |
-        |    |                                          |         X509v3 Subject Key Identifier:                                        |
-        |    |                                          |             82:B8:7A:E4:F2:25:12:42:25:2A:26:44:D9:81:69:F3:4F:90:9C:A8       |
-        |    |                                          |         X509v3 Basic Constraints: critical                                    |
-        |    |                                          |             CA:FALSE                                                          |
-        |    |                                          |         X509v3 Key Usage: critical                                            |
-        |    |                                          |             Digital Signature, Key Encipherment                               |
-        |    |                                          |         X509v3 Extended Key Usage: critical                                   |
-        |    |                                          |             TLS Web Server Authentication, TLS Web Client Authentication      |
-        |    |                                          |         1.2.840.113635.100.6.10.6:                                            |
-        |    |                                          |             ..                                                                |
-        |    |                                          | Signature Algorithm: sha1WithRSAEncryption                                    |
-        |    |                                          |      28:54:6c:d9:4e:97:f5:dd:1f:79:4a:6a:74:42:ad:6e:a1:11:                   |
-                                                               ...
-        |    |                                          |      27:58:3b:d5:1e:c3:71:af:6b:bd:fe:5d:ad:4d:bd:82:fa:53:                   |
-        |    |                                          |      ff:0c                                                                    |
-        +-------------------------------------------------------------------------------------------------------------------------------+
+        +--------------------------------------------------------------------------------------------------------------------------+
+        | Id | Property                            | Value                                                                         |
+        +--------------------------------------------------------------------------------------------------------------------------+
+        |  0 | File                                | Creation : 2021-03-03 18:02:33                                                |
+        |    |                                     | Size     : 824.00 bytes                                                       |
+        +--------------------------------------------------------------------------------------------------------------------------+
+        |  1 | SHA1_HASH_PROP_ID                   | 14A67663C51C66FF5CAD89B4DC34495864338C67                                      |
+        +--------------------------------------------------------------------------------------------------------------------------+
+        |  2 | FRIENDLY_NAME_PROP_ID               | APNS certificate                                                              |
+        +--------------------------------------------------------------------------------------------------------------------------+
+        |  3 | KEY_IDENTIFIER_PROP_ID              | 82B87AE4F2251242252A2644D98169F34F909CA8                                      |
+        +--------------------------------------------------------------------------------------------------------------------------+
+        |  4 | SUBJECT_PUBLIC_KEY_MD5_HASH_PROP_ID | DB532C4794A15E5D0392C7C605FCBCA8                                              |
+        +--------------------------------------------------------------------------------------------------------------------------+
+        |  5 | CERTIFICATE_FILE                    | Data:                                                                         |
+        |    |                                     |     Version: 3 (0x2)                                                          |
+        |    |                                     |     Serial Number:                                                            |
+        |    |                                     |         01:20:cb:ab:28:8a:97:ee:99:cc                                         |
+        |    |                                     |     Signature Algorithm: sha1WithRSAEncryption                                |
+        |    |                                     |     Issuer: C=US, O=Apple Inc., OU=Apple iPhone, CN=Apple iPhone Device CA    |
+        |    |                                     |     Validity                                                                  |
+        |    |                                     |         Not Before: Mar  3 15:57:33 2021 GMT                                  |
+        |    |                                     |         Not After : Mar  3 16:02:33 2022 GMT                                  |
+        |    |                                     |     Subject: CN=1A6032AA-91A2-4B1D-B6AF-5509FC173686                          |
+        |    |                                     |     Subject Public Key Info:                                                  |
+        |    |                                     |         Public Key Algorithm: rsaEncryption                                   |
+        |    |                                     |             RSA Public-Key: (1024 bit)                                        |
+        |    |                                     |             Modulus:                                                          |
+        |    |                                     |                 00:a2:75:db:69:8d:c9:b3:fd:96:4d:28:b9:43:94:                 |
+        |    |                                     |                 db:7d:73:53:88:c9:79:e9:fa:de:e4:12:14:2c:de:                 |
+                                                          ...
+        |    |                                     |                 a7:6b:d0:01:9e:dc:66:27:ef:2e:20:7e:e5:2a:42:                 |
+        |    |                                     |                 9e:6f:85:9c:b6:8f:be:d3:05                                    |
+        |    |                                     |             Exponent: 65537 (0x10001)                                         |
+        |    |                                     |     X509v3 extensions:                                                        |
+        |    |                                     |         X509v3 Authority Key Identifier:                                      |
+        |    |                                     |             keyid:B2:FE:21:23:44:86:95:6A:79:D5:81:26:8E:73:10:D8:A7:4C:8E:74 |
+        |    |                                     |         X509v3 Subject Key Identifier:                                        |
+        |    |                                     |             82:B8:7A:E4:F2:25:12:42:25:2A:26:44:D9:81:69:F3:4F:90:9C:A8       |
+        |    |                                     |         X509v3 Basic Constraints: critical                                    |
+        |    |                                     |             CA:FALSE                                                          |
+        |    |                                     |         X509v3 Key Usage: critical                                            |
+        |    |                                     |             Digital Signature, Key Encipherment                               |
+        |    |                                     |         X509v3 Extended Key Usage: critical                                   |
+        |    |                                     |             TLS Web Server Authentication, TLS Web Client Authentication      |
+        |    |                                     |         1.2.840.113635.100.6.10.6:                                            |
+        |    |                                     |             ..                                                                |
+        |    |                                     | Signature Algorithm: sha1WithRSAEncryption                                    |
+        |    |                                     |      28:54:6c:d9:4e:97:f5:dd:1f:79:4a:6a:74:42:ad:6e:a1:11:                   |
+                                                     ...
+        |    |                                     |      27:58:3b:d5:1e:c3:71:af:6b:bd:fe:5d:ad:4d:bd:82:fa:53:                   |
+        |    |                                     |      ff:0c                                                                    |
+        +--------------------------------------------------------------------------------------------------------------------------+
 </td></tr>
 <tr><td>efs.certificate disk=0 volume=4 inode=0xb5a4 output=mycert</td></tr>
 <tr><td>
