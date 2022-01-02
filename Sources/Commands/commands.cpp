@@ -35,7 +35,5 @@ std::shared_ptr<MFTRecord> commands::helpers::find_record(std::shared_ptr<NTFSEx
 		}
 	}
 
-	std::cout << "[-] Reading record: " << rec->header()->MFTRecordIndex << std::endl;
-
 	return rec;
 }

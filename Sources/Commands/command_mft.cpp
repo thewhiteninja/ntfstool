@@ -439,17 +439,28 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 		{
 			ret.push_back("Dataruns                : ");
 			LONGLONG last = 0;
-			ULONGLONG size_on_disk = 0;
+			ULONGLONG real_size = 0;
+			ULONGLONG virtual_size = 0;
+			std::set<LONGLONG> offsets;
 			for (const auto& run : dataruns)
 			{
-				if (last != run.offset)
+				if (run.offset == 0)
 				{
-					size_on_disk += (run.length * cluster_size);
+					virtual_size += (run.length * cluster_size);
+				}
+				else
+				{
+					if (offsets.find(run.offset) == offsets.end())
+					{
+						real_size += (run.length * cluster_size);
+						offsets.insert(run.offset);
+					}
 				}
 				ret.push_back("    Length: " + utils::format::hex(static_cast<DWORD>(run.length)) + " Offset: " + utils::format::hex(static_cast<DWORD>(run.offset)) + (last == run.offset ? " (S)" : ""));
-				last = run.offset;
 			}
-			ret.push_back("Size on disk            : " + std::to_string(size_on_disk) + " (" + utils::format::size(size_on_disk) + ")");
+			ret.push_back("");
+			ret.push_back("Virtual size            : " + std::to_string(virtual_size) + " (" + utils::format::size(virtual_size) + ")");
+			ret.push_back("Real size               : " + std::to_string(real_size) + " (" + utils::format::size(real_size) + ")");
 		}
 	}
 
