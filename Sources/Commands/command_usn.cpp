@@ -43,10 +43,10 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 
 	PMFT_RECORD_HEADER record_header = record->header();
 
-	Buffer<PBYTE> clusterBuf((DWORD64)2 * cluster_size);
+	Buffer<PBYTE> clusterBuf((DWORD64)2 * 1024 * 1024);
 	ULONG64 total_size = record->datasize(MFT_ATTRIBUTE_DATA_USN_NAME);
 
-	std::cout << "[+] Data stream $J size : " << utils::format::size(total_size) << std::endl;
+	std::cout << "[+] Data stream $J size : " << utils::format::size(total_size) << " (sparse)" << std::endl;
 
 	ULONG64 processed_size = 0;
 	ULONG64 processed_count = 0;
@@ -63,9 +63,9 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 
 	if (format == "raw")
 	{
-		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME))
+		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, 1024 * 1024, true, true))
 		{
-			std::cout << "\r[+] Processing cluster : " << std::to_string(++processed_count);
+			std::cout << "\r[+] Processing data: " << std::to_string(++processed_count) << "MB(s)";
 			DWORD written = 0;
 			WriteFile(houtput, block.first, block.second, &written, NULL);
 		}
@@ -77,7 +77,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 		DWORD header_size = 0;
 		if (!FAILED(SizeTToDWord(csv_header.size(), &header_size))) WriteFile(houtput, csv_header.c_str(), header_size, &written, NULL);
 
-		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME))
+		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, cluster_size, true, true))
 		{
 			memcpy(clusterBuf.data() + filled_size, block.first, block.second);
 			filled_size += block.second;
@@ -103,7 +103,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 					std::wstring a = std::wstring(usn_record->FileName);
 					a.resize(usn_record->FileNameLength / sizeof(WCHAR));
 
-					std::cout << "\r[+] Processing entry : " << std::to_string(++processed_count);
+					std::cout << "\r[+] Processing entry: " << std::to_string(++processed_count);
 
 					std::ostringstream entry;
 					entry << usn_record->MajorVersion << ",";
@@ -131,7 +131,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 					break;
 				}
 				default:
-					std::cout << std::endl << "[!] Unknown USN record version" << std::endl;
+					std::cout << std::endl << "[!] Unknown USN record version (" << std::to_string(header->MajorVersion) << ")" << std::endl;
 					return 1;
 				}
 			}
@@ -144,12 +144,13 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 		DWORD written = 0;
 		WriteFile(houtput, "[\n", 2, &written, NULL);
 
-		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME))
+		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, cluster_size, true, true))
 		{
+			PUSN_RECORD_COMMON_HEADER header = (PUSN_RECORD_COMMON_HEADER)clusterBuf.data();
+
 			memcpy(clusterBuf.data() + filled_size, block.first, block.second);
 			filled_size += block.second;
 
-			PUSN_RECORD_COMMON_HEADER header = (PUSN_RECORD_COMMON_HEADER)clusterBuf.data();
 			while ((filled_size > 0) && (header->RecordLength <= filled_size))
 			{
 				switch (header->MajorVersion)
@@ -170,7 +171,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 					std::wstring a = std::wstring(usn_record->FileName);
 					a.resize(usn_record->FileNameLength / sizeof(WCHAR));
 
-					std::cout << "\r[+] Processing entry : " << std::to_string(++processed_count);
+					std::cout << "\r[+] Processing entry: " << std::to_string(++processed_count);
 
 					nlohmann::json entry;
 					entry["MajorVersion"] = usn_record->MajorVersion;
@@ -199,12 +200,12 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 					break;
 				}
 				default:
-					std::cout << std::endl << "[!] Unknown USN record version" << std::endl;
+					std::cout << std::endl << "[!] Unknown USN record version (" << std::to_string(header->MajorVersion) << ")" << std::endl;
 					return 1;
 				}
 			}
 
-			memcpy(clusterBuf.data(), header, (size_t)filled_size);
+			memcpy(clusterBuf.data(), header, filled_size);
 		}
 
 		WriteFile(houtput, "{}]\n", 2, &written, NULL);
