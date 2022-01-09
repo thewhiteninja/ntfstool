@@ -278,7 +278,7 @@ Current third-party libs:
         Drive Number     : 80
         Reserved         : 00
         Ext. Boot Sign   : 29
-        Serial Nuumber   : 00000000
+        Serial Number    : 00000000
         Volume Name      : NO NAME
         FileSystem Type  : FAT32
         Volume GUID      : {4967d63b-2e29-4ad8-8399-f6a339e3d001}
