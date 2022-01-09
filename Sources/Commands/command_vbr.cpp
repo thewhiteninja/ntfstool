@@ -162,7 +162,7 @@ void print_bootsector_fat32(PBOOT_SECTOR_FAT32 pbs)
 	std::cout << "        Drive Number     : " << utils::format::hex(pbs->driveNumber) << std::endl;
 	std::cout << "        Reserved         : " << utils::format::hex(pbs->reserved2) << std::endl;
 	std::cout << "        Ext. Boot Sign   : " << utils::format::hex(pbs->extSig) << std::endl;
-	std::cout << "        Serial Nuumber   : " << utils::format::hex(pbs->volumeSerialNumber) << std::endl;
+	std::cout << "        Serial Number    : " << utils::format::hex(pbs->volumeSerialNumber) << std::endl;
 	std::string s = std::string((char*)pbs->label);
 	s.resize(11);
 	std::cout << "        Volume Name      : " << s << std::endl;
@@ -211,7 +211,7 @@ void print_bootsector_fat1x(PBOOT_SECTOR_FAT1X pbs)
 	std::cout << "        Drive Number     : " << (ULONG)pbs->driveNumber << std::endl;
 	std::cout << "        Reserved         : " << utils::format::hex(pbs->reserved1) << std::endl;
 	std::cout << "        Ext. Boot Sign   : " << utils::format::hex(pbs->extSig) << std::endl;
-	std::cout << "        Serial Nuumber   : " << utils::format::hex(pbs->volumeSerialNumber) << std::endl;
+	std::cout << "        Serial Number    : " << utils::format::hex(pbs->volumeSerialNumber) << std::endl;
 	std::string s = std::string((char*)pbs->label);
 	s.resize(11);
 	std::cout << "        Volume Name      : " << s << std::endl;
@@ -268,7 +268,7 @@ void print_bootsector_bitlocker(PBOOT_SECTOR_BITLOCKER pbs)
 	std::cout << "        Drive Number     : " << utils::format::hex(pbs->driveNumber) << std::endl;
 	std::cout << "        Reserved         : " << utils::format::hex(pbs->reserved2) << std::endl;
 	std::cout << "        Ext. Boot Sign   : " << utils::format::hex(pbs->extSig) << std::endl;
-	std::cout << "        Serial Nuumber   : " << utils::format::hex(pbs->serial) << std::endl;
+	std::cout << "        Serial Number    : " << utils::format::hex(pbs->serial) << std::endl;
 	std::string s = std::string((char*)pbs->label);
 	s.resize(11);
 	std::cout << "        Volume Name      : " << s << std::endl;

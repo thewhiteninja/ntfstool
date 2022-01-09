@@ -51,7 +51,7 @@ void print_hardware_disk(std::shared_ptr<Disk> disk) {
 	std::cout << "    Media Type  : " << constants::disk::media_type(disk->geometry()->Geometry.MediaType) << (disk->is_ssd() ? " SSD" : " HDD") << std::endl;
 	std::cout << "    Size        : " << disk->size() << " (" << utils::format::size(disk->size()) << ")" << std::endl;
 	std::cout << "    Geometry    : " << std::to_string(disk->geometry()->Geometry.BytesPerSector) << " bytes * " << std::to_string(disk->geometry()->Geometry.SectorsPerTrack) << " sectors * " << std::to_string(disk->geometry()->Geometry.TracksPerCylinder) << " tracks * " << std::to_string(disk->geometry()->Geometry.Cylinders.QuadPart) << " cylinders" << std::endl;
-	std::cout << "    Volume      : " << constants::disk::partition_type(disk->partition_type()) << std::endl;
+	std::cout << "    Partition   : " << constants::disk::partition_type(disk->partition_type()) << std::endl;
 	std::cout << std::endl;
 
 	std::shared_ptr<utils::ui::Table> partitions = std::make_shared<utils::ui::Table>();
