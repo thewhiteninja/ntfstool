@@ -26,7 +26,7 @@ See below for some [examples](#examples) of the features!
 NTFSTool displays the complete structure of master boot record, volume boot record, partition table and [MFT][8] file record.
 It is also possible to dump any file (even $mft or [SAM][9]) or parse [USN journals][6], [LogFile][7] including streams from Alternate Data Stream ([ADS][5]).
 The undelete command will search for any file record marked as "not in use" and allow you to retrieve the file (or part of the file if it was already rewritten).
-It support input from image file or live disk but you can also use tools like [OSFMount][3] to mount your disk image.
+It support input from image file, live disk or virtual like [VeraCrypt][11] and [TrueCrypt][12], but you can also use tools like [OSFMount][3] to mount your disk image.
 Sparse and compressed files are also supported. 
 
 [3]: https://www.osforensics.com/tools/mount-disk-images.html
@@ -36,6 +36,8 @@ Sparse and compressed files are also supported.
 [8]: https://en.wikipedia.org/wiki/NTFS#Master_File_Table
 [9]: https://en.wikipedia.org/wiki/Security_Account_Manager
 [10]: https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc781134(v=ws.10)?redirectedfrom=MSDN
+[11]: https://www.veracrypt.fr/en/Home.html
+[12]: http://truecrypt.sourceforge.net/
 
 ### Bitlocker support
 
