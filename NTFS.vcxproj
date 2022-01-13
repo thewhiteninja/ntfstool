@@ -32,6 +32,7 @@
     <ClInclude Include="Sources\Drive\reader.h" />
     <ClInclude Include="Sources\Drive\smart.h" />
     <ClInclude Include="Sources\Drive\vbr.h" />
+    <ClInclude Include="Sources\Drive\virtual_disk.h" />
     <ClInclude Include="Sources\Drive\volume.h" />
     <ClInclude Include="Sources\EFS\certificate_file.h" />
     <ClInclude Include="Sources\EFS\export_flags.h" />
@@ -93,6 +94,7 @@
     <ClCompile Include="Sources\Commands\command_mbr.cpp" />
     <ClCompile Include="Sources\Drive\disk.cpp" />
     <ClCompile Include="Sources\Drive\reader.cpp" />
+    <ClCompile Include="Sources\Drive\virtual_disk.cpp" />
     <ClCompile Include="Sources\Drive\volume.cpp" />
     <ClCompile Include="Sources\EFS\certificate_file.cpp" />
     <ClCompile Include="Sources\EFS\export_flags_enc.cpp" />

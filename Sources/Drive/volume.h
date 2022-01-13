@@ -44,8 +44,14 @@ private:
 
 	PVOID _parent = nullptr;
 
+	void _detect_bitlocker(HANDLE h, PARTITION_INFORMATION_EX p);
+
+	void _get_info_by_name(PWCHAR volume_name);
+
+	void _detect_filesystem(PARTITION_INFORMATION_EX p);
+
 public:
-	explicit Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index, PVOID parent);
+	explicit Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index, PVOID parent, PWCHAR name = nullptr);
 	std::string name()						const { return _name; }
 	std::string label()						const { return _label; }
 	std::string filesystem()				const { return _filesystem; }

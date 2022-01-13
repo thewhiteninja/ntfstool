@@ -15,10 +15,10 @@ namespace core
 				std::vector<std::shared_ptr<Volume>> volumes;
 
 				std::vector<std::shared_ptr<Disk>> disks = disks::list();
-				for (auto disk : disks)
+				for (auto& disk : disks)
 				{
 					std::vector<std::shared_ptr<Volume>> diskVols = disk->volumes();
-					for (auto diskVol : diskVols)
+					for (auto& diskVol : diskVols)
 					{
 						volumes.push_back(diskVol);
 					}
@@ -105,7 +105,132 @@ std::shared_ptr<Buffer<PBYTE>> read_fve(HANDLE h, LARGE_INTEGER offset)
 	return nullptr;
 }
 
-Volume::Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index, PVOID parent)
+void Volume::_detect_bitlocker(HANDLE h, PARTITION_INFORMATION_EX p)
+{
+	DWORD read;
+	if (h != INVALID_HANDLE_VALUE)
+	{
+		_bootsector.resize(512);
+		SetFilePointer(h, p.StartingOffset.LowPart, &p.StartingOffset.HighPart, FILE_BEGIN);
+		if (ReadFile(h, _bootsector.data(), 512, &read, NULL))
+		{
+			if (std::memcmp(((PBOOT_SECTOR_COMMON)_bootsector.data())->oemID, "-FVE-FS-", 8) == 0) _bitlocker.bitlocked = TRUE;
+			if (std::memcmp(((PBOOT_SECTOR_COMMON)_bootsector.data())->oemID, "MSWIN4.1", 8) == 0) _bitlocker.bitlocked = TRUE;
+
+			if (_bitlocker.bitlocked)
+			{
+				PBOOT_SECTOR_BITLOCKER pbsb = (PBOOT_SECTOR_BITLOCKER)_bootsector.data();
+
+				for (int block_index = 0; block_index < 3; block_index++)
+				{
+					LARGE_INTEGER fve_pos = p.StartingOffset;
+					fve_pos.QuadPart += pbsb->fveBlockOffset[block_index];
+					std::shared_ptr<Buffer<PBYTE>> fve = read_fve(h, fve_pos);
+					if (fve != nullptr)
+					{
+						std::memcpy((void*)&_bitlocker.metadata[block_index].block_header, fve->data(), sizeof(FVE_BLOCK_HEADER));
+						std::memcpy((void*)&_bitlocker.metadata[block_index].header, fve->data() + sizeof(FVE_BLOCK_HEADER), sizeof(FVE_HEADER));
+
+						DWORD size_to_read = _bitlocker.metadata[block_index].header.size - _bitlocker.metadata[block_index].header.header_size;
+
+						PFVE_ENTRY entry = (PFVE_ENTRY)(fve->data() + sizeof(FVE_BLOCK_HEADER) + sizeof(FVE_HEADER));
+						while (size_to_read > 0)
+						{
+							std::shared_ptr<Buffer<PFVE_ENTRY>> entrybuf = std::make_shared<Buffer<PFVE_ENTRY>>(entry->size);
+							std::memcpy(entrybuf->data(), entry, entry->size);
+							_bitlocker.metadata[block_index].entries.push_back(entrybuf);
+							entrybuf = nullptr;
+
+							size_to_read -= entry->size;
+							entry = (PFVE_ENTRY)(((PBYTE)entry) + entry->size);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void Volume::_get_info_by_name(PWCHAR volume_name)
+{
+	_name = utils::strings::to_utf8(volume_name);
+
+	ULARGE_INTEGER li;
+	if (GetDiskFreeSpaceExW(volume_name, NULL, NULL, &li)) _free = li.QuadPart;
+
+	wchar_t labelName[MAX_PATH + 1] = { 0 };
+	wchar_t fileSystemName[MAX_PATH + 1] = { 0 };
+	DWORD serialNumber = 0;
+	DWORD maxComponentLen = 0;
+	DWORD fileSystemFlags = 0;
+	if (GetVolumeInformationW(volume_name, labelName, MAX_PATH + 1, &serialNumber, &maxComponentLen, &fileSystemFlags, fileSystemName, ARRAYSIZE(fileSystemName)))
+	{
+		_label = utils::strings::to_utf8(labelName);
+		_serial_number = serialNumber;
+	}
+
+	DWORD charCount = MAX_PATH;
+	std::shared_ptr<Buffer<wchar_t*>> mps = std::make_shared<Buffer<wchar_t*>>(charCount);
+	if (!GetVolumePathNamesForVolumeNameW(volume_name, mps->data(), charCount, &charCount))
+	{
+		if (GetLastError() == ERROR_MORE_DATA)
+		{
+			mps->resize(charCount);
+		}
+	}
+
+	if (GetVolumePathNamesForVolumeNameW(volume_name, mps->data(), charCount, &charCount))
+	{
+		wchar_t* letters = (wchar_t*)mps->data();
+		size_t i = 0;
+		while (letters[i] != NULL)
+		{
+			_mountpoints.push_back(utils::strings::to_utf8(letters));
+			i += wcslen(letters);
+		}
+	}
+
+	_type = GetDriveTypeW(volume_name);
+}
+
+void Volume::_detect_filesystem(PARTITION_INFORMATION_EX p)
+{
+	if (_filesystem == "")
+	{
+		_filesystem = "Unknown";
+
+		PBOOT_SECTOR_COMMON pbsc = (PBOOT_SECTOR_COMMON)_bootsector.data();
+		if (strncmp((PCHAR)pbsc->oemID, "NTFS", 4) == 0)
+		{
+			_filesystem = "NTFS";
+		}
+		else if (strncmp((PCHAR)pbsc->oemID, "-FVE-FS-", 8) == 0)
+		{
+			_filesystem = "Bitlocker";
+		}
+		else if (strncmp((PCHAR)pbsc->oemID, "MSDOS5.0", 8) == 0)
+		{
+			if (strncmp(((PBOOT_SECTOR_FAT32)pbsc)->fsName, "FAT32   ", 8) == 0)
+			{
+				_filesystem = "FAT32";
+			}
+			if (strncmp(((PBOOT_SECTOR_FAT1X)pbsc)->fsName, "FAT16   ", 8) == 0)
+			{
+				_filesystem = "FAT16";
+			}
+			if (strncmp(((PBOOT_SECTOR_FAT1X)pbsc)->fsName, "FAT12   ", 8) == 0)
+			{
+				_filesystem = "FAT12";
+			}
+		}
+		else if (_partition_type == PARTITION_STYLE_MBR)
+		{
+			_filesystem = constants::disk::mbr_type(p.Mbr.PartitionType);
+		}
+	}
+}
+
+Volume::Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index, PVOID parent, PWCHAR name)
 {
 	_partition_type = p.PartitionStyle;
 	_offset = p.StartingOffset.QuadPart;
@@ -118,140 +243,38 @@ Volume::Volume(HANDLE h, PARTITION_INFORMATION_EX p, int index, PVOID parent)
 	_bitlocker.bitlocked = false;
 	_parent = parent;
 
-	if (_partition_type == PARTITION_STYLE_GPT || _partition_type == PARTITION_STYLE_MBR)
+	if (_partition_type == PARTITION_STYLE_MBR)
 	{
-		if (_partition_type == PARTITION_STYLE_MBR)
+		_bootable = p.Mbr.BootIndicator;
+	}
+	else
+	{
+		_bootable = FALSE;
+	}
+
+	if (_partition_type == PARTITION_STYLE_GPT)
+	{
+		_guid_type = constants::disk::gpt_type(p.Gpt.PartitionType);
+	}
+
+	if (_partition_type == PARTITION_STYLE_GPT || _partition_type == PARTITION_STYLE_MBR || _partition_type == PARTITION_STYLE_RAW)
+	{
+		_detect_bitlocker(h, p);
+
+		if (name)
 		{
-			_bootable = p.Mbr.BootIndicator;
+			_get_info_by_name(name);
 		}
 		else
 		{
-			_bootable = FALSE;
-		}
-
-		if (_partition_type == PARTITION_STYLE_GPT)
-		{
-			_guid_type = constants::disk::gpt_type(p.Gpt.PartitionType);
-		}
-
-		DWORD read;
-		if (h != INVALID_HANDLE_VALUE)
-		{
-			_bootsector.resize(512);
-			SetFilePointer(h, p.StartingOffset.LowPart, &p.StartingOffset.HighPart, FILE_BEGIN);
-			if (ReadFile(h, _bootsector.data(), 512, &read, NULL))
+			wchar_t volumeName[MAX_PATH];
+			if (findVolumeName(volumeName, index, _offset, _size))
 			{
-				if (std::memcmp(((PBOOT_SECTOR_COMMON)_bootsector.data())->oemID, "-FVE-FS-", 8) == 0) _bitlocker.bitlocked = TRUE;
-				if (std::memcmp(((PBOOT_SECTOR_COMMON)_bootsector.data())->oemID, "MSWIN4.1", 8) == 0) _bitlocker.bitlocked = TRUE;
-
-				if (_bitlocker.bitlocked)
-				{
-					PBOOT_SECTOR_BITLOCKER pbsb = (PBOOT_SECTOR_BITLOCKER)_bootsector.data();
-
-					for (int block_index = 0; block_index < 3; block_index++)
-					{
-						LARGE_INTEGER fve_pos = p.StartingOffset;
-						fve_pos.QuadPart += pbsb->fveBlockOffset[block_index];
-						std::shared_ptr<Buffer<PBYTE>> fve = read_fve(h, fve_pos);
-						if (fve != nullptr)
-						{
-							std::memcpy((void*)&_bitlocker.metadata[block_index].block_header, fve->data(), sizeof(FVE_BLOCK_HEADER));
-							std::memcpy((void*)&_bitlocker.metadata[block_index].header, fve->data() + sizeof(FVE_BLOCK_HEADER), sizeof(FVE_HEADER));
-
-							DWORD size_to_read = _bitlocker.metadata[block_index].header.size - _bitlocker.metadata[block_index].header.header_size;
-
-							PFVE_ENTRY entry = (PFVE_ENTRY)(fve->data() + sizeof(FVE_BLOCK_HEADER) + sizeof(FVE_HEADER));
-							while (size_to_read > 0)
-							{
-								std::shared_ptr<Buffer<PFVE_ENTRY>> entrybuf = std::make_shared<Buffer<PFVE_ENTRY>>(entry->size);
-								std::memcpy(entrybuf->data(), entry, entry->size);
-								_bitlocker.metadata[block_index].entries.push_back(entrybuf);
-								entrybuf = nullptr;
-
-								size_to_read -= entry->size;
-								entry = (PFVE_ENTRY)(((PBYTE)entry) + entry->size);
-							}
-						}
-					}
-				}
+				_get_info_by_name(volumeName);
 			}
 		}
 
-		wchar_t volumeName[MAX_PATH];
-		if (findVolumeName(volumeName, index, _offset, _size))
-		{
-			_name = utils::strings::to_utf8(volumeName);
-
-			ULARGE_INTEGER li;
-			if (GetDiskFreeSpaceExW(volumeName, NULL, NULL, &li)) _free = li.QuadPart;
-
-			wchar_t labelName[MAX_PATH + 1] = { 0 };
-			wchar_t fileSystemName[MAX_PATH + 1] = { 0 };
-			DWORD serialNumber = 0;
-			DWORD maxComponentLen = 0;
-			DWORD fileSystemFlags = 0;
-			if (GetVolumeInformationW(volumeName, labelName, MAX_PATH + 1, &serialNumber, &maxComponentLen, &fileSystemFlags, fileSystemName, ARRAYSIZE(fileSystemName)))
-			{
-				_label = utils::strings::to_utf8(labelName);
-				_serial_number = serialNumber;
-			}
-
-			DWORD charCount = MAX_PATH;
-			std::shared_ptr<Buffer<wchar_t*>> mps = std::make_shared<Buffer<wchar_t*>>(charCount);
-			if (!GetVolumePathNamesForVolumeNameW(volumeName, mps->data(), charCount, &charCount))
-			{
-				if (GetLastError() == ERROR_MORE_DATA)
-				{
-					mps->resize(charCount);
-				}
-			}
-
-			if (GetVolumePathNamesForVolumeNameW(volumeName, mps->data(), charCount, &charCount))
-			{
-				wchar_t* letters = (wchar_t*)mps->data();
-				size_t i = 0;
-				while (letters[i] != NULL)
-				{
-					_mountpoints.push_back(utils::strings::to_utf8(letters));
-					i += wcslen(letters);
-				}
-			}
-
-			_type = GetDriveTypeW(volumeName);
-		}
-		if (_filesystem == "")
-		{
-			_filesystem = "Unknown";
-
-			PBOOT_SECTOR_COMMON pbsc = (PBOOT_SECTOR_COMMON)_bootsector.data();
-			if (strncmp((PCHAR)pbsc->oemID, "NTFS", 4) == 0)
-			{
-				_filesystem = "NTFS";
-			}
-			else if (strncmp((PCHAR)pbsc->oemID, "-FVE-FS-", 8) == 0)
-			{
-				_filesystem = "Bitlocker";
-			}
-			else if (strncmp((PCHAR)pbsc->oemID, "MSDOS5.0", 8) == 0)
-			{
-				if (strncmp(((PBOOT_SECTOR_FAT32)pbsc)->fsName, "FAT32   ", 8) == 0)
-				{
-					_filesystem = "FAT32";
-				}
-				if (strncmp(((PBOOT_SECTOR_FAT1X)pbsc)->fsName, "FAT16   ", 8) == 0)
-				{
-					_filesystem = "FAT16";
-				}
-				if (strncmp(((PBOOT_SECTOR_FAT1X)pbsc)->fsName, "FAT12   ", 8) == 0)
-				{
-					_filesystem = "FAT12";
-				}
-			}
-			else if (_partition_type == PARTITION_STYLE_MBR)
-			{
-				_filesystem = constants::disk::mbr_type(p.Mbr.PartitionType);
-			}
-		}
+		_detect_filesystem(p);
 	}
 }
 

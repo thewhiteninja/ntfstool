@@ -1,4 +1,5 @@
 #include "disk.h"
+#include "virtual_disk.h"
 #include "volume.h"
 #include "Utils/buffer.h"
 #include "Utils/utils.h"
@@ -45,12 +46,24 @@ namespace core
 					else break;
 				}
 
+				i = static_cast<int>(disks.size());
+				for (auto virtual_disk : core::win::virtualdisk::list())
+				{
+					virtual_disk->set_index(i++);
+					disks.push_back(virtual_disk);
+				}
+
 				return disks;
 			}
 
 			std::shared_ptr<Disk> by_index(DWORD index)
 			{
-				return try_add_disk(index);;
+				std::vector<std::shared_ptr<Disk>> disks = list();
+				if (index < disks.size())
+				{
+					return disks[index];
+				}
+				return nullptr;
 			}
 
 			std::shared_ptr<Disk> from_image(std::string filename)
@@ -70,7 +83,7 @@ namespace core
 
 chs add_chs(chs& a, chs& b)
 {
-	chs r;
+	chs r = { 0 };
 	r.cylinder = a.cylinder + b.cylinder;
 	r.head = a.head + b.head;
 	r.sector = a.sector + b.sector;
@@ -83,9 +96,8 @@ void Disk::_get_mbr(HANDLE h)
 	_protective_mbr = false;
 	_partition_type = PARTITION_STYLE_RAW;
 
-	LARGE_INTEGER pos;
-	pos.QuadPart = (LONGLONG)0;
-	LARGE_INTEGER result;
+	LARGE_INTEGER pos = { 0 };
+	LARGE_INTEGER result = { 0 };
 	SetFilePointerEx(h, pos, &result, SEEK_SET);
 
 	if (ReadFile(h, &_mbr, sizeof(MBR), &ior, NULL))
@@ -149,10 +161,10 @@ void Disk::_get_mbr(HANDLE h)
 
 void Disk::_get_gpt(HANDLE h) {
 	DWORD ior = 0;
-	LARGE_INTEGER pos;
-	LARGE_INTEGER result;
+	LARGE_INTEGER pos = { 0 };
+	LARGE_INTEGER result = { 0 };
 
-	GPT_HEADER loc_gpt;
+	GPT_HEADER loc_gpt = { 0 };
 
 	if (_protective_mbr)
 	{
