@@ -762,7 +762,7 @@ std::vector<std::string> constants::efs::permissions(DWORD p)
 
 	std::vector<std::string> ret;
 
-	for (auto perm : perms)
+	for (auto& perm : perms)
 	{
 		if (p & perm.first)
 		{

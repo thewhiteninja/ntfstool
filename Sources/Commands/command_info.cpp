@@ -25,7 +25,16 @@ void print_disks_short(std::vector<std::shared_ptr<Disk>> disks) {
 	for (std::shared_ptr<Disk> disk : disks) {
 		disktable->add_item_line(std::to_string(disk->index()));
 		disktable->add_item_line(disk->product_id());
-		disktable->add_item_line(constants::disk::media_type(disk->geometry()->Geometry.MediaType) + (disk->is_ssd() ? " SSD" : " HDD"));
+
+		std::string media_type = constants::disk::media_type(disk->geometry()->Geometry.MediaType);
+		if (media_type == "Virtual")
+		{
+			disktable->add_item_line(media_type);
+		}
+		else
+		{
+			disktable->add_item_line(media_type + (disk->is_ssd() ? " SSD" : " HDD"));
+		}
 		disktable->add_item_line(constants::disk::partition_type(disk->partition_type()));
 		disktable->add_item_line(std::to_string(disk->size()) + " (" + utils::format::size(disk->size()) + ")");
 		disktable->new_line();

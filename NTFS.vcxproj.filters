@@ -177,6 +177,9 @@
     <ClInclude Include="Sources\EFS\export_flags_enc.h">
       <Filter>Header Files\EFS</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Drive\virtual_disk.h">
+      <Filter>Header Files\Drive</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -343,6 +346,9 @@
     </ClCompile>
     <ClCompile Include="Sources\EFS\export_flags_enc.cpp">
       <Filter>Source Files\EFS</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Drive\virtual_disk.cpp">
+      <Filter>Source Files\Drive</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
