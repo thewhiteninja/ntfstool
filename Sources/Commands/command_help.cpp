@@ -80,7 +80,7 @@ void print_help_info(const char* name)
 {
 	command_header("info");
 	command_description(name, "info (disk id) (volume id)", "Provides a list of physical disks or information for selected disk and volume");
-	command_examples(name, "Display the lsit of physical disks", "info");
+	command_examples(name, "Display the list of physical disks", "info");
 	command_examples(name, "Display information on disk 1", "info disk=1");
 	command_examples(name, "Display information on disk 2 and volume 1", "info disk=2 volume=1");
 }
@@ -127,10 +127,10 @@ void print_help_bitlocker(const char* name)
 {
 	command_header("bitlocker");
 	command_description(name, "bitlocker [disk id] [volume id] (password | recovery | bek)", "Provides Bitlocker information for selected disk, volume");
-	command_examples(name, "Display Bitlocker information disk 2, volume 4", "bitlocker disk=2 volume=4");
-	command_examples(name, "Test a password for encrypted disk 2 and volume 4", "mft disk=0 volume=2 password=123456");
-	command_examples(name, "Test a recovery key for encrypted disk 2 and volume 4", "mft disk=0 volume=2 recovery=123456-234567-345678-456789-567890-678901-789012-890123");
-	command_examples(name, "Test a BEK file for encrypted disk 2 and volume 4", "mft disk=0 volume=2 bek=H:\\3926293F-E661-4417-A36B-B41175B4D862.BEK");
+	command_examples(name, "Display Bitlocker information for disk 2, volume 4", "bitlocker disk=2 volume=4");
+	command_examples(name, "Test a password for encrypted for disk 2 and volume 4", "bitlocker disk=0 volume=2 password=123456");
+	command_examples(name, "Test a recovery key for encrypted for disk 2 and volume 4", "bitlocker disk=0 volume=2 recovery=123456-234567-345678-456789-567890-678901-789012-890123");
+	command_examples(name, "Test a BEK file for encrypted for disk 2 and volume 4", "bitlocker disk=0 volume=2 bek=H:\\3926293F-E661-4417-A36B-B41175B4D862.BEK");
 }
 
 void print_help_bitdecrypt(const char* name)
