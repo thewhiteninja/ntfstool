@@ -421,6 +421,12 @@ typedef struct {
 	USHORT Reserved;
 	union {
 		struct {
+			DWORD Version;
+			DWORD Provider;
+			DWORD FileVersionInformation;
+			DWORD CompressionAlgorithm;
+		} WindowsOverlayFilterBuffer;
+		struct {
 			USHORT SubstituteNameOffset;
 			USHORT SubstituteNameLength;
 			USHORT PrintNameOffset;

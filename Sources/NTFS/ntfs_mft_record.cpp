@@ -239,10 +239,10 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 					PMFT_RECORD_ATTRIBUTE pAttrListI = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, attribute_list_data->data(), offset);
 					if (pAttrListI->typeID == $INDEX_ROOT)
 					{
-						DWORD64 ino=pAttrListI->recordNumber & 0xffffffffffff;
-						if (ino != _record->data()->MFTRecordIndex)
+						DWORD64 next_inode = pAttrListI->recordNumber & 0xffffffffffff;
+						if (next_inode != _record->data()->MFTRecordIndex)
 						{
-							std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(ino);
+							std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(next_inode);
 							return extRecordHeader->index();
 						}
 					}

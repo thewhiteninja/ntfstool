@@ -185,6 +185,19 @@ std::string constants::disk::mft::efs_type(ULONG32 t)
 	}
 }
 
+std::string constants::disk::mft::wof_compression(DWORD c)
+{
+	switch (c)
+	{
+	case 0: return "LZXPRESS Huffman with 4k window";
+	case 1: return "LZX with 32k window";
+	case 2: return "LZXPRESS Huffman with 8k window";
+	case 3: return "LZXPRESS Huffman with 16k window";
+	default:
+		return TEXT("UNKNOWN");
+	}
+}
+
 
 std::string constants::disk::partition_type(DWORD t)
 {
