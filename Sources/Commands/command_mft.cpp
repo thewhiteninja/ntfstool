@@ -88,6 +88,7 @@ std::vector<std::string> print_attribute_reparse_point(PMFT_RECORD_ATTRIBUTE_REP
 	if (pAttribute != nullptr)
 	{
 		ret.push_back("Type                    : " + constants::disk::mft::file_record_reparse_point_type(pAttribute->ReparseTag));
+		ret.push_back("------");
 
 		if (pAttribute->ReparseTag == IO_REPARSE_TAG_SYMLINK)
 		{
@@ -106,6 +107,13 @@ std::vector<std::string> print_attribute_reparse_point(PMFT_RECORD_ATTRIBUTE_REP
 			std::wstring display_name = std::wstring(POINTER_ADD(PWCHAR, pAttribute->MountPointReparseBuffer.PathBuffer, pAttribute->MountPointReparseBuffer.PrintNameOffset));
 			display_name.resize(pAttribute->MountPointReparseBuffer.PrintNameLength / sizeof(WCHAR));
 			ret.push_back("Display Name            : " + utils::strings::to_utf8(display_name));
+		}
+		else if (pAttribute->ReparseTag == IO_REPARSE_TAG_WOF)
+		{
+			ret.push_back("Version                 : " + std::to_string(pAttribute->WindowsOverlayFilterBuffer.Version));
+			ret.push_back("Provider                : " + std::to_string(pAttribute->WindowsOverlayFilterBuffer.Provider));
+			ret.push_back("FileVersion             : " + std::to_string(pAttribute->WindowsOverlayFilterBuffer.FileVersionInformation));
+			ret.push_back("Compression Algorithm   : " + constants::disk::mft::wof_compression(pAttribute->WindowsOverlayFilterBuffer.CompressionAlgorithm));
 		}
 		else
 		{

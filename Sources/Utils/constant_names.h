@@ -52,6 +52,8 @@ namespace constants {
 			std::string file_record_filename_name_type(UCHAR t);
 
 			std::string efs_type(ULONG32);
+
+			std::string wof_compression(DWORD);
 		}
 
 		namespace usn
