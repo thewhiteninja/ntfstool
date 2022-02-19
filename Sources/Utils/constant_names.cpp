@@ -189,10 +189,10 @@ std::string constants::disk::mft::wof_compression(DWORD c)
 {
 	switch (c)
 	{
-	case 0: return "LZXPRESS Huffman with 4k window";
-	case 1: return "LZX with 32k window";
-	case 2: return "LZXPRESS Huffman with 8k window";
-	case 3: return "LZXPRESS Huffman with 16k window";
+	case 0: return "XPRESS 4k";
+	case 1: return "LZX 32k";
+	case 2: return "XPRESS 8k";
+	case 3: return "XPRESS 16k";
 	default:
 		return TEXT("UNKNOWN");
 	}

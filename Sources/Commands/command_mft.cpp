@@ -112,7 +112,7 @@ std::vector<std::string> print_attribute_reparse_point(PMFT_RECORD_ATTRIBUTE_REP
 		{
 			ret.push_back("Version                 : " + std::to_string(pAttribute->WindowsOverlayFilterBuffer.Version));
 			ret.push_back("Provider                : " + std::to_string(pAttribute->WindowsOverlayFilterBuffer.Provider));
-			ret.push_back("FileVersion             : " + std::to_string(pAttribute->WindowsOverlayFilterBuffer.FileVersionInformation));
+			ret.push_back("File Version            : " + std::to_string(pAttribute->WindowsOverlayFilterBuffer.FileVersionInformation));
 			ret.push_back("Compression Algorithm   : " + constants::disk::mft::wof_compression(pAttribute->WindowsOverlayFilterBuffer.CompressionAlgorithm));
 		}
 		else
