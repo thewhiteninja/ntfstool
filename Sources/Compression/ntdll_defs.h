@@ -18,6 +18,16 @@ typedef NTSTATUS(__stdcall* _RtlDecompressBuffer)(
 	PULONG FinalUncompressedSize
 	);
 
+typedef NTSTATUS(__stdcall* _RtlDecompressBufferEx)(
+	USHORT CompressionFormat,
+	PUCHAR UncompressedBuffer,
+	ULONG UncompressedBufferSize,
+	PUCHAR CompressedBuffer,
+	ULONG CompressedBufferSize,
+	PULONG FinalUncompressedSize,
+	PVOID  WorkSpace
+	);
+
 typedef NTSTATUS(__stdcall* _RtlGetCompressionWorkSpaceSize)(
 	USHORT CompressionFormatAndEngine,
 	PULONG CompressBufferWorkSpaceSize,
@@ -34,3 +44,5 @@ typedef NTSTATUS(__stdcall* _RtlDecompressFragment)(
 	PULONG FinalUncompressedSize,
 	PVOID  WorkSpace
 	);
+
+

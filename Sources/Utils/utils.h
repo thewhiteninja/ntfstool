@@ -17,10 +17,12 @@
 #include <sddl.h>
 
 #include "buffer.h"
+#include "Compression/ntdll_defs.h"
 
 #include <openssl/evp.h>
 #include <openssl/aes.h>
 #include <openssl/des.h>
+
 
 #define POINTER_ADD(t, p, v)	(reinterpret_cast<t>(reinterpret_cast<uint64_t>(p) + v))
 
@@ -158,6 +160,14 @@ namespace utils
 			const EVP_MD* hash_to_evp(DWORD hash_alg);
 
 			const EVP_CIPHER* encryption_to_evp(DWORD enc_alg);
+		}
+	}
+
+	namespace dll
+	{
+		namespace ntdll
+		{
+			int load_compression_functions(_RtlDecompressBuffer* RtlDecompressBuffer, _RtlDecompressBufferEx* RtlDecompressBufferEx, _RtlGetCompressionWorkSpaceSize* RtlGetCompressionWorkSpaceSize);
 		}
 	}
 

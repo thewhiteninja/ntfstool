@@ -32,7 +32,6 @@
 
 #include "Buffer.h"
 
-
 #pragma comment(lib, "ntdll")
 #pragma comment(lib, "wintrust")
 #pragma comment(lib, "advapi32")
@@ -543,17 +542,18 @@ namespace utils
 		std::pair<std::string, std::string> split_file_and_stream(std::string& str)
 		{
 			std::filesystem::path p(str);
+			std::string fname = str;
 
 			size_t ads_sep = p.filename().string().find(':');
 			std::string stream_name = "";
 			if (ads_sep != std::string::npos)
 			{
 				stream_name = p.filename().string().substr(ads_sep + 1);
-				size_t last_sep = str.find_last_of(':');
-				str = str.substr(0, last_sep);
+				size_t last_sep = fname.find_last_of(':');
+				fname = fname.substr(0, last_sep);
 			}
 
-			return std::make_pair(str, stream_name);
+			return std::make_pair(fname, stream_name);
 		}
 	}
 
@@ -761,3 +761,41 @@ const EVP_CIPHER* utils::crypto::cryptoapi::encryption_to_evp(DWORD enc_alg)
 	}
 }
 
+int utils::dll::ntdll::load_compression_functions(_RtlDecompressBuffer* RtlDecompressBuffer, _RtlDecompressBufferEx* RtlDecompressBufferEx, _RtlGetCompressionWorkSpaceSize* RtlGetCompressionWorkSpaceSize)
+{
+	auto ntdll = GetModuleHandle("ntdll.dll");
+	if (ntdll != nullptr)
+	{
+		if (RtlDecompressBuffer)
+		{
+			*RtlDecompressBuffer = (_RtlDecompressBuffer)GetProcAddress(ntdll, "RtlDecompressBuffer");
+			if (*RtlDecompressBuffer == nullptr)
+			{
+				return 4;
+			}
+		}
+
+		if (RtlGetCompressionWorkSpaceSize)
+		{
+			*RtlGetCompressionWorkSpaceSize = (_RtlGetCompressionWorkSpaceSize)GetProcAddress(ntdll, "RtlGetCompressionWorkSpaceSize");
+			if (*RtlGetCompressionWorkSpaceSize == nullptr)
+			{
+				return 3;
+			}
+		}
+
+		if (RtlDecompressBufferEx)
+		{
+			*RtlDecompressBufferEx = (_RtlDecompressBufferEx)GetProcAddress(ntdll, "RtlDecompressBufferEx");
+			if (*RtlDecompressBufferEx == nullptr)
+			{
+				return 2;
+			}
+		}
+	}
+	else
+	{
+		return 1;
+	}
+	return 0;
+}
