@@ -26,7 +26,10 @@
     <ClInclude Include="Sources\Bitlocker\password.h" />
     <ClInclude Include="Sources\Bitlocker\recovery.h" />
     <ClInclude Include="Sources\Commands\commands.h" />
-    <ClInclude Include="Sources\Compression\definitions.h" />
+    <ClInclude Include="Sources\Compression\lznt1.h" />
+    <ClInclude Include="Sources\Compression\ntdll_defs.h" />
+    <ClInclude Include="Sources\Compression\lzx.h" />
+    <ClInclude Include="Sources\Compression\xpress.h" />
     <ClInclude Include="Sources\Drive\disk.h" />
     <ClInclude Include="Sources\Drive\mbr_gpt.h" />
     <ClInclude Include="Sources\Drive\reader.h" />
@@ -92,6 +95,9 @@
     <ClCompile Include="Sources\Commands\command_help.cpp" />
     <ClCompile Include="Sources\Commands\command_info.cpp" />
     <ClCompile Include="Sources\Commands\command_mbr.cpp" />
+    <ClCompile Include="Sources\Compression\lznt1.cpp" />
+    <ClCompile Include="Sources\Compression\lzx.cpp" />
+    <ClCompile Include="Sources\Compression\xpress.cpp" />
     <ClCompile Include="Sources\Drive\disk.cpp" />
     <ClCompile Include="Sources\Drive\reader.cpp" />
     <ClCompile Include="Sources\Drive\virtual_disk.cpp" />

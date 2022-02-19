@@ -132,7 +132,7 @@
     <ClInclude Include="Sources\Bitlocker\decryption.h">
       <Filter>Header Files\Bitlocker</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Compression\definitions.h">
+    <ClInclude Include="Sources\Compression\ntdll_defs.h">
       <Filter>Header Files\Compression</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Utils\progress_bar.h">
@@ -179,6 +179,15 @@
     </ClInclude>
     <ClInclude Include="Sources\Drive\virtual_disk.h">
       <Filter>Header Files\Drive</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Compression\xpress.h">
+      <Filter>Header Files\Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Compression\lzx.h">
+      <Filter>Header Files\Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Compression\lznt1.h">
+      <Filter>Header Files\Compression</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -349,6 +358,15 @@
     </ClCompile>
     <ClCompile Include="Sources\Drive\virtual_disk.cpp">
       <Filter>Source Files\Drive</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Compression\xpress.cpp">
+      <Filter>Source Files\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Compression\lzx.cpp">
+      <Filter>Source Files\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Compression\lznt1.cpp">
+      <Filter>Source Files\Compression</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
