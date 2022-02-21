@@ -47,7 +47,7 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 		}
 	}
 
-	std::cout << "[+] Extracting file" << std::endl;
+	std::cout << "[+] Extracting file..." << std::endl;
 	std::wstring output_filename = utils::strings::from_string(opts->output);
 
 	ULONG64 written = record->data_to_file(output_filename, stream_name);
