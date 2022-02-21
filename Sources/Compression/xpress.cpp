@@ -5,23 +5,23 @@
 bool parse_chunk_table(std::shared_ptr<Buffer<PBYTE>> compressed, DWORD windows_size, PBYTE* data_start, std::vector<DWORD>& chunks_sizes)
 {
 	chunks_sizes.clear();
-	DWORD last_chunk_size = 0;
-	DWORD current_chunk_size = 1;
+	DWORD last_chunk_offset = 0;
+	DWORD current_chunk_offset = 1;
 	DWORD chunk_index = 0;
 	int64_t remaining_bytes = compressed->size();
 
 	while (remaining_bytes > 0)
 	{
-		current_chunk_size = compressed->read_at<DWORD>(sizeof(DWORD) * chunk_index++);
-		if (!current_chunk_size)
+		current_chunk_offset = compressed->read_at<DWORD>(sizeof(DWORD) * chunk_index++);
+		if (current_chunk_offset < last_chunk_offset || current_chunk_offset > compressed->size() || (current_chunk_offset - last_chunk_offset) > windows_size)
 		{
 			break;
 		}
 		else
 		{
-			chunks_sizes.push_back(current_chunk_size - last_chunk_size);
-			last_chunk_size = current_chunk_size;
-			remaining_bytes -= sizeof(DWORD) + (current_chunk_size - last_chunk_size);
+			chunks_sizes.push_back(current_chunk_offset - last_chunk_offset);
+			last_chunk_offset = current_chunk_offset;
+			remaining_bytes -= sizeof(DWORD) + (current_chunk_offset - last_chunk_offset);
 		}
 	}
 

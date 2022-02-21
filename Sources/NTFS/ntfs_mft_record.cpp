@@ -526,51 +526,16 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 					co_return;
 				}
 
-				LONGLONG last_offset = 0;
+				std::shared_ptr<Buffer<PBYTE>> buffer_compressed = data(stream_name);
+				std::shared_ptr<Buffer<PBYTE>> buffer_decompressed = std::make_shared<Buffer<PBYTE>>(datasize("", false));
 
-				for (const MFT_DATARUN& run : data_runs)
+				DWORD final_size = static_cast<DWORD>(datasize());
+				int dec_status = decompress_xpress(buffer_compressed, buffer_decompressed, window_size, final_size);
+
+				if (!dec_status)
 				{
-					if (err) break; //-V547
-
-					if (last_offset == run.offset) // Padding run
-					{
-						continue;
-					}
-					last_offset = run.offset;
-
-					if (run.offset == 0)
-					{
-						Buffer<PBYTE> buffer_decompressed(block_size);
-
-						DWORD64 total_size = run.length * _reader->sizes.cluster_size;
-						for (DWORD64 i = 0; i < total_size; i += block_size)
-						{
-							fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, block_size));
-							co_yield std::pair<PBYTE, DWORD>(buffer_decompressed.data(), real_size ? fixed_blocksize : block_size);
-							writeSize += fixed_blocksize;
-						}
-					}
-					else
-					{
-						_reader->seek(run.offset * _reader->sizes.cluster_size);
-						DWORD64 total_size = run.length * _reader->sizes.cluster_size;
-
-						std::shared_ptr<Buffer<PBYTE>> buffer_compressed = data(stream_name);
-						std::shared_ptr<Buffer<PBYTE>> buffer_decompressed = std::make_shared<Buffer<PBYTE>>(datasize("", false));
-
-						DWORD final_size = static_cast<DWORD>(datasize());
-						int dec_status = decompress_xpress(buffer_compressed, buffer_decompressed, window_size, final_size);
-
-						if (!dec_status)
-						{
-							co_yield std::pair<PBYTE, DWORD>(buffer_decompressed->data(), buffer_decompressed->size());
-							writeSize += buffer_decompressed->size();
-						}
-						else
-						{
-							break;
-						}
-					}
+					co_yield std::pair<PBYTE, DWORD>(buffer_decompressed->data(), buffer_decompressed->size());
+					writeSize += buffer_decompressed->size();
 				}
 			}
 			else
