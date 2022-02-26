@@ -46,7 +46,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	Buffer<PBYTE> clusterBuf((DWORD64)2 * 1024 * 1024);
 	ULONG64 total_size = record->datasize(MFT_ATTRIBUTE_DATA_USN_NAME);
 
-	std::cout << "[+] Data stream $J size : " << utils::format::size(total_size) << " (sparse)" << std::endl;
+	std::cout << "[+] Data stream $J size  : " << utils::format::size(total_size) << " (sparse)" << std::endl;
 
 	ULONG64 processed_size = 0;
 	ULONG64 processed_count = 0;
@@ -65,7 +65,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	{
 		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, 1024 * 1024, true, true))
 		{
-			std::cout << "\r[+] Processing data: " << std::to_string(++processed_count) << "MB(s)";
+			std::cout << "\r[+] Processing data: " << std::to_string(++processed_count) << " MB(s)";
 			DWORD written = 0;
 			WriteFile(houtput, block.first, block.second, &written, NULL);
 		}
@@ -74,11 +74,14 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	{
 		std::string csv_header = "MajorVersion,MinorVersion,FileReferenceNumber,FileReferenceSequenceNumber,ParentFileReferenceNumber,ParentFileReferenceSequenceNumber,Usn,Timestamp,Reason,SourceInfo,SecurityId,FileAttributes,Filename\n";
 		DWORD written = 0;
+		DWORD read = 0;
 		DWORD header_size = 0;
 		if (!FAILED(SizeTToDWord(csv_header.size(), &header_size))) WriteFile(houtput, csv_header.c_str(), header_size, &written, NULL);
 
 		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, cluster_size, true, true))
 		{
+			read += cluster_size;
+
 			memcpy(clusterBuf.data() + filled_size, block.first, block.second);
 			filled_size += block.second;
 
@@ -103,7 +106,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 					std::wstring a = std::wstring(usn_record->FileName);
 					a.resize(usn_record->FileNameLength / sizeof(WCHAR));
 
-					std::cout << "\r[+] Processing entry: " << std::to_string(++processed_count);
+					std::cout << "\r[+] Processing entry: " << std::to_string(++processed_count) << " (" << utils::format::size(read) << ")     ";
 
 					std::ostringstream entry;
 					entry << usn_record->MajorVersion << ",";
@@ -142,10 +145,13 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	else if (format == "json")
 	{
 		DWORD written = 0;
+		DWORD read = 0;
 		WriteFile(houtput, "[\n", 2, &written, NULL);
 
 		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, cluster_size, true, true))
 		{
+			read += cluster_size;
+
 			PUSN_RECORD_COMMON_HEADER header = (PUSN_RECORD_COMMON_HEADER)clusterBuf.data();
 
 			memcpy(clusterBuf.data() + filled_size, block.first, block.second);
@@ -171,7 +177,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 					std::wstring a = std::wstring(usn_record->FileName);
 					a.resize(usn_record->FileNameLength / sizeof(WCHAR));
 
-					std::cout << "\r[+] Processing entry: " << std::to_string(++processed_count);
+					std::cout << "\r[+] Processing entry: " << std::to_string(++processed_count) << " (" << utils::format::size(read) << ")     ";
 
 					nlohmann::json entry;
 					entry["MajorVersion"] = usn_record->MajorVersion;
