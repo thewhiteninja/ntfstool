@@ -434,7 +434,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 
 			if (pAttributeData->Flags & ATTRIBUTE_FLAG_COMPRESSED)
 			{
-				auto expansion_factor = 15ULL;
+				auto expansion_factor = 0x10ULL;
 
 				LONGLONG last_offset = 0;
 
@@ -595,7 +595,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 				bool is_first_data = true;
 				ULONG64 filesize_left = 0;
 
-				while (offset + sizeof(MFT_RECORD_ATTRIBUTE_HEADER) <= attribute_list_data->size())
+				while (offset + sizeof(MFT_RECORD_ATTRIBUTE) <= attribute_list_data->size())
 				{
 					PMFT_RECORD_ATTRIBUTE pAttrListI = POINTER_ADD(PMFT_RECORD_ATTRIBUTE, attribute_list_data->data(), offset);
 					if (pAttrListI->typeID == $DATA)
