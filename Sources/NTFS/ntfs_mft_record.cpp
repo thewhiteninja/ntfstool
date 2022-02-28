@@ -12,6 +12,7 @@
 #include "NTFS/ntfs_explorer.h"
 #include <Compression/lznt1.h>
 #include <Compression/xpress.h>
+#include <Compression/lzx.h>
 
 
 MFTRecord::MFTRecord(PMFT_RECORD_HEADER pRecordHeader, MFT* mft, std::shared_ptr<NTFSReader> reader)
@@ -520,17 +521,20 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 					co_return;
 				}
 
-				if (!is_xpress_compressed)
-				{
-					std::cerr << "[!] LZX compression is not supported yet" << std::endl;
-					co_return;
-				}
-
 				std::shared_ptr<Buffer<PBYTE>> buffer_compressed = data(stream_name);
 				std::shared_ptr<Buffer<PBYTE>> buffer_decompressed = std::make_shared<Buffer<PBYTE>>(datasize("", false));
 
 				DWORD final_size = static_cast<DWORD>(datasize());
-				int dec_status = decompress_xpress(buffer_compressed, buffer_decompressed, window_size, final_size);
+				int dec_status = 0;
+
+				if (is_xpress_compressed)
+				{
+					decompress_xpress(buffer_compressed, buffer_decompressed, window_size, final_size);
+				}
+				else
+				{
+					decompress_lzx(buffer_compressed, buffer_decompressed, window_size);
+				}
 
 				if (!dec_status)
 				{

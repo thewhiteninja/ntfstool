@@ -2,7 +2,7 @@
 #include <Compression/ntdll_defs.h>
 #include <Utils/utils.h>
 
-bool parse_chunk_table(std::shared_ptr<Buffer<PBYTE>> compressed, DWORD windows_size, PBYTE* data_start, std::vector<DWORD>& chunks_sizes)
+static bool parse_chunk_table(std::shared_ptr<Buffer<PBYTE>> compressed, DWORD windows_size, PBYTE* data_start, std::vector<DWORD>& chunks_sizes)
 {
 	chunks_sizes.clear();
 	DWORD last_chunk_offset = 0;
