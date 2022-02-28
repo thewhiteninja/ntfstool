@@ -415,6 +415,22 @@ typedef struct
 	BYTE		bitmap[1];
 } MFT_RECORD_ATTRIBUTE_BITMAP, * PMFT_RECORD_ATTRIBUTE_BITMAP;
 
+typedef struct
+{
+	USHORT packed_length;
+	USHORT need_ea_count;
+	DWORD unpacked_length;
+} MFT_RECORD_ATTRIBUTE_EA_INFORMATION, * PMFT_RECORD_ATTRIBUTE_EA_INFORMATION;
+
+typedef struct
+{
+	DWORD next_entry_offset;
+	UCHAR flags;
+	UCHAR name_length;
+	USHORT value_length;
+	CHAR data[1];
+} MFT_RECORD_ATTRIBUTE_EA, * PMFT_RECORD_ATTRIBUTE_EA;
+
 typedef struct {
 	ULONG  ReparseTag;
 	USHORT ReparseDataLength;
