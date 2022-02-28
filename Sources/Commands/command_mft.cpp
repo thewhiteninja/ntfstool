@@ -552,6 +552,49 @@ std::vector<std::string> print_attribute_list(PMFT_RECORD_ATTRIBUTE pAttribute, 
 	return ret;
 }
 
+std::vector<std::string> print_attribute_ea_information(PMFT_RECORD_ATTRIBUTE_EA_INFORMATION pAttribute)
+{
+	std::vector<std::string> ret;
+
+	ret.push_back("Packed size   : " + std::to_string(pAttribute->packed_length));
+	ret.push_back("Need EA Count : " + std::to_string(pAttribute->need_ea_count));
+	ret.push_back("Unpacked size : " + std::to_string(pAttribute->unpacked_length));
+
+	return ret;
+}
+
+std::vector<std::string> print_attribute_ea(std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_EA>> pAttribute)
+{
+	std::vector<std::string> ret;
+
+	bool first = true;
+	DWORD offset = 0;
+	PMFT_RECORD_ATTRIBUTE_EA cur = pAttribute->data();
+	while (offset < pAttribute->size())
+	{
+		PMFT_RECORD_ATTRIBUTE_EA cur = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EA, pAttribute->data(), offset);
+
+		if (first)
+		{
+			first = false;
+		}
+		else
+		{
+			ret.push_back("");
+		}
+
+		std::string name = std::string(cur->data, cur->name_length);
+		ret.push_back("Name     : " + name);
+		ret.push_back("Need EA  : " + std::to_string(cur->flags & 0x80));
+		ret.push_back("Value    : ");
+		ret.push_back(utils::convert::to_hex(cur->data + cur->name_length + 1, cur->value_length));
+
+		offset += cur->next_entry_offset;
+	}
+
+	return ret;
+}
+
 int commands::mft::print_mft_info_details(std::shared_ptr<MFTRecord> record, ULONG32 cluster_size)
 {
 	PMFT_RECORD_HEADER record_header = record->header();
@@ -725,6 +768,37 @@ int commands::mft::print_mft_info_details(std::shared_ptr<MFTRecord> record, ULO
 
 			fr_attributes->add_item_multiline(print_attribute_bitmap(reinterpret_cast<PMFT_RECORD_ATTRIBUTE_BITMAP>(attr_buf->data()), attr_buf->size()));
 
+			break;
+		}
+		case $EA_INFORMATION:
+		{
+			PMFT_RECORD_ATTRIBUTE_EA_INFORMATION pattr = nullptr;
+			if (pAttribute->FormCode == RESIDENT_FORM)
+			{
+				if (pAttribute->Form.Resident.ValueLength == 0x8)
+				{
+					pattr = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_EA_INFORMATION, pAttribute, pAttribute->Form.Resident.ValueOffset);
+					fr_attributes->add_item_multiline(print_attribute_ea_information(pattr));
+				}
+				else
+				{
+					wprintf(L"$EA_INFORMATION != 8 bytes is not supported");
+				}
+			}
+			else
+			{
+				wprintf(L"Non-resident $EA_INFORMATION is not supported");
+			}
+
+			break;
+		}
+		case $EA:
+		{
+			std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_EA>> pattr = record->attribute_data<PMFT_RECORD_ATTRIBUTE_EA>(pAttribute);
+			if (pattr->size() <= 0x10000)
+			{
+				fr_attributes->add_item_multiline(print_attribute_ea(pattr));
+			}
 			break;
 		}
 		case $ATTRIBUTE_LIST:
