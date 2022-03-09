@@ -14,7 +14,7 @@
 NTFSTool is a forensic tool focused on [NTFS][10] volumes.
 It supports reading partition info (mbr, partition table, vbr) but also information on master file table, bitlocker encrypted volume, EFS encrypted files and more.
 
-Download the lastest binaries in the [latest](https://github.com/thewhiteninja/ntfstool/releases/tag/latest) release or on [AppVeyor](https://ci.appveyor.com/project/thewhiteninja/ntfstool).
+Download the latest binaries on [AppVeyor](https://ci.appveyor.com/project/thewhiteninja/ntfstool).
 
 See below for some [examples](#examples) of the features!
 
@@ -110,16 +110,20 @@ Feel free to open an issue or ask for a new feature!
 
 ## Build
     
-Vcpkg is the best way to install required third-party libs.
+- Install [Visual Studio 2022](https://visualstudio.microsoft.com/fr/vs/)
+    
+- Install vcpkg (for required third-party libs) as described here: [vcpkg#getting-started](https://github.com/microsoft/vcpkg#getting-started)
 
-Install vcpkg as described here: [vcpkg#getting-started](https://github.com/microsoft/vcpkg#getting-started)
+	```
+	git clone https://github.com/microsoft/vcpkg
+	.\vcpkg\bootstrap-vcpkg.bat
+	```
 
-    git clone https://github.com/microsoft/vcpkg
-    .\vcpkg\bootstrap-vcpkg.bat
+- Integrate it to your VisualStudio env:
 
-Integrate it to your VisualStudio env:
-
-    vcpkg integrate install
+	```
+	vcpkg integrate install
+	```
 
 At build time, VisualStudio will detect the `vcpkg.json` file and install required packages automatically.
 
