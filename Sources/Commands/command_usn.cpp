@@ -44,9 +44,9 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	PMFT_RECORD_HEADER record_header = record->header();
 
 	Buffer<PBYTE> clusterBuf((DWORD64)2 * 1024 * 1024);
-	ULONG64 total_size = record->datasize(MFT_ATTRIBUTE_DATA_USN_NAME);
+	ULONG64 total_size = record->datasize(MFT_ATTRIBUTE_DATA_USN_NAME, true);
 
-	std::cout << "[+] Data stream $J size  : " << utils::format::size(total_size) << " (sparse)" << std::endl;
+	std::cout << "[+] Virtual $J stream size  : " << utils::format::size(total_size) << " (sparse, ~32MiBs on disk by default)" << std::endl;
 
 	ULONG64 processed_size = 0;
 	ULONG64 processed_count = 0;
@@ -65,7 +65,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	{
 		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, 1024 * 1024, true, true))
 		{
-			std::cout << "\r[+] Processing data: " << utils::format::size(processed_count);
+			std::cout << "\r[+] Processing data: " << utils::format::size(processed_count) << "     ";
 			processed_count += block.second;
 
 			DWORD written = 0;
