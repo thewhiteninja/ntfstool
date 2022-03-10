@@ -65,7 +65,9 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	{
 		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, 1024 * 1024, true, true))
 		{
-			std::cout << "\r[+] Processing data: " << std::to_string(++processed_count) << " MB(s)";
+			std::cout << "\r[+] Processing data: " << utils::format::size(processed_count);
+			processed_count += block.second;
+
 			DWORD written = 0;
 			WriteFile(houtput, block.first, block.second, &written, NULL);
 		}

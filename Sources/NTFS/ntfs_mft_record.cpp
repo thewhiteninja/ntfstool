@@ -606,22 +606,26 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 					{
 						data_attribute_found = true;
 
-						std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttrListI->recordNumber & 0xffffffffffff);
-
-						if (is_first_data)
+						DWORD64 next_inode = pAttrListI->recordNumber & 0xffffffffffff;
+						if (next_inode != _record->data()->MFTRecordIndex)
 						{
-							filesize_left = extRecordHeader->datasize(stream_name);
-							is_first_data = false;
-						}
+							std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttrListI->recordNumber & 0xffffffffffff);
 
-						for (std::pair<PBYTE, DWORD> b : extRecordHeader->process_data(stream_name, block_size, false, skip_sparse))
-						{
-							if (filesize_left < b.second && real_size)
+							if (is_first_data)
 							{
-								b.second = static_cast<DWORD>(filesize_left);
+								filesize_left = extRecordHeader->datasize(stream_name);
+								is_first_data = false;
 							}
-							co_yield b;
-							filesize_left -= b.second;
+
+							for (std::pair<PBYTE, DWORD> b : extRecordHeader->process_data(stream_name, block_size, false, skip_sparse))
+							{
+								if (filesize_left < b.second && real_size)
+								{
+									b.second = static_cast<DWORD>(filesize_left);
+								}
+								co_yield b;
+								filesize_left -= b.second;
+							}
 						}
 					}
 
