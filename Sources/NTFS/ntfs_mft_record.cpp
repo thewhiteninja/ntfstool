@@ -568,16 +568,17 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 					{
 						_reader->seek(run.offset * _reader->sizes.cluster_size);
 						DWORD64 total_size = run.length * _reader->sizes.cluster_size;
-						for (DWORD64 i = 0; i < total_size; i += block_size)
+						DWORD read_block_size = static_cast<DWORD>(min(block_size, total_size));
+						for (DWORD64 i = 0; i < total_size; i += read_block_size)
 						{
-							if (!_reader->read(buffer.data(), block_size))
+							if (!_reader->read(buffer.data(), read_block_size))
 							{
 								std::cout << "[!] ReadFile failed" << std::endl;
 								err = true;
 								break;
 							}
-							fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, block_size));
-							co_yield std::pair<PBYTE, DWORD>(buffer.data(), real_size ? fixed_blocksize : block_size);
+							fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, read_block_size));
+							co_yield std::pair<PBYTE, DWORD>(buffer.data(), real_size ? fixed_blocksize : read_block_size);
 							writeSize += fixed_blocksize;
 						}
 					}
