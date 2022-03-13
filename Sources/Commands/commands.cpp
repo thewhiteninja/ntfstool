@@ -23,7 +23,7 @@ std::shared_ptr<MFTRecord> commands::helpers::find_record(std::shared_ptr<NTFSEx
 		rec = ex->mft()->record_from_path(filepath);
 		if (rec == nullptr)
 		{
-			invalid_option(opts, "from", opts->from, "Unable to find file record");
+			invalid_option(opts, "from", opts->from, "Unable to find file record.");
 		}
 	}
 	else
@@ -31,7 +31,7 @@ std::shared_ptr<MFTRecord> commands::helpers::find_record(std::shared_ptr<NTFSEx
 		rec = ex->mft()->record_from_number(opts->inode);
 		if (rec == nullptr)
 		{
-			invalid_option(opts, "inode", opts->inode, "Unable to find file record");
+			invalid_option(opts, "inode", opts->inode, "Unable to find file record.");
 		}
 	}
 
