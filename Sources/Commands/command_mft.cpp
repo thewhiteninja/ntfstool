@@ -412,20 +412,20 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 
 	if (pAttribute->NameLength > 0)
 	{
-		ret.push_back("Name                    : " + utils::strings::to_utf8(name));
+		ret.push_back("Name: " + utils::strings::to_utf8(name));
 	}
 
 	ULONG64 datasize = record->datasize(utils::strings::to_utf8(name));
 	if (record->header()->baseRecord == 0)
 	{
-		ret.push_back("Data Size               : " + std::to_string(datasize) + " (" + utils::format::size(datasize) + ")");
+		ret.push_back("Size: " + std::to_string(datasize) + " (" + utils::format::size(datasize) + ")");
 	}
 
 	if (pAttribute->FormCode == NON_RESIDENT_FORM)
 	{
 		if (pAttribute->Flags)
 		{
-			ret.push_back("Flags                   : ");
+			ret.push_back("Flags: ");
 
 			if (pAttribute->Flags & ATTRIBUTE_FLAG_COMPRESSED)
 			{
@@ -445,7 +445,7 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 		auto dataruns = record->read_dataruns(pAttribute);
 		if (!dataruns.empty())
 		{
-			ret.push_back("Dataruns                : ");
+			ret.push_back("Dataruns: ");
 			LONGLONG last = 0;
 			ULONGLONG real_size = 0;
 			ULONGLONG virtual_size = 0;
@@ -467,8 +467,8 @@ std::vector<std::string> print_attribute_data(std::shared_ptr<MFTRecord> record,
 				ret.push_back("    Length: " + utils::format::hex(static_cast<DWORD>(run.length)) + " Offset: " + utils::format::hex(static_cast<DWORD>(run.offset)) + (last == run.offset ? " (S)" : ""));
 			}
 			ret.push_back("");
-			ret.push_back("Virtual size            : " + std::to_string(virtual_size) + " (" + utils::format::size(virtual_size) + ")");
-			ret.push_back("Real size               : " + std::to_string(real_size) + " (" + utils::format::size(real_size) + ")");
+			ret.push_back("Virtual size: " + std::to_string(virtual_size) + " (" + utils::format::size(virtual_size) + ")");
+			ret.push_back("Real size   : " + std::to_string(real_size) + " (" + utils::format::size(real_size) + ")");
 		}
 	}
 
@@ -481,14 +481,14 @@ std::vector<std::string> commands::mft::print_attribute_index_allocation(PMFT_RE
 
 	if (pIndexAttrHeader->FormCode == NON_RESIDENT_FORM)
 	{
-		ret.push_back("First VCN               : 0x" + utils::format::hex6(pIndexAttrHeader->Form.Nonresident.LowestVcn));
-		ret.push_back("Last VCN                : 0x" + utils::format::hex6(pIndexAttrHeader->Form.Nonresident.HighestVcn));
+		ret.push_back("First VCN    : 0x" + utils::format::hex6(pIndexAttrHeader->Form.Nonresident.LowestVcn));
+		ret.push_back("Last VCN     : 0x" + utils::format::hex6(pIndexAttrHeader->Form.Nonresident.HighestVcn));
 		ret.push_back("");
 
 		auto dataruns = record->read_dataruns(pIndexAttrHeader);
 		if (!dataruns.empty())
 		{
-			ret.push_back("Dataruns                : ");
+			ret.push_back("Dataruns     : ");
 			LONGLONG last = 0;
 			ULONGLONG size_on_disk = 0;
 			for (const auto& run : dataruns)
@@ -500,7 +500,7 @@ std::vector<std::string> commands::mft::print_attribute_index_allocation(PMFT_RE
 				ret.push_back("    Length: " + utils::format::hex(static_cast<DWORD>(run.length)) + " Offset: " + utils::format::hex(static_cast<DWORD>(run.offset)) + (last == run.offset ? " (S)" : ""));
 				last = run.offset;
 			}
-			ret.push_back("Size on disk            : " + std::to_string(size_on_disk) + " (" + utils::format::size(size_on_disk) + ")");
+			ret.push_back("Size on disk : " + std::to_string(size_on_disk) + " (" + utils::format::size(size_on_disk) + ")");
 		}
 	}
 
