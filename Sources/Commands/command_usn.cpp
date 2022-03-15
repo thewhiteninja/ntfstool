@@ -52,7 +52,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	ULONG64 processed_count = 0;
 	ULONG64 filled_size = 0;
 
-	std::cout << "[+] Reading $J" << std::endl;
+	std::cout << "[+] Creating " << output << std::endl;
 
 	HANDLE houtput = CreateFileA(output.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (houtput == INVALID_HANDLE_VALUE)
@@ -82,7 +82,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 
 		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, cluster_size, true))
 		{
-			read += cluster_size;
+			read += block.second;
 
 			memcpy(clusterBuf.data() + filled_size, block.first, block.second);
 			filled_size += block.second;
@@ -152,7 +152,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 
 		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, cluster_size, true))
 		{
-			read += cluster_size;
+			read += block.second;
 
 			PUSN_RECORD_COMMON_HEADER header = (PUSN_RECORD_COMMON_HEADER)clusterBuf.data();
 
