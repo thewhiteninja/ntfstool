@@ -120,6 +120,8 @@ public:
 
 	ULONG64 data_to_file(std::wstring dest_filename, std::string stream_name = "", bool real_size = true);
 
+	cppcoro::generator<std::pair<PBYTE, DWORD>> process_data_raw(std::string stream_name = "", DWORD blocksize = 1024 * 1024, bool real_size = true, bool skip_sparse = false);
+
 	cppcoro::generator<std::pair<PBYTE, DWORD>> process_data(std::string stream_name = "", DWORD blocksize = 1024 * 1024, bool real_size = true, bool skip_sparse = false);
 
 	std::vector<std::string> alternate_data_names();
