@@ -605,8 +605,6 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::str
 			if (attribute_list_data != nullptr)
 			{
 				DWORD offset = 0;
-				bool is_first_data = true;
-				ULONG64 filesize_left = 0;
 
 				while (offset + sizeof(MFT_RECORD_ATTRIBUTE) <= attribute_list_data->size())
 				{
@@ -619,17 +617,9 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::str
 						if (next_inode != _record->data()->MFTRecordIndex)
 						{
 							std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttrListI->recordNumber & 0xffffffffffff);
-
-							if (is_first_data)
-							{
-								filesize_left = extRecordHeader->datasize(stream_name);
-								is_first_data = false;
-							}
-
 							for (std::pair<PBYTE, DWORD> b : extRecordHeader->process_data_raw(stream_name, block_size, skip_sparse))
 							{
 								co_yield b;
-								filesize_left -= b.second;
 							}
 						}
 					}
@@ -654,16 +644,21 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::str
 cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string stream_name, DWORD block_size, bool skip_sparse)
 {
 	ULONG64 final_datasize = datasize("", true);
-	std::cout << final_datasize << std::endl;
+	bool check_size = final_datasize != 0; // ex: no real size for usn
 
 	for (auto& block : process_data_raw(stream_name, block_size, skip_sparse))
 	{
-		if (block.second > final_datasize)
+		if (block.second > final_datasize && check_size)
 		{
 			block.second = static_cast<DWORD>(final_datasize);
 		}
+
 		co_yield block;
-		final_datasize -= block.second;
+
+		if (check_size)
+		{
+			final_datasize -= block.second;
+		}
 	}
 }
 

@@ -111,14 +111,12 @@ std::shared_ptr<MFTRecord> MFT::record_from_number(ULONG64 record_number)
 		}
 		if (offset == -1LL)
 		{
-			wprintf(L"Failed to find record offset for inode 0x%08llx", record_number);
 			return nullptr;
 		}
 
 		_reader->seek(offset);
 		if (!_reader->read(buffer->address() + sector * _reader->boot_record()->bytePerSector, _reader->boot_record()->bytePerSector))
 		{
-			wprintf(L"Failed to read record at offset 0x%08llx", offset);
 			return nullptr;
 		}
 	}
