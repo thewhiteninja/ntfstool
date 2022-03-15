@@ -376,14 +376,14 @@ PMFT_RECORD_ATTRIBUTE_HEADER MFTRecord::attribute_header(DWORD type, std::string
 	return nullptr;
 }
 
-ULONG64 MFTRecord::data_to_file(std::wstring dest_filename, std::string stream_name, bool real_size)
+ULONG64 MFTRecord::data_to_file(std::wstring dest_filename, std::string stream_name, bool skip_sparse)
 {
 	ULONG64 written_bytes = 0ULL;
 
 	HANDLE output = CreateFileW(dest_filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	if (output != INVALID_HANDLE_VALUE)
 	{
-		for (auto& data_block : process_data(stream_name, 1024 * 1024, real_size))
+		for (auto& data_block : process_data(stream_name, 1024 * 1024, skip_sparse))
 		{
 			DWORD written_block;
 			if (!WriteFile(output, data_block.first, data_block.second, &written_block, NULL))
@@ -405,7 +405,7 @@ ULONG64 MFTRecord::data_to_file(std::wstring dest_filename, std::string stream_n
 	return written_bytes;
 }
 
-cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::string stream_name, DWORD block_size, bool real_size, bool skip_sparse)
+cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::string stream_name, DWORD block_size, bool skip_sparse)
 {
 	PMFT_RECORD_ATTRIBUTE_HEADER pAttributeData = attribute_header($DATA, stream_name);
 	if (pAttributeData != NULL)
@@ -458,7 +458,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::str
 						for (DWORD64 i = 0; i < total_size; i += block_size)
 						{
 							fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, block_size));
-							co_yield std::pair<PBYTE, DWORD>(buffer_decompressed.data(), real_size ? static_cast<DWORD>(fixed_blocksize) : block_size);
+							co_yield std::pair<PBYTE, DWORD>(buffer_decompressed.data(), static_cast<DWORD>(fixed_blocksize));
 							writeSize += fixed_blocksize;
 						}
 					}
@@ -566,7 +566,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::str
 							for (DWORD64 i = 0; i < total_size; i += block_size)
 							{
 								fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, block_size));
-								co_yield std::pair<PBYTE, DWORD>(buffer.data(), real_size ? static_cast<DWORD>(fixed_blocksize) : block_size);
+								co_yield std::pair<PBYTE, DWORD>(buffer.data(), static_cast<DWORD>(fixed_blocksize));
 								writeSize += fixed_blocksize;
 							}
 						}
@@ -585,16 +585,8 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::str
 								break;
 							}
 							read_block_size = min(read_block_size, total_size - i);
-							if (pAttributeData->Form.Nonresident.FileSize)
-							{
-								fixed_blocksize = DWORD(min(pAttributeData->Form.Nonresident.FileSize - writeSize, read_block_size));
-							}
-							else
-							{
-								fixed_blocksize = read_block_size;
-
-							}
-							co_yield std::pair<PBYTE, DWORD>(buffer.data(), real_size ? static_cast<DWORD>(fixed_blocksize) : static_cast<DWORD>(read_block_size));
+							fixed_blocksize = read_block_size;
+							co_yield std::pair<PBYTE, DWORD>(buffer.data(), static_cast<DWORD>(fixed_blocksize));
 							writeSize += fixed_blocksize;
 						}
 					}
@@ -634,12 +626,8 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::str
 								is_first_data = false;
 							}
 
-							for (std::pair<PBYTE, DWORD> b : extRecordHeader->process_data_raw(stream_name, block_size, real_size, skip_sparse))
+							for (std::pair<PBYTE, DWORD> b : extRecordHeader->process_data_raw(stream_name, block_size, skip_sparse))
 							{
-								if (filesize_left < b.second && real_size)
-								{
-									b.second = static_cast<DWORD>(filesize_left);
-								}
 								co_yield b;
 								filesize_left -= b.second;
 							}
@@ -663,14 +651,19 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::str
 	}
 }
 
-cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string stream_name, DWORD block_size, bool real_size, bool skip_sparse)
+cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string stream_name, DWORD block_size, bool skip_sparse)
 {
 	ULONG64 final_datasize = datasize("", true);
 	std::cout << final_datasize << std::endl;
 
-	for (auto& block : process_data_raw(stream_name, block_size, real_size, skip_sparse))
+	for (auto& block : process_data_raw(stream_name, block_size, skip_sparse))
 	{
+		if (block.second > final_datasize)
+		{
+			block.second = static_cast<DWORD>(final_datasize);
+		}
 		co_yield block;
+		final_datasize -= block.second;
 	}
 }
 
