@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <memory>
 
-#define VERSION "1.4"
+#define VERSION "1.5"
 
 void usage(const char* binname)
 {

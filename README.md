@@ -4,7 +4,7 @@
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-brightgreen.svg?tyle=flat-square)](#)
 [![x64](https://img.shields.io/badge/Windows-64_bit-0078d7.svg)](#)
 [![x86](https://img.shields.io/badge/Windows-32_bit-0078d7.svg)](#)
-[![v1.4](https://img.shields.io/badge/Version-1.4-ff5733.svg)](#)
+[![v1.5](https://img.shields.io/badge/Version-1.5-ff5733.svg)](#)
 [![Build](https://ci.appveyor.com/api/projects/status/a3cn5dpdv146tdji?svg=true)](https://ci.appveyor.com/project/thewhiteninja/ntfstool)
 
 <img align="right" width="100" height="100" src="https://cdn-icons-png.flaticon.com/512/3850/3850133.png">
@@ -27,7 +27,7 @@ NTFSTool displays the complete structure of master boot record, volume boot reco
 It is also possible to dump any file (even $mft or [SAM][9]) or parse [USN journals][6], [LogFile][7] including streams from Alternate Data Stream ([ADS][5]).
 The undelete command will search for any file record marked as "not in use" and allow you to retrieve the file (or part of the file if it was already rewritten).
 It support input from image file, live disk or virtual like [VeraCrypt][11] and [TrueCrypt][12], but you can also use tools like [OSFMount][3] to mount your disk image.
-Sparse and compressed files are also supported. 
+Sparse and compressed files (lznt1, xpress) are also supported. 
 
 [3]: https://www.osforensics.com/tools/mount-disk-images.html
 [5]: https://www.sans.org/white-papers/1503/
