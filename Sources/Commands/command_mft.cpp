@@ -842,6 +842,12 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
+	if (opts->inode == -1 && opts->from == "")
+	{
+		// Default inode to display
+		opts->inode = 0;
+	}
+
 	std::shared_ptr<MFTRecord> record = commands::helpers::find_record(explorer, opts);
 
 	utils::ui::title("MFT (inode:" + std::to_string(record->header()->MFTRecordIndex) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
