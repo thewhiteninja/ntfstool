@@ -110,7 +110,6 @@ void print_help_mft_record(const char* name)
 {
 	command_header("mft.record");
 	command_description(name, "mft.record [disk id] [volume id] (inode/from)", "Display MFT file record information and detailed attributes for selected disk, volume and inode/path");
-	command_examples(name, "Display MFT file record for disk 0, volume 2", "mft.record disk=0 volume=2");
 	command_examples(name, "Display MFT file record for disk 0, volume 2 and inode 5", "mft.record disk=0 volume=2 inode=5");
 	command_examples(name, "Display MFT File record for disk 0, volume 2 and file \"c:\\file.bin\"", "mft.record disk=0 volume=2 from=\"c:\\file.bin\"");
 }
@@ -213,9 +212,9 @@ void print_help_extract(const char* name)
 {
 	command_header("extract");
 	command_description(name, "extract [disk id] [volume id] [from] [output]", "Extract a file specified by a path in from to output");
-	command_examples(name, "Extract a file", "extract disk=0 volume=1 from=\"c:\\windows\\notepad.exe\" output = \"d:\\notepad.exe\"");
-	command_examples(name, "Extract SAM hive", "extract disk=0 volume=1 --sam output = \"d:\\sam\"");
-	command_examples(name, "Extract SYSTEM file", "extract disk=0 volume=1 --system output = \"d:\\system\"");
+	command_examples(name, "Extract a file", "extract disk=0 volume=1 from=\"c:\\windows\\notepad.exe\" output=\"d:\\notepad.exe\"");
+	command_examples(name, "Extract SAM hive", "extract disk=0 volume=1 --sam output=\"d:\\sam\"");
+	command_examples(name, "Extract SYSTEM file", "extract disk=0 volume=1 --system output=\"d:\\system\"");
 }
 
 void print_help_streams(const char* name)
