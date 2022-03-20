@@ -82,7 +82,14 @@ namespace commands {
 
 	namespace usn
 	{
-		int dispatch(std::shared_ptr<Options> opts);
+		namespace dump
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
+		namespace analyze
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
 	}
 
 	namespace extract
