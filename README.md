@@ -24,7 +24,7 @@ See below for some [examples](#examples) of the features!
 ### Forensics
 
 NTFSTool displays the complete structure of master boot record, volume boot record, partition table and [MFT][8] file record.
-It is also possible to dump any file (even $mft or [SAM][9]) or parse [USN journals][6], [LogFile][7] including streams from Alternate Data Stream ([ADS][5]).
+It is also possible to dump any file (even $mft or [SAM][9]) or parse [USN journal][6], [LogFile][7] including streams from Alternate Data Stream ([ADS][5]).
 The undelete command will search for any file record marked as "not in use" and allow you to retrieve the file (or part of the file if it was already rewritten).
 It support input from image file, live disk or virtual like [VeraCrypt][11] and [TrueCrypt][12], but you can also use tools like [OSFMount][3] to mount your disk image.
 Sparse and compressed files (lznt1, xpress) are also supported. 

@@ -23,9 +23,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
 	std::cout << std::setfill('0');
-	utils::ui::title("USN Journals from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
-
-	DWORD cluster_size = ((PBOOT_SECTOR_NTFS)vol->bootsector())->bytePerSector * ((PBOOT_SECTOR_NTFS)vol->bootsector())->sectorPerCluster;
+	utils::ui::title("Dump USN journal from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
@@ -42,8 +40,6 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	}
 
 	std::cout << "[+] Found in file record: " << std::to_string(record->header()->MFTRecordIndex) << std::endl;
-
-	PMFT_RECORD_HEADER record_header = record->header();
 
 	Buffer<PBYTE> clusterBuf((DWORD64)2 * 1024 * 1024);
 	ULONG64 total_size = record->datasize(MFT_ATTRIBUTE_DATA_USN_NAME, true);
@@ -110,7 +106,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 		ULONG64 processed_size = 0;
 		ULONG64 processed_count = 0;
 
-		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, cluster_size, true))
+		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, explorer->reader()->sizes.cluster_size, true))
 		{
 			processed_size += block.second;
 
@@ -187,39 +183,42 @@ namespace commands
 {
 	namespace usn
 	{
-		int dispatch(std::shared_ptr<Options> opts)
+		namespace dump
 		{
-			std::ios_base::fmtflags flag_backup(std::cout.flags());
-
-			std::shared_ptr<Disk> disk = get_disk(opts);
-			if (disk != nullptr)
+			int dispatch(std::shared_ptr<Options> opts)
 			{
-				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
-				if (volume != nullptr)
-				{
-					if (opts->output != "")
-					{
-						if (opts->format == "") opts->format = "raw";
+				std::ios_base::fmtflags flag_backup(std::cout.flags());
 
-						print_usn_journal(disk, volume, opts->format, opts->output);
+				std::shared_ptr<Disk> disk = get_disk(opts);
+				if (disk != nullptr)
+				{
+					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+					if (volume != nullptr)
+					{
+						if (opts->output != "")
+						{
+							if (opts->format == "") opts->format = "raw";
+
+							print_usn_journal(disk, volume, opts->format, opts->output);
+						}
+						else
+						{
+							invalid_option(opts, "output", opts->output);
+						}
 					}
 					else
 					{
-						invalid_option(opts, "output", opts->output);
+						invalid_option(opts, "volume", opts->volume);
 					}
 				}
 				else
 				{
-					invalid_option(opts, "volume", opts->volume);
+					invalid_option(opts, "disk", opts->disk);
 				}
-			}
-			else
-			{
-				invalid_option(opts, "disk", opts->disk);
-			}
 
-			std::cout.flags(flag_backup);
-			return 0;
+				std::cout.flags(flag_backup);
+				return 0;
+			}
 		}
 	}
 }
