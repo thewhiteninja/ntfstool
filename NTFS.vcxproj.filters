@@ -189,6 +189,18 @@
     <ClInclude Include="Sources\Compression\lznt1.h">
       <Filter>Header Files\Compression</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Utils\zone_identifier.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\csv_file.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\formatted_file.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\json_file.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -227,16 +239,16 @@
     <ClCompile Include="Sources\Commands\command_bitlocker.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_mft.cpp">
+    <ClCompile Include="Sources\Commands\command_mft.record.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_usn.cpp">
+    <ClCompile Include="Sources\Commands\command_usn.dump.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_shell.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_logfile.cpp">
+    <ClCompile Include="Sources\Commands\command_logfile.dump.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_undelete.cpp">
@@ -317,7 +329,7 @@
     <ClCompile Include="Sources\EFS\masterkey_file.cpp">
       <Filter>Source Files\EFS</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_btree.cpp">
+    <ClCompile Include="Sources\Commands\command_mft.btree.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_efs_key.cpp">
@@ -367,6 +379,18 @@
     </ClCompile>
     <ClCompile Include="Sources\Compression\lznt1.cpp">
       <Filter>Source Files\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_mft.dump.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\zone_identifier.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\csv_file.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\json_file.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

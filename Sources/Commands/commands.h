@@ -107,6 +107,11 @@ namespace commands {
 			int dispatch(std::shared_ptr<Options> opts);
 		}
 
+		namespace dump
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
+
 		namespace btree
 		{
 			int dispatch(std::shared_ptr<Options> opts);

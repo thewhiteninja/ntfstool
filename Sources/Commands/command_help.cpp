@@ -21,8 +21,9 @@ void usage(const char* binname)
 	std::cerr << "  mbr             : display master boot record" << std::endl;
 	std::cerr << "  gpt             : display GUID partition table" << std::endl;
 	std::cerr << "  vbr             : display volume boot record" << std::endl;
-	std::cerr << "  mft.record      : display master file table" << std::endl;
 	std::cerr << "  mft.btree       : display index btree" << std::endl;
+	std::cerr << "  mft.dump        : dump MFT (raw, csv, json)" << std::endl;
+	std::cerr << "  mft.record      : display master file table" << std::endl;
 	std::cerr << "  extract         : extract a file" << std::endl;
 	std::cerr << "  bitlocker       : display bitlocker GUID/status and test password, recovery or BEK file" << std::endl;
 	std::cerr << "  bitdecrypt      : decrypt volume to an image file" << std::endl;
@@ -32,8 +33,8 @@ void usage(const char* binname)
 	std::cerr << "  efs.certificate : list, display and export system certificates" << std::endl;
 	std::cerr << "  efs.key         : list, display, decrypt and export private keys" << std::endl;
 	std::cerr << "  efs.masterkey   : list, display and decrypt masterkeys" << std::endl;
-	std::cerr << "  logfile         : dump and parse log file" << std::endl;
-	std::cerr << "  usn             : dump and parse usn journal" << std::endl;
+	std::cerr << "  logfile.dump    : dump log file (raw, csv, json)" << std::endl;
+	std::cerr << "  usn.dump        : dump usn journal (raw, csv, json)" << std::endl;
 	std::cerr << "  shadow          : list volume shadow copies" << std::endl;
 	std::cerr << "  reparse         : parse and display reparse points" << std::endl;
 	std::cerr << "  undelete        : find deleted files" << std::endl;
@@ -122,6 +123,14 @@ void print_help_mft_btree(const char* name)
 	command_examples(name, "Display Index B-tree for disk 0, volume 2 and from \"c:\\file.bin\"", "mft.btree disk=0 volume=2 from \"c:\\file.bin\"");
 }
 
+void print_help_mft_dump(const char* name)
+{
+	command_header("mft.dump");
+	command_description(name, "mft.dump [disk id] [volume id] [output] (format)", "Dump $MFT for selected disk, volume and inode/path");
+	command_examples(name, "Dump raw $MFT for disk 0, volume 2 to a file", "mft.dump disk=0 volume=2 output=myvolume.mft");
+	command_examples(name, "Parse $MFT for disk 0, volume 2 and output results in a CSV file", "mft.dump disk=0 volume=2 output=my_mft.json format=json");
+}
+
 void print_help_bitlocker(const char* name)
 {
 	command_header("bitlocker");
@@ -149,18 +158,18 @@ void print_help_fve(const char* name)
 
 void print_help_logfile(const char* name)
 {
-	command_header("logfile");
-	command_description(name, "logfile [disk id] [volume id] [output] (format)", "Dump or parse the $LogFile of a NTFS volume ");
-	command_examples(name, "Dump raw $LogFile for disk 1, volume 2 to log.dat", "logfile disk=1 volume=2 output=log.dat");
-	command_examples(name, "Parse logfile for disk 2, volume 4 and output results in csv file", "logfile disk=2 volume=4 output=log.csv format=csv");
+	command_header("logfile.dump");
+	command_description(name, "logfile.dump [disk id] [volume id] [output] (format)", "Dump and parse $LogFile of a NTFS volume  (raw, csv, json)");
+	command_examples(name, "Dump raw $LogFile for disk 1, volume 2 to log.dat", "logfile.dump disk=1 volume=2 output=log.dat");
+	command_examples(name, "Parse $LogFile for disk 2, volume 4 and output results in csv file", "logfile.dump disk=2 volume=4 output=log.csv format=csv");
 }
 
 void print_help_usn(const char* name)
 {
-	command_header("usn");
-	command_description(name, "usn [disk id] [volume id] [output] (format)", "Dump or parse the $UsnJrnl of a NTFS volume (raw, csv, json)");
-	command_examples(name, "Dump raw $UsnJrnl for disk 1, volume 2 to usn.dat", "usn disk=1 volume=2 output=usn.dat");
-	command_examples(name, "Parse usn journal for disk 2, volume 4 and output results in json file", "usn disk=2 volume=4 output=usn.json format=json");
+	command_header("usn.dump");
+	command_description(name, "usn.dump [disk id] [volume id] [output] (format)", "Dump and parse $UsnJrnl of a NTFS volume (raw, csv, json)");
+	command_examples(name, "Dump raw $UsnJrnl for disk 1, volume 2 to usn.dat", "us.dumpn disk=1 volume=2 output=usn.dat");
+	command_examples(name, "Parse $UsnJrnl for disk 2, volume 4 and output results in json file", "usn.dump disk=2 volume=4 output=usn.json format=json");
 }
 
 
@@ -288,17 +297,18 @@ namespace commands
 				if (opts->subcommand == "mbr") { print_help_mbr(name.c_str()); return; }
 				if (opts->subcommand == "gpt") { print_help_gpt(name.c_str()); return; }
 				if (opts->subcommand == "vbr") { print_help_vbr(name.c_str()); return; }
-				if (opts->subcommand == "mft") { print_help_mft_record(name.c_str()); return; }
-				if (opts->subcommand == "btree") { print_help_mft_btree(name.c_str()); return; }
+				if (opts->subcommand == "mft.btree") { print_help_mft_btree(name.c_str()); return; }
+				if (opts->subcommand == "mft.dump") { print_help_mft_dump(name.c_str()); return; }
+				if (opts->subcommand == "mft.record") { print_help_mft_record(name.c_str()); return; }
 				if (opts->subcommand == "extract") { print_help_extract(name.c_str()); return; }
 				if (opts->subcommand == "bitlocker") { print_help_bitlocker(name.c_str()); return; }
 				if (opts->subcommand == "bitdecrypt") { print_help_bitdecrypt(name.c_str()); return; }
 				if (opts->subcommand == "fve") { print_help_fve(name.c_str()); return; }
 				if (opts->subcommand == "image") { print_help_image(name.c_str()); return; }
 				if (opts->subcommand == "shadow") { print_help_shadow(name.c_str()); return; }
-				if (opts->subcommand == "logfile") { print_help_logfile(name.c_str()); return; }
+				if (opts->subcommand == "logfile.dump") { print_help_logfile(name.c_str()); return; }
 				if (opts->subcommand == "reparse") { print_help_reparse(name.c_str()); return; }
-				if (opts->subcommand == "usn") { print_help_usn(name.c_str()); return; }
+				if (opts->subcommand == "usn.dump") { print_help_usn(name.c_str()); return; }
 				if (opts->subcommand == "efs.backup") { print_help_efs_backup(name.c_str()); return; }
 				if (opts->subcommand == "efs.certificate") { print_help_efs_certificate(name.c_str()); return; }
 				if (opts->subcommand == "efs.decrypt") { print_help_efs_decrypt(name.c_str()); return; }

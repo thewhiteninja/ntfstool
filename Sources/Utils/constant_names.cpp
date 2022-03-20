@@ -154,7 +154,7 @@ std::string constants::disk::smart::capabilities(DWORD cap)
 		if (cap & c.first) ret.push_back(c.second);
 	}
 
-	return utils::strings::join(ret, ", ");
+	return utils::strings::join_vec(ret, ", ");
 }
 
 
@@ -606,7 +606,7 @@ std::string constants::disk::usn::reasons(DWORD reason)
 		if (reason & r.first) ret.push_back(r.second);
 	}
 
-	return utils::strings::join(ret, "+");
+	return utils::strings::join_vec(ret, "+");
 }
 
 std::string constants::disk::usn::fileattributes(DWORD attributes)
@@ -638,7 +638,7 @@ std::string constants::disk::usn::fileattributes(DWORD attributes)
 		if (attributes & r.first) ret.push_back(r.second);
 	}
 
-	return utils::strings::join(ret, "+");
+	return utils::strings::join_vec(ret, "+");
 }
 
 std::string constants::disk::logfile::operation(WORD w)
@@ -820,7 +820,7 @@ std::string constants::efs::cert_prop_flags(DWORD f)
 	if (f & CRYPT_MACHINE_KEYSET) ret.push_back("CRYPT_MACHINE_KEYSET");
 	else ret.push_back("CRYPT_USER_KEYSET");
 	if (f & CRYPT_SILENT) ret.push_back("CRYPT_SILENT");
-	return utils::strings::join(ret, " | ");
+	return utils::strings::join_vec(ret, " | ");
 }
 
 std::string constants::efs::cert_prop_keyspec(DWORD k)

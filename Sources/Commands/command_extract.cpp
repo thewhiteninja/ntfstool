@@ -31,6 +31,11 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 
 	std::cout << "[-] Record Num  : " << record->header()->MFTRecordIndex << " (" << utils::format::hex(record->header()->MFTRecordIndex, true) << ")" << std::endl;
 
+	if (stream_name != "")
+	{
+		std::cout << "[-] Stream      : " << stream_name << std::endl;
+	}
+
 	std::cout << "[-] Destination : " << opts->output << std::endl;
 
 	PMFT_RECORD_ATTRIBUTE_STANDARD_INFORMATION stdinfo = nullptr;
