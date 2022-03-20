@@ -14,6 +14,7 @@ public:
 	std::string from;
 	std::string output;
 	std::string format;
+	std::string rules;
 
 	std::string password;
 	std::string sid;

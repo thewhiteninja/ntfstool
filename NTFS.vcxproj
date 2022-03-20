@@ -64,6 +64,7 @@
     <ClInclude Include="Sources\Utils\progress_bar.h" />
     <ClInclude Include="Sources\Utils\table.h" />
     <ClInclude Include="Sources\Utils\btree.h" />
+    <ClInclude Include="Sources\Utils\usn_rules.h" />
     <ClInclude Include="Sources\Utils\utils.h" />
     <ClInclude Include="Sources\Utils\zone_identifier.h" />
   </ItemGroup>
@@ -94,6 +95,7 @@
     <ClCompile Include="Sources\Commands\command_smart.cpp" />
     <ClCompile Include="Sources\Commands\command_streams.cpp" />
     <ClCompile Include="Sources\Commands\command_undelete.cpp" />
+    <ClCompile Include="Sources\Commands\command_usn.analyze.cpp" />
     <ClCompile Include="Sources\Commands\command_usn.dump.cpp" />
     <ClCompile Include="Sources\Commands\command_vbr.cpp" />
     <ClCompile Include="Sources\Commands\command_gpt.cpp" />
@@ -129,6 +131,7 @@
     <ClCompile Include="Sources\Utils\json_file.cpp" />
     <ClCompile Include="Sources\Utils\table.cpp" />
     <ClCompile Include="Sources\Utils\btree.cpp" />
+    <ClCompile Include="Sources\Utils\usn_rules.cpp" />
     <ClCompile Include="Sources\Utils\utils.cpp" />
     <ClCompile Include="Sources\Utils\zone_identifier.cpp" />
   </ItemGroup>
