@@ -2,6 +2,7 @@
 
 
 #include <string>
+#include <sstream>
 #include <vector>
 #include <chrono>
 #include <set>
@@ -63,7 +64,36 @@ namespace utils
 
 		std::vector<std::string> split(const std::string& text, TCHAR delimiter);
 
-		std::string join(std::vector<std::string> items, std::string separator);
+		template <class T>
+		std::string join_vec(std::vector<T> items, const std::string separator)
+		{
+			std::ostringstream out;
+			if (items.size() > 0) out << std::string(items[0]);
+			for (unsigned int i = 1; i < items.size(); i++) {
+				out << separator << std::string(items[i]);
+			}
+			return out.str();
+		}
+
+		template <class T>
+		std::string join_set(std::set<T> items, const std::string separator)
+		{
+			std::ostringstream out;
+			bool first = true;
+			for (auto& item : items)
+			{
+				if (!first)
+				{
+					out << separator;
+				}
+				else
+				{
+					first = false;
+				}
+				out << std::string(item);
+			}
+			return out.str();
+		}
 	}
 
 	namespace format

@@ -33,7 +33,9 @@ private:
 
 	MFT* _mft = nullptr;
 
-	std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> parse_index_block(std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>> pIndexBlock);
+	std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> _parse_index_block(std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>> pIndexBlock);
+
+	cppcoro::generator<std::pair<PBYTE, DWORD>> _process_data_raw(std::string stream_name = "", DWORD blocksize = 1024 * 1024, bool skip_sparse = false);
 
 public:
 
@@ -120,13 +122,13 @@ public:
 
 	ULONG64 data_to_file(std::wstring dest_filename, std::string stream_name = "", bool skip_sparse = false);
 
-	cppcoro::generator<std::pair<PBYTE, DWORD>> process_data_raw(std::string stream_name = "", DWORD blocksize = 1024 * 1024, bool skip_sparse = false);
-
 	cppcoro::generator<std::pair<PBYTE, DWORD>> process_data(std::string stream_name = "", DWORD blocksize = 1024 * 1024, bool skip_sparse = false);
 
-	std::vector<std::string> alternate_data_names();
+	std::vector<std::string> ads_names();
 
 	std::vector<std::shared_ptr<IndexEntry>> index();
+
+	static bool is_valid(PMFT_RECORD_HEADER pmfth);
 
 	static std::vector<MFT_DATARUN> read_dataruns(PMFT_RECORD_ATTRIBUTE_HEADER pAttribute);
 };

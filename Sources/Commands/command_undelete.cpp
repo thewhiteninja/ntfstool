@@ -17,16 +17,6 @@
 #include "Utils/table.h"
 #include <Commands/commands.h>
 
-bool valid_record(PMFT_RECORD_HEADER ph)
-{
-	return (
-		(memcmp(ph->signature, "FILE", 4) == 0) &&
-		(ph->attributeOffset > 0x30) &&
-		(ph->attributeOffset < 0x400) &&
-		(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, ph, ph->attributeOffset)->TypeCode >= 10) &&
-		(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, ph, ph->attributeOffset)->TypeCode <= 100)
-		);
-}
 
 std::string get_full_path(DWORD index, std::map<DWORD, std::string>& index_to_name, std::map<DWORD, DWORD>& index_to_parent)
 {
@@ -136,7 +126,7 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 		for (offset = 0; offset <= block.second - record_size; offset += record_size)
 		{
 			PMFT_RECORD_HEADER pmrh = POINTER_ADD(PMFT_RECORD_HEADER, block.first, offset);
-			if (valid_record(pmrh))
+			if (MFTRecord::is_valid(pmrh))
 			{
 				std::shared_ptr<MFTRecord> f = explorer->mft()->record_from_number(pmrh->MFTRecordIndex);
 

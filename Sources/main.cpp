@@ -31,15 +31,16 @@ int main(int argc, char** argv) {
 			else if (opts->command == "shell")				commands::shell::dispatch(opts);
 			else if (opts->command == "smart")				commands::smart::dispatch(opts);
 			else if (opts->command == "gpt")				commands::gpt::dispatch(opts);
-			else if (opts->command == "usn")				commands::usn::dispatch(opts);
+			else if (opts->command == "usn.dump")			commands::usn::dispatch(opts);
 			else if (opts->command == "extract")			commands::extract::dispatch(opts);
 			else if (opts->command == "vbr")				commands::vbr::dispatch(opts);
 			else if (opts->command == "image")				commands::image::dispatch(opts);
 			else if (opts->command == "undelete")			commands::undelete::dispatch(opts);
 			else if (opts->command == "mft.record")			commands::mft::record::dispatch(opts);
 			else if (opts->command == "mft.btree")			commands::mft::btree::dispatch(opts);
+			else if (opts->command == "mft.dump")			commands::mft::dump::dispatch(opts);
 			else if (opts->command == "shadow")				commands::shadow::dispatch(opts);
-			else if (opts->command == "logfile") 			commands::logfile::dispatch(opts);
+			else if (opts->command == "logfile.dump") 			commands::logfile::dispatch(opts);
 			else if (opts->command == "reparse") 			commands::reparse::dispatch(opts);
 			else if (opts->command == "streams") 			commands::streams::dispatch(opts);
 			else if (opts->command == "efs.backup")			commands::efs::backup::dispatch(opts);

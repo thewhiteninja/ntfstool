@@ -16,6 +16,8 @@
 #include <iomanip>
 #include <memory>
 #include <iterator>
+#include <Utils/csv_file.h>
+#include <Utils/json_file.h>
 
 void fixup_sequence(PRECORD_PAGE_HEADER prh)
 {
@@ -76,47 +78,23 @@ std::vector<std::string> get_log_clients(PRESTART_AREA ra)
 	return ret;
 }
 
-void print_record_log(HANDLE outputfile, PRECORD_LOG rl, const std::string& format)
+void _add_record(std::shared_ptr<FormatteddFile> ffile, PRECORD_LOG rl)
 {
-	std::string to_write;
-	if (format == "csv")
-	{
-		std::ostringstream entry;
-		entry << rl->lsn << ",";
-		entry << rl->client_previous_lsn << ",";
-		entry << rl->client_undo_next_lsn << ",";
-		entry << rl->client_id.client_index << ",";
-		entry << rl->record_type << ",";
-		entry << rl->transaction_id << ",";
-		entry << constants::disk::logfile::operation(rl->redo_operation) << ",";
-		entry << constants::disk::logfile::operation(rl->undo_operation) << ",";
-		entry << rl->mft_cluster_index << ",";
-		entry << rl->target_vcn << ",";
-		entry << rl->target_lcn;
-		entry << std::endl;
-		to_write = entry.str();
-	}
-	if (format == "json")
-	{
-		nlohmann::json j;
-		j["lsn"] = rl->lsn;
-		j["previous_lsn"] = rl->client_previous_lsn;
-		j["undonext_lsn"] = rl->client_undo_next_lsn;
-		j["client_id"] = rl->client_id.client_index;
-		j["record_type"] = rl->record_type;
-		j["transaction_id"] = rl->transaction_id;
-		j["redo_op"] = constants::disk::logfile::operation(rl->redo_operation);
-		j["undo_op"] = constants::disk::logfile::operation(rl->undo_operation);
-		j["mft_index"] = rl->mft_cluster_index;
-		j["target_vcn"] = rl->target_vcn;
-		j["target_lcn"] = rl->target_lcn;
-		to_write = j.dump() + ",\n";
-	}
+	ffile->add_item(rl->lsn);
+	ffile->add_item(rl->client_previous_lsn);
+	ffile->add_item(rl->client_undo_next_lsn);
+	ffile->add_item(rl->client_id.client_index);
+	ffile->add_item(rl->record_type);
+	ffile->add_item(rl->transaction_id);
+	ffile->add_item(constants::disk::logfile::operation(rl->redo_operation));
+	ffile->add_item(constants::disk::logfile::operation(rl->undo_operation));
+	ffile->add_item(rl->mft_cluster_index);
+	ffile->add_item(rl->target_vcn);
+	ffile->add_item(rl->target_lcn);
 
-	DWORD written = 0;
-	DWORD write_size = 0;
-	if (!FAILED(SizeTToDWord(to_write.size(), &write_size)))  WriteFile(outputfile, to_write.c_str(), write_size, &written, NULL);
+	ffile->new_line();
 }
+
 
 int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output)
 {
@@ -134,46 +112,41 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 	ULONG64 total_size = record->datasize();
 	std::cout << "[+] $LogFile size : " << utils::format::size(total_size) << std::endl;
 
-	HANDLE houtput = CreateFileA(output.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
-	if (houtput == INVALID_HANDLE_VALUE)
-	{
-		std::cout << "[!] Failed to create output file" << std::endl;
-		return 1;
-	}
+	std::cout << "[+] Creating " << output << std::endl;
 
 	if (format == "raw")
 	{
-		ULONG64 processed_count = 0;
-		for (auto& block : record->process_data())
+		HANDLE houtput = CreateFileA(output.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+		if (houtput == INVALID_HANDLE_VALUE)
 		{
+			std::cout << "[!] Failed to create output file" << std::endl;
+			return 1;
+		}
+
+		ULONG64 processed_size = 0;
+
+		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, 1024 * 1024, true))
+		{
+			std::cout << "\r[+] Processing data: " << utils::format::size(processed_size) << "     ";
+			processed_size += block.second;
+
 			DWORD written = 0;
 			WriteFile(houtput, block.first, block.second, &written, NULL);
-			std::cout << "\r[+] Processed data size : " << std::to_string(processed_count) << " (" << std::to_string(100 * processed_count / total_size) << "%)";
-			processed_count += block.second;
 		}
+		std::cout << "\r[+] Processing data: " << utils::format::size(processed_size);
+
+		CloseHandle(houtput);
+
+		std::cout << "[+] Closing volume" << std::endl;
 	}
-	else if (format == "csv" || format == "json")
+	else if (format == "json" || format == "csv")
 	{
-		if (format == "csv")
-		{
-			std::string header = "LSN,ClientPreviousLSN,UndoNextLSN,ClientID,RecordType,TransactionID,RedoOperation,UndoOperation,MFTClusterIndex,TargetVCN,TargetLCN\n";
-			DWORD written = 0;
-			WriteFile(houtput, header.c_str(), static_cast<DWORD>(header.size()), &written, NULL);
-		}
-		if (format == "json")
-		{
-			DWORD written = 0;
-			WriteFile(houtput, "[\n", 2, &written, NULL);
-		}
-
 		std::shared_ptr<Buffer<PBYTE>> logfile = record->data();
-
-		std::cout << "[+] Parsing $LogFile Restart Pages" << std::endl;
 
 		PRESTART_PAGE_HEADER newest_restart_header = find_newest_restart_page(logfile->data());
 		PRESTART_AREA newest_restart_area = POINTER_ADD(PRESTART_AREA, newest_restart_header, newest_restart_header->restart_area_offset);
 
-		std::cout << "[+] Newest Restart Page LSN : " << std::to_string(newest_restart_area->current_lsn) << std::endl;
+		std::cout << "[-] Newest Restart Page LSN : " << std::to_string(newest_restart_area->current_lsn) << std::endl;
 
 		if (newest_restart_area->flags & MFT_LOGFILE_RESTART_AREA_FLAG_VOLUME_CLEANLY_UNMOUNTED)
 		{
@@ -181,7 +154,7 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 		}
 		else
 		{
-			std::cout << "[+] Volume marked as cleanly unmounted" << std::endl;
+			std::cout << "[-] Volume marked as cleanly unmounted" << std::endl;
 		}
 
 		//////////
@@ -189,7 +162,7 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 		DWORD client_i = 1;
 		for (auto& client : get_log_clients(newest_restart_area))
 		{
-			std::cout << "[+] Client found : [" << std::to_string(client_i++) << "] " << client << std::endl;
+			std::cout << "[-] Client found : [" << std::to_string(client_i++) << "] " << client << std::endl;
 		}
 
 		//////////
@@ -207,17 +180,44 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 			record_page_offsets.push_back(prh);
 		}
 
-		std::cout << "[+] $LogFile Record Page Count : " << std::to_string(record_page_offsets.size()) << std::endl;
+		std::cout << "[-] $LogFile Record Page Count : " << std::to_string(record_page_offsets.size()) << std::endl;
 
 		/////////
 
-		std::cout << "[+] Parsing $LogFile Records" << std::endl;
+		std::shared_ptr<FormatteddFile> ffile;
+
+		if (format == "csv")
+		{
+			ffile = std::make_shared<CSVFile>(output);
+		}
+		else
+		{
+			ffile = std::make_shared<JSONFile>(output);
+		}
+
+		ffile->set_columns(
+			{
+			"LSN",
+			"ClientPreviousLSN",
+			"UndoNextLSN",
+			"ClientID",
+			"RecordType",
+			"TransactionID",
+			"RedoOperation",
+			"UndoOperation",
+			"MFTClusterIndex",
+			"TargetVCN",
+			"TargetLCN"
+			}
+		);
+
+		std::cout << "[-] Parsing $LogFile Records" << std::endl;
 
 		Buffer<PBYTE> leftover_buffer(8 * 4096);
 		DWORD leftover_size = 0;
 		DWORD leftover_missing_size = 0;
-
 		DWORD processed = 0;
+
 		for (PRECORD_PAGE_HEADER prh : record_page_offsets)
 		{
 			fixup_sequence(prh);
@@ -232,10 +232,10 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 
 				if (leftover_missing_size == 0)
 				{
-					PRECORD_LOG prllo = POINTER_ADD(PRECORD_LOG, leftover_buffer.data(), 0);
-					print_record_log(houtput, prllo, format);
+					_add_record(ffile, POINTER_ADD(PRECORD_LOG, leftover_buffer.data(), 0));
+
 					processed++;
-					std::cout << "\r[+] $LogFile Record Count : " << std::to_string(processed);
+					std::cout << "\r[-] $LogFile Record Count : " << std::to_string(processed) + "     ";
 
 					offset += leftover_missing_size;
 					leftover_size = 0;
@@ -276,32 +276,29 @@ int print_logfile_records(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vo
 				}
 				else
 				{
-					print_record_log(houtput, prl, format);
+					_add_record(ffile, prl);
+
 					processed++;
-					std::cout << "\r[+] $LogFile Record Count : " << std::to_string(processed);
+					std::cout << "\r[-] $LogFile Record Count : " << std::to_string(processed) + "     ";
 				}
 			}
 		}
-		if (format == "json")
-		{
-			DWORD written = 0;
-			WriteFile(houtput, "{}]\n", 2, &written, NULL);
-		}
-		std::cout << std::endl;
 	}
 	else
 	{
 		std::cout << "[!] Invalid or missing format" << std::endl;
+		return 2;
 	}
 
-	CloseHandle(houtput);
-	std::cout << "[+] Closing volume" << std::endl;
+	std::cout << std::endl << "[+] Closing volume" << std::endl;
 
 	return 0;
 }
 
-namespace commands {
-	namespace logfile {
+namespace commands
+{
+	namespace logfile
+	{
 		int dispatch(std::shared_ptr<Options> opts)
 		{
 			std::ios_base::fmtflags flag_backup(std::cout.flags());

@@ -127,7 +127,7 @@ ULONG64 MFTRecord::datasize(std::string stream_name, bool real_size)
 	return 0;
 }
 
-std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> MFTRecord::parse_index_block(std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>> pIndexBlock)
+std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> MFTRecord::_parse_index_block(std::shared_ptr<Buffer<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>> pIndexBlock)
 {
 	std::map<DWORD64, PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK> mapVCNToIndexBlock;
 
@@ -278,7 +278,7 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 			{
 				indexBlocks = attribute_data<PMFT_RECORD_ATTRIBUTE_INDEX_BLOCK>(pAttrAllocation);
 
-				VCNToBlock = parse_index_block(indexBlocks);
+				VCNToBlock = _parse_index_block(indexBlocks);
 			}
 			else
 			{
@@ -290,6 +290,18 @@ std::vector<std::shared_ptr<IndexEntry>> MFTRecord::index()
 	}
 
 	return ret;
+}
+
+bool MFTRecord::is_valid(PMFT_RECORD_HEADER pmfth)
+{
+	return (
+		(memcmp(pmfth->signature, "FILE", 4) == 0) &&
+		(pmfth->attributeOffset > 0x30) &&
+		(pmfth->attributeOffset < 0x400) &&
+		(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, pmfth, pmfth->attributeOffset)->TypeCode >= 10) &&
+		(POINTER_ADD(PMFT_RECORD_ATTRIBUTE_HEADER, pmfth, pmfth->attributeOffset)->TypeCode <= 100)
+		);
+
 }
 
 std::vector<MFT_DATARUN> MFTRecord::read_dataruns(PMFT_RECORD_ATTRIBUTE_HEADER pAttribute)
@@ -388,7 +400,7 @@ ULONG64 MFTRecord::data_to_file(std::wstring dest_filename, std::string stream_n
 			DWORD written_block;
 			if (!WriteFile(output, data_block.first, data_block.second, &written_block, NULL))
 			{
-				std::cout << "[!] WriteFile failed" << std::endl;
+				std::cout << "[!] WriteFile failed (0x" << utils::format::hex(GetLastError()) << ")" << std::endl;
 				break;
 			}
 			else
@@ -400,12 +412,12 @@ ULONG64 MFTRecord::data_to_file(std::wstring dest_filename, std::string stream_n
 	}
 	else
 	{
-		std::cout << "[!] CreateFile failed" << std::endl;
+		std::cout << "[!] CreateFile failed (0x" << utils::format::hex(GetLastError()) << ")" << std::endl;
 	}
 	return written_bytes;
 }
 
-cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::string stream_name, DWORD block_size, bool skip_sparse)
+cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::_process_data_raw(std::string stream_name, DWORD block_size, bool skip_sparse)
 {
 	PMFT_RECORD_ATTRIBUTE_HEADER pAttributeData = attribute_header($DATA, stream_name);
 	if (pAttributeData != NULL)
@@ -509,7 +521,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::str
 				if (pAttributeHeaderRP != NULL)
 				{
 					auto pAttributeRP = attribute_data<PMFT_RECORD_ATTRIBUTE_REPARSE_POINT>(pAttributeHeaderRP);
-					if (pAttributeRP->data()->ReparseTag = IO_REPARSE_TAG_WOF)
+					if (pAttributeRP->data()->ReparseTag == IO_REPARSE_TAG_WOF)
 					{
 						switch (pAttributeRP->data()->WindowsOverlayFilterBuffer.CompressionAlgorithm)
 						{
@@ -617,7 +629,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data_raw(std::str
 						if (next_inode != _record->data()->MFTRecordIndex)
 						{
 							std::shared_ptr<MFTRecord> extRecordHeader = _mft->record_from_number(pAttrListI->recordNumber & 0xffffffffffff);
-							for (std::pair<PBYTE, DWORD> b : extRecordHeader->process_data_raw(stream_name, block_size, skip_sparse))
+							for (std::pair<PBYTE, DWORD> b : extRecordHeader->_process_data_raw(stream_name, block_size, skip_sparse))
 							{
 								co_yield b;
 							}
@@ -646,7 +658,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 	ULONG64 final_datasize = datasize("", true);
 	bool check_size = final_datasize != 0; // ex: no real size for usn
 
-	for (auto& block : process_data_raw(stream_name, block_size, skip_sparse))
+	for (auto& block : _process_data_raw(stream_name, block_size, skip_sparse))
 	{
 		if (block.second > final_datasize && check_size)
 		{
@@ -705,7 +717,7 @@ std::shared_ptr<Buffer<PBYTE>> MFTRecord::data(std::string stream_name, bool rea
 	return ret;
 }
 
-std::vector<std::string> MFTRecord::alternate_data_names()
+std::vector<std::string> MFTRecord::ads_names()
 {
 	std::vector<std::string> ret;
 
