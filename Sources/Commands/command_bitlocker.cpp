@@ -23,7 +23,6 @@
 
 void print_test_bitlocker_password(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	std::cout << std::setfill('0');
 	utils::ui::title("Bitlocker Password Test for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	PBOOT_SECTOR_COMMON pbsc = (PBOOT_SECTOR_COMMON)vol->bootsector();
@@ -145,7 +144,6 @@ void print_test_bitlocker_password(std::shared_ptr<Disk> disk, std::shared_ptr<V
 
 void print_test_bitlocker_recovery(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	std::cout << std::setfill('0');
 	utils::ui::title("Bitlocker Recovery Key Test for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	PBOOT_SECTOR_COMMON pbsc = (PBOOT_SECTOR_COMMON)vol->bootsector();
@@ -267,7 +265,6 @@ void print_test_bitlocker_recovery(std::shared_ptr<Disk> disk, std::shared_ptr<V
 
 void print_test_bitlocker_bek(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	std::cout << std::setfill('0');
 	utils::ui::title("Bitlocker Encryption Key Test for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	PBOOT_SECTOR_COMMON pbsc = (PBOOT_SECTOR_COMMON)vol->bootsector();
@@ -389,8 +386,7 @@ void print_test_bitlocker_bek(std::shared_ptr<Disk> disk, std::shared_ptr<Volume
 
 void print_bitlocker_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
 
-	std::cout << std::setfill('0');
-	utils::ui::title("Bitlocker Info from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Bitlocker Info for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	PBOOT_SECTOR_COMMON pbsc = (PBOOT_SECTOR_COMMON)vol->bootsector();
 	if (strncmp((char*)pbsc->oemID, "-FVE-FS-", 8) == 0)
@@ -500,7 +496,6 @@ std::string get_guid_from_volume(std::shared_ptr<Volume> vol)
 
 void list_guid_for_all_disks(std::vector<std::shared_ptr<Disk>> disks)
 {
-	std::cout << std::setfill('0');
 	utils::ui::title("Bitlocker Recovery Key GUIDs");
 
 	std::shared_ptr<utils::ui::Table> table = std::make_shared<utils::ui::Table>();

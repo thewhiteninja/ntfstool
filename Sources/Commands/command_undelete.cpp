@@ -91,7 +91,7 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 		return 1;
 	}
 
-	utils::ui::title("Undelete from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Undelete for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
@@ -250,8 +250,7 @@ int extract_deleted_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol
 {
 	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
-	std::cout << std::setfill('0');
-	utils::ui::title("Extract deleted file from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Extract deleted file for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 

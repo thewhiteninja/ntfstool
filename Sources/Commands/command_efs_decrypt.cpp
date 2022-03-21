@@ -101,7 +101,7 @@ int decrypt_file(std::shared_ptr<MFTRecord> record, std::shared_ptr<Buffer<PEFS_
 
 int load_key_and_decrypt_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	utils::ui::title("Decrypt EFS file from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Decrypt EFS file for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 

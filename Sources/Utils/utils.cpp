@@ -613,6 +613,7 @@ namespace utils
 
 		void title(std::string s, std::ostream& out)
 		{
+			std::cout << std::setfill('0');
 			out << s << std::endl;
 			out << line(utils::strings::utf8_string_size(s));
 			out << std::endl;
