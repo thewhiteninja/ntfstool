@@ -23,8 +23,7 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 {
 	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
-	std::cout << std::setfill('0');
-	utils::ui::title("Analyze USN journal from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Analyze USN journal for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
@@ -84,13 +83,14 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 
 	ULONG64 processed_size = 0;
 	ULONG64 processed_count = 0;
-	ULONG64 matches = 0;
+	ULONG64 matches_count = 0;
+	std::map<std::string, ULONG64> matches;
 
 	for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, explorer->reader()->sizes.cluster_size, true))
 	{
 		processed_size += block.second;
 
-		std::cout << "\r[-] Processing entry: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches << " matches     ";
+		std::cout << "\r[-] Processing entry: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches_count << " matches     ";
 
 		memcpy(clusterBuf.data() + filled_size, block.first, block.second);
 		filled_size += block.second;
@@ -122,7 +122,15 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 				{
 					if (rule->match(filename, usn_record))
 					{
-						matches++;
+						matches_count++;
+						if (matches.find(rule->id()) != matches.end())
+						{
+							matches[rule->id()] += 1;
+						}
+						else
+						{
+							matches[rule->id()] = 1;
+						}
 					}
 				}
 
@@ -140,9 +148,35 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 
 		memcpy(clusterBuf.data(), header, (size_t)filled_size);
 	}
-	std::cout << "\r[-] Processing entry: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches << " matches     ";
+	std::cout << "\r[-] Processing entry: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches_count << " matches     ";
 
 	std::cout << std::endl << "[+] Closing volume" << std::endl;
+
+	if (matches_count)
+	{
+		std::cout << "[+] Results:" << std::endl;
+
+		std::shared_ptr<utils::ui::Table> results = std::make_shared<utils::ui::Table>();
+		results->set_margin_left(4);
+
+		results->add_header_line("Index");
+		results->add_header_line("Rule ID");
+		results->add_header_line("Count");
+
+		int index = 0;
+		for (std::pair<std::string, ULONG64> element : matches)
+		{
+			results->add_item_line(std::to_string(index++));
+			results->add_item_line(element.first);
+			results->add_item_line(std::to_string(element.second));
+			results->new_line();
+		}
+		results->render(std::cout);
+	}
+	else
+	{
+		std::cout << "[+] No match" << std::endl;
+	}
 
 	return 0;
 }
