@@ -25,7 +25,7 @@ int dump_mft(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 {
 	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
-	utils::ui::title("MFT Dump (inode:0) from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("MFT Dump (inode:0) for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 

@@ -21,8 +21,7 @@
 
 int decrypt_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
-	std::cout << std::setfill('0');
-	utils::ui::title("Decrypt Bitlocker Volume from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Decrypt Bitlocker Volume for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	DWORD sector_size = ((PBOOT_SECTOR_FAT32)vol->bootsector())->bytePerSector;
 

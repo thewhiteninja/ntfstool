@@ -850,7 +850,7 @@ int print_mft_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 
 	std::shared_ptr<MFTRecord> record = commands::helpers::find_record(explorer, opts);
 
-	utils::ui::title("MFT (inode:" + std::to_string(record->header()->MFTRecordIndex) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("MFT (inode:" + std::to_string(record->header()->MFTRecordIndex) + ") for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	commands::mft::print_mft_info_details(record, explorer->reader()->sizes.cluster_size);
 

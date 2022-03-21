@@ -21,7 +21,7 @@ int print_reparse(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const
 {
 	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
-	utils::ui::title("Reparse points from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Reparse points for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 

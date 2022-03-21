@@ -18,7 +18,7 @@
 
 void print_mbr(std::shared_ptr<Disk> disk)
 {
-	utils::ui::title("MBR from " + disk->name());
+	utils::ui::title("MBR for " + disk->name());
 
 	PMBR mbr = disk->mbr();
 

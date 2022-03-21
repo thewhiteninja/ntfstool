@@ -22,8 +22,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 {
 	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
-	std::cout << std::setfill('0');
-	utils::ui::title("Dump USN journal from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Dump USN journal for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 

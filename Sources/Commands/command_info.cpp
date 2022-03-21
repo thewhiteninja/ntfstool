@@ -227,7 +227,7 @@ void print_image_disk(std::shared_ptr<Disk> disk) {
 }
 
 void print_hardware_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
-	utils::ui::title("Info for PhysicalDrive:" + std::to_string(disk->index()) + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Info for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	if (vol->serial_number())
 	{

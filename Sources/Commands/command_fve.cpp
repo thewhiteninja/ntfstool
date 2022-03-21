@@ -198,8 +198,8 @@ std::vector<std::string> get_fve_entry_values(PFVE_ENTRY entry, const std::strin
 	return ret;
 }
 
-void print_bitlocker_vbr(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, unsigned long block_id) {
-	std::cout << std::setfill('0');
+void print_bitlocker_vbr(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, unsigned long block_id)
+{
 	utils::ui::title("FVE Info from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	PBOOT_SECTOR_COMMON pbsc = (PBOOT_SECTOR_COMMON)vol->bootsector();
