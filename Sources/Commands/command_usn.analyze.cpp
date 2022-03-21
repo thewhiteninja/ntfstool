@@ -118,7 +118,7 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 				SYSTEMTIME st = { 0 };
 				utils::times::ull_to_local_systemtime(usn_record->TimeStamp.QuadPart, &st);
 
-				for (auto rule : usn_rules->rules())
+				for (auto& rule : usn_rules->rules())
 				{
 					if (rule->match(filename, usn_record))
 					{

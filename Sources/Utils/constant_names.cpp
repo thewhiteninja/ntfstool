@@ -609,6 +609,41 @@ std::string constants::disk::usn::reasons(DWORD reason)
 	return utils::strings::join_vec(ret, "+");
 }
 
+DWORD constants::disk::usn::reasons_inv(std::string r)
+{
+	const std::map<std::string, DWORD> reasons_map = {
+		{ "DATA_OVERWRITE", 0x1},
+		{ "DATA_EXTEND", 0x2 },
+		{ "DATA_TRUNCATION", 0x4},
+		{ "NAMED_DATA_OVERWRITE", 0x10},
+		{ "NAMED_DATA_EXTEND", 0x20 },
+		{ "NAMED_DATA_TRUNCATION", 0x40 },
+		{ "FILE_CREATE", 0x100 },
+		{ "FILE_DELETE", 0x200 },
+		{ "EA_CHANGE", 0x400 },
+		{ "SECURITY_CHANGE", 0x800 },
+		{ "RENAME_OLD_NAME", 0x1000 },
+		{ "RENAME_NEW_NAME", 0x2000 },
+		{ "INDEXABLE_CHANGE", 0x4000},
+		{ "BASIC_INFO_CHANGE", 0x8000 },
+		{ "HARD_LINK_CHANGE", 0x10000 },
+		{ "COMPRESSION_CHANGE", 0x20000 },
+		{ "ENCRYPTION_CHANGE", 0x40000},
+		{ "OBJECT_ID_CHANGE", 0x80000 },
+		{ "REPARSE_POINT_CHANGE", 0x100000},
+		{ "STREAM_CHANGE", 0x200000},
+		{ "CLOSE", 0x80000000 }
+	};
+
+	auto flag = reasons_map.find(r);
+	if (flag != reasons_map.end())
+	{
+		return flag->second;
+	}
+
+	return 0;
+}
+
 std::string constants::disk::usn::fileattributes(DWORD attributes)
 {
 	std::vector<std::string> ret;
