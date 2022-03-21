@@ -115,9 +115,6 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 				wfilename.resize(usn_record->FileNameLength / sizeof(WCHAR));
 				std::string filename = utils::strings::to_utf8(wfilename);
 
-				SYSTEMTIME st = { 0 };
-				utils::times::ull_to_local_systemtime(usn_record->TimeStamp.QuadPart, &st);
-
 				for (auto& rule : usn_rules->rules())
 				{
 					if (rule->match(filename, usn_record))
@@ -131,6 +128,25 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 						{
 							matches[rule->id()] = 1;
 						}
+
+						ffile->add_item(usn_record->MajorVersion);
+						ffile->add_item(usn_record->MinorVersion);
+						ffile->add_item(usn_record->FileReferenceNumber & 0xffffffffffff);
+						ffile->add_item(usn_record->FileReferenceNumber >> 48);
+						ffile->add_item(usn_record->ParentFileReferenceNumber & 0xffffffffffff);
+						ffile->add_item(usn_record->ParentFileReferenceNumber >> 48);
+						ffile->add_item(usn_record->Usn);
+
+						SYSTEMTIME st = { 0 };
+						utils::times::ull_to_local_systemtime(usn_record->TimeStamp.QuadPart, &st);
+						ffile->add_item(utils::times::display_systemtime(st));
+						ffile->add_item(constants::disk::usn::reasons(usn_record->Reason));
+						ffile->add_item((usn_record->SourceInfo));
+						ffile->add_item((usn_record->SecurityId));
+						ffile->add_item(constants::disk::usn::fileattributes(usn_record->FileAttributes));
+						ffile->add_item(filename);
+
+						ffile->new_line();
 					}
 				}
 
