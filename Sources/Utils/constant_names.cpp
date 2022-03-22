@@ -676,6 +676,39 @@ std::string constants::disk::usn::fileattributes(DWORD attributes)
 	return utils::strings::join_vec(ret, "+");
 }
 
+DWORD  constants::disk::usn::fileattributes_inv(std::string a)
+{
+	std::vector<std::string> ret;
+
+	const std::map<std::string, DWORD> attributes_map = {
+		{ "READONLY", 0x1,},
+		{ "HIDDEN", 0x2},
+		{ "SYSTEM", 0x4},
+		{ "DIRECTORY", 0x10},
+		{ "ARCHIVE", 0x20},
+		{ "DEVICE", 0x40},
+		{ "NORMAL", 0x80},
+		{ "TEMPORARY", 0x100},
+		{ "SPARSE_FILE", 0x200},
+		{ "REPARSE_POINT", 0x400},
+		{ "COMPRESSED", 0x800},
+		{ "OFFLINE", 0x1000},
+		{ "NOT_CONTENT_INDEXED", 0x2000},
+		{ "ENCRYPTED", 0x4000},
+		{ "INTEGRITY_STREAM", 0x8000},
+		{ "VIRTUAL", 0x10000},
+		{ "NO_SCRUB_DATA", 0x20000},
+	};
+
+	auto flag = attributes_map.find(a);
+	if (flag != attributes_map.end())
+	{
+		return flag->second;
+	}
+
+	return 0;
+}
+
 std::string constants::disk::logfile::operation(WORD w)
 {
 	switch (w) {

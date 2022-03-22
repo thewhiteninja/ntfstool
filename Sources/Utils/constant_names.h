@@ -63,6 +63,8 @@ namespace constants {
 			DWORD reasons_inv(std::string r);
 
 			std::string fileattributes(DWORD a);
+
+			DWORD fileattributes_inv(std::string a);
 		}
 
 		namespace logfile
