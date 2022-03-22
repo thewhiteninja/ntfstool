@@ -313,22 +313,28 @@ Current third-party libs:
 
 ### Extract
 <table>
+<tr><td>extract disk=0 volume=4 inode=0 output=d:\mymft</td></tr>
+<tr><td>
+
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
+    [-] Record Num  : 0 (00000000h)
+    [-] Destination : d:\mymft
+    [+] File extracted (5123541 bytes written)
+</td></tr>
 <tr><td>extract disk=3 volume=1 from=\bob.txt output=d:\bob.txt</td></tr>
 <tr><td>
 
     [+] Opening \\?\Volume{00023d5d-0000-0000-0002-000000000000}\
-    [-] Source      : \bob.txt
-    [-] Destination : d:\bob.txt
     [-] Record Num  : 47 (0000002fh)
+    [-] Destination : d:\bob.txt
     [+] File extracted (42 bytes written)
 </td></tr>
 <tr><td>extract disk=0 volume=4 --system output=d:\system</td></tr>
 <tr><td>
 
     [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
-    [-] Source      : c:\windows\system32\config\system
-    [-] Destination : d:\system
     [-] Record Num  : 623636 (00098414h)
+    [-] Destination : d:\system
     [+] File extracted (19398656 bytes written)
 </td></tr>
 </table>
