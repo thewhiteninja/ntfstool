@@ -155,7 +155,7 @@ USNRule::USNRule(nlohmann::json j)
 						}
 						else
 						{
-							throw std::invalid_argument("invalid reason \"" + r + "\"");
+							throw std::invalid_argument("invalid reason value \"" + r + "\"");
 						}
 					}
 					_a_rules[it.key()] = value << 32 | mask;;
@@ -163,6 +163,55 @@ USNRule::USNRule(nlohmann::json j)
 				else
 				{
 					throw std::invalid_argument("\"reason\" is not an array");
+				}
+			}
+			else if (it.key() == "attributes")
+			{
+				if (it.value().is_array())
+				{
+					DWORD64 mask = 0;
+					DWORD64 value = 0;
+
+					for (auto& reason : it.value())
+					{
+						std::string& r = reason.get<std::string>();
+						if (r.length() > 1)
+						{
+							if (r[0] == '+' || r[0] == '-')
+							{
+								DWORD64 r_flag = constants::disk::usn::fileattributes_inv(r.substr(1));
+								if (r_flag)
+								{
+									mask |= r_flag;
+									if (r[0] == '+')
+									{
+										value |= r_flag;
+									}
+									else
+									{
+										value &= ~r_flag;
+									}
+								}
+								else
+								{
+									throw std::invalid_argument("invalid usn file attribute value \"" + r.substr(1) + "\"");
+								}
+							}
+							else
+							{
+								throw std::invalid_argument("file attribute must start with \"+\" or \"-\"");
+							}
+						}
+						else
+						{
+							throw std::invalid_argument("invalid file attribute value \"" + r + "\"");
+						}
+					}
+					_a_rules[it.key()] = value << 32 | mask;;
+				}
+				else
+				{
+					throw std::invalid_argument("\"attributes\" is not an array");
 				}
 			}
 			else
@@ -200,6 +249,16 @@ bool USNRule::match(std::string filename, PUSN_RECORD_V2 usn)
 			DWORD value = std::any_cast<DWORD64>(it->second) >> 32;
 
 			if ((usn->Reason & mask) != value)
+			{
+				return false;
+			}
+		}
+		else if (it->first == "attributes")
+		{
+			DWORD mask = std::any_cast<DWORD64>(it->second) & 0xffffffff;
+			DWORD value = std::any_cast<DWORD64>(it->second) >> 32;
+
+			if ((usn->FileAttributes & mask) != value)
 			{
 				return false;
 			}
