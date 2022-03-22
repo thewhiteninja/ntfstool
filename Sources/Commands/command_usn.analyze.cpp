@@ -45,7 +45,7 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 	ULONG64 total_size = record->datasize(MFT_ATTRIBUTE_DATA_USN_NAME, true);
 	ULONG64 filled_size = 0;
 
-	std::cout << "[-] $J stream size: " << utils::format::size(total_size) << " (maybe sparse, ~32MiBs on disk by default)" << std::endl;
+	std::cout << "[-] $J stream size: " << utils::format::size(total_size) << " (could be sparse)" << std::endl;
 
 	std::cout << "[+] Loading rules from: " << rules << std::endl;
 	std::shared_ptr<USNRules> usn_rules = std::make_shared<USNRules>(rules);

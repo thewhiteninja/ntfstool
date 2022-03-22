@@ -18,6 +18,84 @@
 #include <Utils/csv_file.h>
 #include <Utils/json_file.h>
 
+void load_mft(std::shared_ptr<NTFSExplorer> explorer, std::unordered_map<DWORD64, DWORD64>& map_parent, std::unordered_map<DWORD64, std::string>& map_name)
+{
+	std::cout << "[+] Loading $MFT records" << std::endl;
+
+	map_name.clear();
+	map_parent.clear();
+
+	std::shared_ptr<MFTRecord> record_mft = explorer->mft()->record_from_number(0);
+	if (record_mft == nullptr)
+	{
+		std::cout << "[!] Error accessing record 0" << std::endl;
+		return;
+	}
+	ULONG64 total_size_mft = record_mft->datasize();
+	DWORD record_size = explorer->reader()->sizes.cluster_size;
+
+	std::shared_ptr<MFTRecord> record = nullptr;
+
+	auto index = 0ULL;
+	for (index = 0ULL; index < (total_size_mft / record_size); index++)
+	{
+		std::cout << "\r[+] Processing $MFT records: " << utils::format::size(index * record_size) << "     ";
+
+		record = explorer->mft()->record_from_number(index);
+
+		if (record == nullptr || !MFTRecord::is_valid(record->header()))
+		{
+			continue;
+		}
+
+		ULONGLONG file_info_parentid = 0;
+		PMFT_RECORD_ATTRIBUTE_HEADER pattr = record->attribute_header($FILE_NAME, "", 0);
+		if (pattr != nullptr)
+		{
+			auto pattr_filename = POINTER_ADD(PMFT_RECORD_ATTRIBUTE_FILENAME, pattr, pattr->Form.Resident.ValueOffset);
+			file_info_parentid = pattr_filename->ParentDirectory.SequenceNumber << 48 | pattr_filename->ParentDirectory.FileRecordNumber;
+		}
+
+		ULONGLONG file_record_num = record->header()->sequenceNumber;
+		file_record_num = file_record_num << 48 | record->header()->MFTRecordIndex;
+
+		map_parent[file_record_num] = file_info_parentid;
+		map_name[file_record_num] = utils::strings::to_utf8(record->filename());
+	}
+	std::cout << "\r[+] Processing $MFT records: " << utils::format::size(index * record_size) << "     " << std::endl;
+
+	std::cout << "[+] " << index << " record loaded" << std::endl;
+}
+
+std::string get_file_path(std::unordered_map<DWORD64, DWORD64>& map_parent, std::unordered_map<DWORD64, std::string>& map_name, DWORD64 parent_inode, std::string filename)
+{
+	std::string path = filename;
+
+	while ((parent_inode & 0xffffffffffff) != 5)
+	{
+		auto tmp = map_parent.find(parent_inode);
+		if (tmp != map_parent.end())
+		{
+			path = map_name[parent_inode] + "\\" + path;
+			parent_inode = tmp->second;
+		}
+		else
+		{
+			break;
+		}
+	}
+	if ((parent_inode & 0xffffffffffff) == 5)
+	{
+		path = "volume:\\" + path;
+	}
+	else
+	{
+		path = "orphan:\\" + path;
+	}
+
+	return path;
+}
+
 int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& format, std::string output)
 {
 	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
@@ -31,7 +109,6 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	std::cout << "[+] Finding $Extend\\$UsnJrnl record" << std::endl;
 
 	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_path("\\$Extend\\$UsnJrnl");
-
 	if (record == nullptr)
 	{
 		std::cout << "[!] Not found" << std::endl;
@@ -44,7 +121,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 	ULONG64 total_size = record->datasize(MFT_ATTRIBUTE_DATA_USN_NAME, true);
 	ULONG64 filled_size = 0;
 
-	std::cout << "[+] $J stream size: " << utils::format::size(total_size) << " (maybe sparse, ~32MiBs on disk by default)" << std::endl;
+	std::cout << "[+] $J stream size: " << utils::format::size(total_size) << " (could be sparse)" << std::endl;
 
 	std::cout << "[+] Creating " << output << std::endl;
 
@@ -61,18 +138,23 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 
 		for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, 1024 * 1024, true))
 		{
-			std::cout << "\r[+] Processing data: " << utils::format::size(processed_size) << "     ";
+			std::cout << "\r[+] Processing USN records: " << utils::format::size(processed_size) << "     ";
 			processed_size += block.second;
 
 			DWORD written = 0;
 			WriteFile(houtput, block.first, block.second, &written, NULL);
 		}
-		std::cout << "\r[+] Processing data: " << utils::format::size(processed_size);
+		std::cout << "\r[+] Processing USN records: " << utils::format::size(processed_size);
 
 		CloseHandle(houtput);
 	}
 	else if (format == "csv" || format == "json")
 	{
+		std::unordered_map<DWORD64, DWORD64> map_parent;
+		std::unordered_map<DWORD64, std::string> map_name;
+
+		load_mft(explorer, map_parent, map_name);
+
 		std::shared_ptr<FormatteddFile> ffile;
 
 		if (format == "csv")
@@ -150,7 +232,7 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 					ffile->add_item((usn_record->SourceInfo));
 					ffile->add_item((usn_record->SecurityId));
 					ffile->add_item(constants::disk::usn::fileattributes(usn_record->FileAttributes));
-					ffile->add_item(utils::strings::to_utf8(a));
+					ffile->add_item(get_file_path(map_parent, map_name, usn_record->ParentFileReferenceNumber, utils::strings::to_utf8(a)));
 
 					ffile->new_line();
 
@@ -167,6 +249,9 @@ int print_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, c
 			memcpy(clusterBuf.data(), header, (size_t)filled_size);
 		}
 		std::cout << "\r[+] Processing entry: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ")     ";
+
+		map_parent.clear();
+		map_name.clear();
 	}
 	else
 	{
