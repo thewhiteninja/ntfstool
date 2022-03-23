@@ -12,7 +12,7 @@
 <br />
 
 NTFSTool is a forensic tool focused on [NTFS][10] volumes.
-It supports reading partition info (mbr, partition table, vbr) but also information on master file table, bitlocker encrypted volume, EFS encrypted files and more.
+It supports reading partition info (mbr, partition table, vbr) but also information on master file table, Bitlocker encrypted volume, EFS encrypted files and more.
 
 Download the latest binaries on [AppVeyor](https://ci.appveyor.com/project/thewhiteninja/ntfstool).
 
@@ -1311,9 +1311,9 @@ Current third-party libs:
 </table>
 
 
-### logfile
+### logfile-dump
 <table>
-<tr><td>logfile disk=4 volume=1 output=logfile.csv format=csv</td></tr>
+<tr><td>logfile.dump disk=4 volume=1 output=logfile.csv format=csv</td></tr>
 <tr><td>
 
     [+] Opening \\?\Volume{00000001-0000-0000-0000-000000000000}\
@@ -1329,15 +1329,15 @@ Current third-party libs:
     [+] Closing volume
 </td></tr>
 <tr><td>Sample of logfile.csv</td></tr>
-<tr><td><pre>    LSN,ClientPreviousLSN,UndoNextLSN,ClientID,RecordType,TransactionID,RedoOperation,UndoOperation,MFTClusterIndex,TargetVCN,TargetLCN
-    5269000,5268967,5268967,0,1,24,SetNewAttributeSizes,SetNewAttributeSizes,2,10,43700
-    5269019,5269000,5269000,0,1,24,UpdateNonresidentValue,Noop,0,0,37594
-    5269044,5269019,5269019,0,1,24,SetNewAttributeSizes,SetNewAttributeSizes,2,10,43700
-    5269063,5269044,5269044,0,1,24,SetNewAttributeSizes,SetNewAttributeSizes,2,10,43700
-    5269082,5269063,5269063,0,1,24,UpdateNonresidentValue,Noop,0,0,37594
-    5269103,5269082,5269082,0,1,24,SetNewAttributeSizes,SetNewAttributeSizes,2,10,43700
-    5269122,5269103,0,0,1,24,ForgetTransaction,CompensationLogRecord,0,0,18446744073709551615
-    5269133,0,0,0,1,24,UpdateResidentValue,UpdateResidentValue,2,13,43703</pre>
+<tr><td><pre>LSN,ClientPreviousLSN,UndoNextLSN,ClientID,RecordType,TransactionID,RedoOperation,UndoOperation,MFTClusterIndex,TargetVCN,TargetLCN
+5269000,5268967,5268967,0,1,24,SetNewAttributeSizes,SetNewAttributeSizes,2,10,43700
+5269019,5269000,5269000,0,1,24,UpdateNonresidentValue,Noop,0,0,37594
+5269044,5269019,5269019,0,1,24,SetNewAttributeSizes,SetNewAttributeSizes,2,10,43700
+5269063,5269044,5269044,0,1,24,SetNewAttributeSizes,SetNewAttributeSizes,2,10,43700
+5269082,5269063,5269063,0,1,24,UpdateNonresidentValue,Noop,0,0,37594
+5269103,5269082,5269082,0,1,24,SetNewAttributeSizes,SetNewAttributeSizes,2,10,43700
+5269122,5269103,0,0,1,24,ForgetTransaction,CompensationLogRecord,0,0,18446744073709551615
+5269133,0,0,0,1,24,UpdateResidentValue,UpdateResidentValue,2,13,43703</pre>
 </td></tr>
 </table>
 
