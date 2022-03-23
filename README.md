@@ -387,7 +387,7 @@ Current third-party libs:
     [+] Closing volume
 </td></tr>
 <tr><td>Sample of mft.csv</td></tr>
-<tr><td><pre>    RecordIndex,InUse,Type,Filename,Ext,Size,Parents,Time_MFT,Time_Create,Time_Alter,Time_Read,Att_Archive,Att_Compressed,Att_Device,Att_Encrypted,Att_Hidden,Att_Normal,Att_NotIndexed,Att_Offline,Att_Readonly,Att_Reparse,Att_Sparse,Att_System,Att_Temp,USN,Hardlinks,ADS,ZoneId,ReferrerUrl,HostUrl
+<tr><td><pre>RecordIndex,InUse,Type,Filename,Ext,Size,Parents,Time_MFT,Time_Create,Time_Alter,Time_Read,Att_Archive,Att_Compressed,Att_Device,Att_Encrypted,Att_Hidden,Att_Normal,Att_NotIndexed,Att_Offline,Att_Readonly,Att_Reparse,Att_Sparse,Att_System,Att_Temp,USN,Hardlinks,ADS,ZoneId,ReferrerUrl,HostUrl
 0,"True","File","$MFT","",1048576,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""
 1,"True","File","$MFTMirr","",4096,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""
 2,"True","File","$LogFile","",67108864,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""
@@ -1344,27 +1344,26 @@ Current third-party libs:
 
 ### usn-analyze
 <table>
-<tr><td>usn.analyze disk=4 volume=1 rules=myrules.json output=usn.csv format=csv</td></tr>
+<tr><td>usn.analyze disk=4 volume=1 rules=d:\rules.json output=usn.csv format=csv</td></tr>
 <tr><td>
-  
-Analyze USN journal for \\.\PhysicalDrive2 > Volume:1
------------------------------------------------------
 
-[+] Opening \\?\Volume{498eed94-0000-0000-007e-000000000000}\
-[+] Searching for $Extend\$UsnJrnl
-[-] Found in file record: 396
-[-] $J stream size: 171.74 KiBs (maybe sparse, ~32MiBs on disk by default)
-[+] Loading rules from: d:\rules.json
-[-] 1 rules loaded
-[+] Creating d:\usn_analyze_results.csv
-[-] Processing entry: 1418 (512.00 KiBs) - 3 matches
-[+] Closing volume
-[+] Results:
-    +--------------------------+
-    | Index | Rule ID  | Count |
-    +--------------------------+
-    | 0     | ccleaner | 3     |
-    +--------------------------+
+	[+] Opening \\?\Volume{498eed94-0000-0000-007e-000000000000}\
+	[+] Searching for $Extend\$UsnJrnl
+	[-] Found in file record: 396
+	[-] $J stream size: 171.74 KiBs (maybe sparse)
+	[+] Loading rules from: d:\rules.json
+	[-] 1 rules loaded
+	[+] Creating d:\usn_analyze_results.csv
+	[-] Processing entry: 1418 (512.00 KiBs) - 105 matches
+	[+] Closing volume
+	[+] Results:
+	    +-----------------------------------+
+	    | Index | Rule ID           | Count |
+	    +-----------------------------------+
+	    | 0     | deleted_documents | 102   |
+	    +-----------------------------------+
+	    | 0     | ccleaner          | 3     |
+	    +-----------------------------------+
 </td></tr>
 </table>
 
