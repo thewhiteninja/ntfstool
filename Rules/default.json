@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ccleaner",
+    "author": "thewhiteninja",
+    "status": "experimental",
+    "description": "CCleaner is a disk cleanup tool for temporary junk files, web history, logs and even wiping the disk.",
+    "type": "cleaning_tool",
+    "severity": "high",
+    "rule": {
+      "filename": "(.*)ccleaner\\.exe",
+      "reason": [
+        "+RENAME_NEW_NAME",
+        "+CLOSE"
+      ],
+      "attributes": [
+        "-ARCHIVE"
+      ]
+    }
+  }
+]
