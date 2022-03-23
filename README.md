@@ -364,6 +364,39 @@ Current third-party libs:
 </table>
 
 
+### MFT-dump
+<table>
+<tr><td>mft.dump disk=2 volume=2 output=d:\mft.raw</td></tr>
+<tr><td>
+
+    [+] $MFT size   : 1.00 MiB
+    [-] Record size : 1024
+    [-] Record count: 1024
+    [+] Creating d:\mft.raw
+    [+] Processing data: 1.00 MiB
+    [+] Closing volume
+</td></tr>
+<tr><td>mft.dump disk=2 volume=2 output=d:\mft.csv format=csv</td></tr>
+<tr><td>
+
+    [+] $MFT size   : 1.00 MiB
+    [-] Record size : 1024
+    [-] Record count: 1024
+    [+] Creating d:\mft.csv
+    [+] Processing data: 1.00 MiB
+    [+] Closing volume
+</td></tr>
+<tr><td>Sample of mft.csv</td></tr>
+<tr><td><pre>    RecordIndex,InUse,Type,Filename,Ext,Size,Parents,Time_MFT,Time_Create,Time_Alter,Time_Read,Att_Archive,Att_Compressed,Att_Device,Att_Encrypted,Att_Hidden,Att_Normal,Att_NotIndexed,Att_Offline,Att_Readonly,Att_Reparse,Att_Sparse,Att_System,Att_Temp,USN,Hardlinks,ADS,ZoneId,ReferrerUrl,HostUrl
+    0,"True","File","$MFT","",1048576,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""
+    1,"True","File","$MFTMirr","",4096,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""
+    2,"True","File","$LogFile","",67108864,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""
+    3,"True","File","$Volume","",0,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""
+    4,"True","File","$AttrDef","",2560,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""</pre>
+</td></tr>
+</table>
+
+
 ### MFT-record
 <table>
 <tr><td>mft.record disk=2 volume=1 inode=5 (root folder)</td></tr>
