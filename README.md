@@ -81,23 +81,25 @@ Options can be entered as decimal or hex number with "0x" prefix (ex: inode).
 | [vbr](#vbr)  | Display VBR structure and code for a specidifed volume (ntfs, fat32, fat1x, bitlocker supported) |
 | [extract](#extract)  | Extract a file from a volume. |
 | [image](#image)  | Create an image file of a disk or volume. |
+| [mft.dump](#mft-dump)  | Dump $MFT file  in specified format: csv, json, raw. |
 | [mft.record](#mft-record)  | Display FILE record details for a specified MFT inode. Almost all attribute types supported |
 | [mft.btree](#mft-btree)  | Display VCN content and Btree index for an inode |
-| [bitlocker](#bitlocker)  | Display detailed information and hash ($bitlocker$) for all VMK. It is possible to test a password or recovery key. If it is correct, the decrypted VMK and FVEK is displayed. |
-| [bitdecrypt](#bitdecrypt)  | Decrypt a volume to a file using password, recovery key or bek. |
+| [bitlocker.info](#bitlocker-info)  | Display information and hash ($bitlocker$) for all VMK. Test a password or recovery key. |
+| [bitlocker.decrypt](#bitlocker-decrypt)  | Decrypt a volume to a file using password, recovery key or bek. |
+| [bitlocker.fve](#bitlocker-fve)  | Display information for the specified FVE block. |
 | [efs.backup](#efs-backup)  | Export EFS keys in PKCS12 (pfx) format. |
 | [efs.decrypt](#efs-decrypt)  | Decrypt EFS encrypted file using keys in PKCS12 (pfx) format. |
 | [efs.certificate](#efs-certificate)  | List, display and export system certificates (SystemCertificates/My/Certificates). |
 | [efs.key](#efs-key)  | List, display, decrypt and export private keys (Crypto/RSA). |
 | [efs.masterkey](#efs-masterkey)  | List, display and decrypt masterkeys (Protect). |
-| [fve](#fve)  | Display information for the specified FVE block (0, 1, 2) |
 | [reparse](#reparse)  | Parse and display reparse points from \$Extend\$Reparse. |
 | [logfile](#logfile)  | Dump $LogFile file in specified format: csv, json, raw. |
-| [usn](#usn)  | Dump $UsnJrnl file  in specified format: csv, json, raw. |
+| [usn.analyze](#usn-analyze)  | Analyze $UsnJrnl file with specified rules. Output : csv or json. |
+| [usn.dump](#usn-dump)  | Dump $UsnJrnl file in specified format: csv, json, raw. |
 | [shadow](#shadow)  | List volume shadow snapshots from selected disk and volume. |
 | [streams](#streams)   | Display Alternate Data Streams |
 | [undelete](#undelete)  | Search and extract deleted files for a volume. |
-| [shell](#shell-1)   | Start a mini Unix-like shell |
+| [shell](#shell-1)   | Start a limited Unix-like shell |
 | [smart](#smart)  | Display S.M.A.R.T data |
 
 
@@ -565,9 +567,9 @@ Current third-party libs:
 </table>
 
 
-### Bitlocker
+### Bitlocker-Info
 <table>
-<tr><td>bitlocker disk=3 volume=1</td></tr>
+<tr><td>bitlocker.info disk=3 volume=1</td></tr>
 <tr><td>
 
     FVE Version    : 2
@@ -612,7 +614,7 @@ Current third-party libs:
     |    |                   |                                        |                 865e805367f7bef1                 |
     +--------------------------------------------------------------------------------------------------------------------+
 </td></tr>
-<tr><td>bitlocker disk=3 volume=1 password=badpassword</td></tr>
+<tr><td>bitlocker.info disk=3 volume=1 password=badpassword</td></tr>
 <tr><td>
 
     FVE Version    : 2
@@ -631,7 +633,7 @@ Current third-party libs:
     | 1  | Password | {2dd368f3-37d7-414f-94e6-3c5b86fadd50} | badpassword | Invalid |
     +--------------------------------------------------------------------------------+
 </td></tr>
-<tr><td>bitlocker disk=3 volume=1 password=123456789</td></tr>
+<tr><td>bitlocker.info disk=3 volume=1 password=123456789</td></tr>
 <tr><td>
 
     FVE Version    : 2
@@ -658,9 +660,9 @@ Current third-party libs:
 </table>
 
 
-### Bitdecrypt
+### Bitlocker-Decrypt
 <table>
-<tr><td>bitdecrypt disk=3 volume=1 output=decrypted.img fvek=35b8197e6d74d8521f49698d5f5565892cf286ae5323c65631965c905a9d7da4</td></tr>
+<tr><td>bitlocker.decrypt disk=3 volume=1 output=decrypted.img fvek=35b8197e6d74d8521f49698d5f5565892cf286ae5323c65631965c905a9d7da4</td></tr>
 <tr><td>
   
     [+] Opening \\?\Volume{09a02598-0000-0000-0002-000000000000}\
@@ -673,6 +675,132 @@ Current third-party libs:
     [-]   Processed data size : 512.00 MiBs (100%)
     [+] Duration : 7535ms
     [+] Closing Volume
+</td></tr>
+</table>
+
+### Bitlocker-FVE
+<table>
+<tr><td>bitlocker.fve disk=3 volume=1 fve_block=2</td></tr>
+<tr><td>
+  
+    Signature             : -FVE-FS-
+    Size                  : 57
+    Version               : 2
+    Current State         : ENCRYPTED (4)
+    Next State            : ENCRYPTED (4)
+    Encrypted Size        : 536870400 (512.00 MiBs)
+    Convert Size          : 0
+    Backup Sectors        : 16
+    FVE Block 1           : 0000000002100000
+    FVE Block 2           : 00000000059e4000
+    FVE Block 3           : 00000000092c8000
+    Backup Sectors Offset : 0000000002110000
+
+    FVE Metadata Header
+    -------------------
+
+    Size                  : 840
+    Version               : 1
+    Header Size           : 48
+    Copy Size             : 840
+    Volume GUID           : {70a57ea3-9b98-4034-8b6a-645f731e2d1e}
+    Next Counter          : 10
+    Algorithm             : AES-XTS-128 (8004)
+    Timestamp             : 2020-02-26 16:39:17
+
+    FVE Metadata Entries (5)
+    ------------------------
+
+    +----------------------------------------------------------------------------------------------------------------+
+    | Id | Version | Size | Entry Type          | Value Type      | Value                                            |
+    +----------------------------------------------------------------------------------------------------------------+
+    | 1  | 1       | 72   | Drive Label         | Unicode         | String        : TWN NTFSDRIVE 26/02/2020         |
+    +----------------------------------------------------------------------------------------------------------------+
+    | 2  | 1       | 224  | VMK                 | VMK             | Key ID        : {2dd368f3-37d7-414f-94e6-3c5b86f |
+    |    |         |      |                     |                 |                 add50}                           |
+    |    |         |      |                     |                 | Last Change   : 2020-02-26 16:40:00              |
+    |    |         |      |                     |                 | Protection    : Password                         |
+    |    |         |      |                     |                 |                                                  |
+    |    |         |      |                     |                 | Property #1 - Stretch Key - 108                  |
+    |    |         |      |                     |                 | --------                                         |
+    |    |         |      |                     |                 | Encryption    : STRETCH KEY                      |
+    |    |         |      |                     |                 | MAC           : daea96439babc5d1e7f20c8860ff1ee9 |
+    |    |         |      |                     |                 |                                                  |
+    |    |         |      |                     |                 | Property #1.1 - AES-CCM - 80                     |
+    |    |         |      |                     |                 | --------                                         |
+    |    |         |      |                     |                 | Nonce as Hex  : 01d5ecbb00f71550                 |
+    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
+    |    |         |      |                     |                 | Nonce Counter : 00000002                         |
+    |    |         |      |                     |                 | MAC           : 1dfebdc79a966e72ca806d6a83d8c7ba |
+    |    |         |      |                     |                 | Key           : eb51a188df981b54f51698c76d76a8bb |
+    |    |         |      |                     |                 |                 d22afbbe27603ea6afc34c077726262e |
+    |    |         |      |                     |                 |                 5ba07482053d3c36fdecf80f         |
+    |    |         |      |                     |                 |                                                  |
+    |    |         |      |                     |                 | Property #2 - AES-CCM - 80                       |
+    |    |         |      |                     |                 | --------                                         |
+    |    |         |      |                     |                 | Nonce as Hex  : 01d5ecbb00f71550                 |
+    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
+    |    |         |      |                     |                 | Nonce Counter : 00000003                         |
+    |    |         |      |                     |                 | MAC           : 175ec23cd799e2bde9d24bf3697919fe |
+    |    |         |      |                     |                 | Key           : b76281568419ec3bee89d1eddccf3169 |
+    |    |         |      |                     |                 |                 59c466b6b392f40f0875e58168d868d7 |
+    |    |         |      |                     |                 |                 0788bd366bec117b11a9fd6e         |
+    +----------------------------------------------------------------------------------------------------------------+
+    | 3  | 1       | 316  | VMK                 | VMK             | Key ID        : {19b4a3e2-94b3-452f-a614-6212fae |
+    |    |         |      |                     |                 |                 b1b9d}                           |
+    |    |         |      |                     |                 | Last Change   : 2020-02-26 16:40:07              |
+    |    |         |      |                     |                 | Protection    : Recovery Password                |
+    |    |         |      |                     |                 |                                                  |
+    |    |         |      |                     |                 | Property #1 - Stretch Key - 172                  |
+    |    |         |      |                     |                 | --------                                         |
+    |    |         |      |                     |                 | Encryption    : STRETCH KEY                      |
+    |    |         |      |                     |                 | MAC           : b9963d29e1bad1f42e60c3bfb6e3bef5 |
+    |    |         |      |                     |                 |                                                  |
+    |    |         |      |                     |                 | Property #1.1 - AES-CCM - 64                     |
+    |    |         |      |                     |                 | --------                                         |
+    |    |         |      |                     |                 | Nonce as Hex  : 01d5ecbb00f71550                 |
+    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
+    |    |         |      |                     |                 | Nonce Counter : 00000004                         |
+    |    |         |      |                     |                 | MAC           : 8064d679c7d8d1fa8ae548b0844882c7 |
+    |    |         |      |                     |                 | Key           : 18d21021d40e3dc99d38c8dd84faed10 |
+    |    |         |      |                     |                 |                 370c32095f4f63261ad8ec40         |
+    |    |         |      |                     |                 |                                                  |
+    |    |         |      |                     |                 | Property #1.2 - AES-CCM - 80                     |
+    |    |         |      |                     |                 | --------                                         |
+    |    |         |      |                     |                 | Nonce as Hex  : 01d5ecbb00f71550                 |
+    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
+    |    |         |      |                     |                 | Nonce Counter : 00000005                         |
+    |    |         |      |                     |                 | MAC           : 3d40f2b5fc0091b894b438763fcdf4cd |
+    |    |         |      |                     |                 | Key           : a0af0aeda32d977d26ac76f9fc429668 |
+    |    |         |      |                     |                 |                 955d2a6a49fe4e2323751924e47e6c39 |
+    |    |         |      |                     |                 |                 8c22f7fcd2d4272003cb7a4e         |
+    |    |         |      |                     |                 |                                                  |
+    |    |         |      |                     |                 | Property #2 - AES-CCM - 80                       |
+    |    |         |      |                     |                 | --------                                         |
+    |    |         |      |                     |                 | Nonce as Hex  : 01d5ecbb00f71550                 |
+    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
+    |    |         |      |                     |                 | Nonce Counter : 00000006                         |
+    |    |         |      |                     |                 | MAC           : 3a06a06fdb044d850ecd6faf5cf2aec9 |
+    |    |         |      |                     |                 | Key           : 97a43d40c695c6d190eba3956ac7c7b1 |
+    |    |         |      |                     |                 |                 f5fdbbc7f9a61a77c914fa347479c7ac |
+    |    |         |      |                     |                 |                 6124ff46865e805367f7bef1         |
+    |    |         |      |                     |                 |                                                  |
+    |    |         |      |                     |                 | Property #3 - Unknown (00000015)                 |
+    |    |         |      |                     |                 |  - 28                                            |
+    |    |         |      |                     |                 | --------                                         |
+    |    |         |      |                     |                 | Unknown Value Type (21)                          |
+    +----------------------------------------------------------------------------------------------------------------+
+    | 4  | 1       | 80   | FKEV                | AES-CCM         | Nonce as Hex  : 01d5ecbb00f71550                 |
+    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
+    |    |         |      |                     |                 | Nonce Counter : 00000008                         |
+    |    |         |      |                     |                 | MAC           : 2ff7d7f79920e3509fb8d20cb15b62c8 |
+    |    |         |      |                     |                 | Key           : 097169b9a5c41420ed2353a4a4210763 |
+    |    |         |      |                     |                 |                 a8833d1a4a88c6f7c0c45ec7c0959f25 |
+    |    |         |      |                     |                 |                 2c8eac3f306e9fd1e693784a         |
+    +----------------------------------------------------------------------------------------------------------------+
+    | 5  | 1       | 100  | Volume Header Block | Offset and Size | Offset        : 0000000002110000                 |
+    |    |         |      |                     |                 | Size          : 0000000000002000                 |
+    +----------------------------------------------------------------------------------------------------------------+
 </td></tr>
 </table>
 
@@ -1108,133 +1236,6 @@ Current third-party libs:
 </table>
 
 
-### FVE
-<table>
-<tr><td>fve disk=3 volume=1 fve_block=2</td></tr>
-<tr><td>
-  
-    Signature             : -FVE-FS-
-    Size                  : 57
-    Version               : 2
-    Current State         : ENCRYPTED (4)
-    Next State            : ENCRYPTED (4)
-    Encrypted Size        : 536870400 (512.00 MiBs)
-    Convert Size          : 0
-    Backup Sectors        : 16
-    FVE Block 1           : 0000000002100000
-    FVE Block 2           : 00000000059e4000
-    FVE Block 3           : 00000000092c8000
-    Backup Sectors Offset : 0000000002110000
-
-    FVE Metadata Header
-    -------------------
-
-    Size                  : 840
-    Version               : 1
-    Header Size           : 48
-    Copy Size             : 840
-    Volume GUID           : {70a57ea3-9b98-4034-8b6a-645f731e2d1e}
-    Next Counter          : 10
-    Algorithm             : AES-XTS-128 (8004)
-    Timestamp             : 2020-02-26 16:39:17
-
-    FVE Metadata Entries (5)
-    ------------------------
-
-    +----------------------------------------------------------------------------------------------------------------+
-    | Id | Version | Size | Entry Type          | Value Type      | Value                                            |
-    +----------------------------------------------------------------------------------------------------------------+
-    | 1  | 1       | 72   | Drive Label         | Unicode         | String        : TWN NTFSDRIVE 26/02/2020         |
-    +----------------------------------------------------------------------------------------------------------------+
-    | 2  | 1       | 224  | VMK                 | VMK             | Key ID        : {2dd368f3-37d7-414f-94e6-3c5b86f |
-    |    |         |      |                     |                 |                 add50}                           |
-    |    |         |      |                     |                 | Last Change   : 2020-02-26 16:40:00              |
-    |    |         |      |                     |                 | Protection    : Password                         |
-    |    |         |      |                     |                 |                                                  |
-    |    |         |      |                     |                 | Property #1 - Stretch Key - 108                  |
-    |    |         |      |                     |                 | --------                                         |
-    |    |         |      |                     |                 | Encryption    : STRETCH KEY                      |
-    |    |         |      |                     |                 | MAC           : daea96439babc5d1e7f20c8860ff1ee9 |
-    |    |         |      |                     |                 |                                                  |
-    |    |         |      |                     |                 | Property #1.1 - AES-CCM - 80                     |
-    |    |         |      |                     |                 | --------                                         |
-    |    |         |      |                     |                 | Nonce as Hex  : 01d5ecbb00f71550                 |
-    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
-    |    |         |      |                     |                 | Nonce Counter : 00000002                         |
-    |    |         |      |                     |                 | MAC           : 1dfebdc79a966e72ca806d6a83d8c7ba |
-    |    |         |      |                     |                 | Key           : eb51a188df981b54f51698c76d76a8bb |
-    |    |         |      |                     |                 |                 d22afbbe27603ea6afc34c077726262e |
-    |    |         |      |                     |                 |                 5ba07482053d3c36fdecf80f         |
-    |    |         |      |                     |                 |                                                  |
-    |    |         |      |                     |                 | Property #2 - AES-CCM - 80                       |
-    |    |         |      |                     |                 | --------                                         |
-    |    |         |      |                     |                 | Nonce as Hex  : 01d5ecbb00f71550                 |
-    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
-    |    |         |      |                     |                 | Nonce Counter : 00000003                         |
-    |    |         |      |                     |                 | MAC           : 175ec23cd799e2bde9d24bf3697919fe |
-    |    |         |      |                     |                 | Key           : b76281568419ec3bee89d1eddccf3169 |
-    |    |         |      |                     |                 |                 59c466b6b392f40f0875e58168d868d7 |
-    |    |         |      |                     |                 |                 0788bd366bec117b11a9fd6e         |
-    +----------------------------------------------------------------------------------------------------------------+
-    | 3  | 1       | 316  | VMK                 | VMK             | Key ID        : {19b4a3e2-94b3-452f-a614-6212fae |
-    |    |         |      |                     |                 |                 b1b9d}                           |
-    |    |         |      |                     |                 | Last Change   : 2020-02-26 16:40:07              |
-    |    |         |      |                     |                 | Protection    : Recovery Password                |
-    |    |         |      |                     |                 |                                                  |
-    |    |         |      |                     |                 | Property #1 - Stretch Key - 172                  |
-    |    |         |      |                     |                 | --------                                         |
-    |    |         |      |                     |                 | Encryption    : STRETCH KEY                      |
-    |    |         |      |                     |                 | MAC           : b9963d29e1bad1f42e60c3bfb6e3bef5 |
-    |    |         |      |                     |                 |                                                  |
-    |    |         |      |                     |                 | Property #1.1 - AES-CCM - 64                     |
-    |    |         |      |                     |                 | --------                                         |
-    |    |         |      |                     |                 | Nonce as Hex  : 01d5ecbb00f71550                 |
-    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
-    |    |         |      |                     |                 | Nonce Counter : 00000004                         |
-    |    |         |      |                     |                 | MAC           : 8064d679c7d8d1fa8ae548b0844882c7 |
-    |    |         |      |                     |                 | Key           : 18d21021d40e3dc99d38c8dd84faed10 |
-    |    |         |      |                     |                 |                 370c32095f4f63261ad8ec40         |
-    |    |         |      |                     |                 |                                                  |
-    |    |         |      |                     |                 | Property #1.2 - AES-CCM - 80                     |
-    |    |         |      |                     |                 | --------                                         |
-    |    |         |      |                     |                 | Nonce as Hex  : 01d5ecbb00f71550                 |
-    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
-    |    |         |      |                     |                 | Nonce Counter : 00000005                         |
-    |    |         |      |                     |                 | MAC           : 3d40f2b5fc0091b894b438763fcdf4cd |
-    |    |         |      |                     |                 | Key           : a0af0aeda32d977d26ac76f9fc429668 |
-    |    |         |      |                     |                 |                 955d2a6a49fe4e2323751924e47e6c39 |
-    |    |         |      |                     |                 |                 8c22f7fcd2d4272003cb7a4e         |
-    |    |         |      |                     |                 |                                                  |
-    |    |         |      |                     |                 | Property #2 - AES-CCM - 80                       |
-    |    |         |      |                     |                 | --------                                         |
-    |    |         |      |                     |                 | Nonce as Hex  : 01d5ecbb00f71550                 |
-    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
-    |    |         |      |                     |                 | Nonce Counter : 00000006                         |
-    |    |         |      |                     |                 | MAC           : 3a06a06fdb044d850ecd6faf5cf2aec9 |
-    |    |         |      |                     |                 | Key           : 97a43d40c695c6d190eba3956ac7c7b1 |
-    |    |         |      |                     |                 |                 f5fdbbc7f9a61a77c914fa347479c7ac |
-    |    |         |      |                     |                 |                 6124ff46865e805367f7bef1         |
-    |    |         |      |                     |                 |                                                  |
-    |    |         |      |                     |                 | Property #3 - Unknown (00000015)                 |
-    |    |         |      |                     |                 |  - 28                                            |
-    |    |         |      |                     |                 | --------                                         |
-    |    |         |      |                     |                 | Unknown Value Type (21)                          |
-    +----------------------------------------------------------------------------------------------------------------+
-    | 4  | 1       | 80   | FKEV                | AES-CCM         | Nonce as Hex  : 01d5ecbb00f71550                 |
-    |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
-    |    |         |      |                     |                 | Nonce Counter : 00000008                         |
-    |    |         |      |                     |                 | MAC           : 2ff7d7f79920e3509fb8d20cb15b62c8 |
-    |    |         |      |                     |                 | Key           : 097169b9a5c41420ed2353a4a4210763 |
-    |    |         |      |                     |                 |                 a8833d1a4a88c6f7c0c45ec7c0959f25 |
-    |    |         |      |                     |                 |                 2c8eac3f306e9fd1e693784a         |
-    +----------------------------------------------------------------------------------------------------------------+
-    | 5  | 1       | 100  | Volume Header Block | Offset and Size | Offset        : 0000000002110000                 |
-    |    |         |      |                     |                 | Size          : 0000000000002000                 |
-    +----------------------------------------------------------------------------------------------------------------+
-</td></tr>
-</table>
-
-
 ### reparse
 <table>
 <tr><td>reparse disk=0 volume=4</td></tr>
@@ -1308,29 +1309,59 @@ Current third-party libs:
 </table>
 
 
-### usn
+### usn-analyze
 <table>
-<tr><td>usn disk=4 volume=1 output=usn.csv format=csv</td></tr>
+<tr><td>usn.analyze disk=4 volume=1 rules=myrules.json output=usn.csv format=csv</td></tr>
 <tr><td>
   
-    [+] Opening \\?\Volume{00000001-0000-0000-0000-000000000000}\
+Analyze USN journal for \\.\PhysicalDrive2 > Volume:1
+-----------------------------------------------------
+
+[+] Opening \\?\Volume{498eed94-0000-0000-007e-000000000000}\
+[+] Searching for $Extend\$UsnJrnl
+[-] Found in file record: 396
+[-] $J stream size: 171.74 KiBs (maybe sparse, ~32MiBs on disk by default)
+[+] Loading rules from: d:\rules.json
+[-] 1 rules loaded
+[+] Creating d:\usn_analyze_results.csv
+[-] Processing entry: 1418 (512.00 KiBs) - 3 matches
+[+] Closing volume
+[+] Results:
+    +--------------------------+
+    | Index | Rule ID  | Count |
+    +--------------------------+
+    | 0     | ccleaner | 3     |
+    +--------------------------+
+</td></tr>
+</table>
+
+
+### usn-dump
+<table>
+<tr><td>usn.dump disk=4 volume=1 output=usn.csv format=csv</td></tr>
+<tr><td>
+  
+    [+] Opening \\?\Volume{ee732b26-571c-4516-b8fd-32282aa8e66b}\
     [+] Finding $Extend\$UsnJrnl record
-    [+] Found in file record : 41
-    [+] Data stream $J size : 2.66 KiBs
-    [+] Reading $J
-    [+] Processing entry : 32
+    [+] Found in file record: 88008
+    [+] $J stream size: 60.24 GiBs (could be sparse)
+    [+] Creating d:\mft_c.csv
+    [+] Loading $MFT records
+    [+] Processing $MFT records: 1.37 GiB
+    [+] 1436928 record loaded
+    [+] Processing entry: 322667 (34.12 MiBs)
     [+] Closing volume
 </td></tr>
 <tr><td>Sample of usn.csv</td></tr>
 <tr><td><pre>MajorVersion,MinorVersion,FileReferenceNumber,FileReferenceSequenceNumber,ParentFileReferenceNumber,ParentFileReferenceSequenceNumber,Usn,Timestamp,Reason,SourceInfo,SecurityId,FileAttributes,Filename
-2,0,53,4,5,5,0,2020-02-26 21:43:36,FILE_CREATE,0,0,DIRECTORY,Nouveau dossier
-2,0,53,4,5,5,96,2020-02-26 21:43:36,FILE_CREATE+CLOSE,0,0,DIRECTORY,Nouveau dossier
-2,0,53,4,5,5,192,2020-02-26 21:43:38,RENAME_OLD_NAME,0,0,DIRECTORY,Nouveau dossier
-2,0,53,4,5,5,288,2020-02-26 21:43:38,RENAME_NEW_NAME,0,0,DIRECTORY,test
-2,0,53,4,5,5,360,2020-02-26 21:43:38,RENAME_NEW_NAME+CLOSE,0,0,DIRECTORY,test
-2,0,53,4,5,5,432,2020-02-26 21:43:39,OBJECT_ID_CHANGE,0,0,DIRECTORY,test
-2,0,53,4,5,5,504,2020-02-26 21:43:39,OBJECT_ID_CHANGE+CLOSE,0,0,DIRECTORY,test
-2,0,54,2,53,4,576,2020-02-26 21:43:41,FILE_CREATE,0,0,ARCHIVE,Nouveau document texte.txt</pre>
+2,0,53,4,5,5,0,2020-02-26 21:43:36,FILE_CREATE,0,0,DIRECTORY,volume:\Nouveau dossier
+2,0,53,4,5,5,96,2020-02-26 21:43:36,FILE_CREATE+CLOSE,0,0,DIRECTORY,volume:\Nouveau dossier
+2,0,53,4,5,5,192,2020-02-26 21:43:38,RENAME_OLD_NAME,0,0,DIRECTORY,volume:\Nouveau dossier
+2,0,53,4,5,5,288,2020-02-26 21:43:38,RENAME_NEW_NAME,0,0,DIRECTORY,volume:\test
+2,0,53,4,5,5,360,2020-02-26 21:43:38,RENAME_NEW_NAME+CLOSE,0,0,DIRECTORY,volume:\test
+2,0,53,4,5,5,432,2020-02-26 21:43:39,OBJECT_ID_CHANGE,0,0,DIRECTORY,volume:\test
+2,0,53,4,5,5,504,2020-02-26 21:43:39,OBJECT_ID_CHANGE+CLOSE,0,0,DIRECTORY,volume:\test
+2,0,54,2,53,4,576,2020-02-26 21:43:41,FILE_CREATE,0,0,ARCHIVE,volume:\test\Nouveau document texte.txt</pre>
 </td></tr>
 </table>
 
