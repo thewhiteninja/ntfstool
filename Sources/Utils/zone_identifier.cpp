@@ -8,6 +8,10 @@ utils::dfir::ZoneIdentifier::ZoneIdentifier(std::shared_ptr<Buffer<PBYTE>> data)
 		size_t pos = line.find("=");
 		if (pos != std::string::npos)
 		{
+			if (line.back() == '\r')
+			{
+				line.pop_back();
+			}
 			_values.insert(std::pair<std::string, std::string>(line.substr(0, pos), line.substr(pos + 1)));
 		}
 	}

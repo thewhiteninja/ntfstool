@@ -32,7 +32,7 @@ void load_mft(std::shared_ptr<NTFSExplorer> explorer, std::unordered_map<DWORD64
 		return;
 	}
 	ULONG64 total_size_mft = record_mft->datasize();
-	DWORD record_size = explorer->reader()->sizes.cluster_size;
+	DWORD record_size = explorer->reader()->sizes.record_size;
 
 	std::shared_ptr<MFTRecord> record = nullptr;
 
