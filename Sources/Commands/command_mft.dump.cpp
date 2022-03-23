@@ -36,8 +36,7 @@ int dump_mft(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 		return 1;
 	}
 
-	DWORD cluster_size = explorer->reader()->boot_record()->bytePerSector * explorer->reader()->boot_record()->sectorPerCluster;
-	DWORD record_size = explorer->reader()->boot_record()->clusterPerRecord >= 0 ? explorer->reader()->boot_record()->clusterPerRecord * cluster_size : 1 << -explorer->reader()->boot_record()->clusterPerRecord;
+	DWORD record_size = explorer->reader()->sizes.record_size;
 	ULONG64 total_size = record->datasize();
 
 	std::cout << "[+] $MFT size   : " << utils::format::size(total_size) << std::endl;
