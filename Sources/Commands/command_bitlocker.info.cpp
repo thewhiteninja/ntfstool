@@ -579,17 +579,20 @@ namespace commands
 {
 	namespace bitlocker
 	{
-		int dispatch(std::shared_ptr<Options> opts)
+		namespace info
 		{
-			if (opts->password != "" || opts->recovery != "" || opts->bek != "")
+			int dispatch(std::shared_ptr<Options> opts)
 			{
-				test_password(opts);
+				if (opts->password != "" || opts->recovery != "" || opts->bek != "")
+				{
+					test_password(opts);
+				}
+				else
+				{
+					print_bitlocker(opts);
+				}
+				return 0;
 			}
-			else
-			{
-				print_bitlocker(opts);
-			}
-			return 0;
 		}
 	}
 

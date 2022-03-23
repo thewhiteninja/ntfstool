@@ -134,40 +134,43 @@ int decrypt_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std:
 
 namespace commands
 {
-	namespace bitdecrypt
+	namespace bitlocker
 	{
-		int dispatch(std::shared_ptr<Options> opts)
+		namespace decrypt
 		{
-			std::ios_base::fmtflags flag_backup(std::cout.flags());
-
-			std::shared_ptr<Disk> disk = get_disk(opts);
-			if (disk != nullptr)
+			int dispatch(std::shared_ptr<Options> opts)
 			{
-				std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
-				if (volume != nullptr)
+				std::ios_base::fmtflags flag_backup(std::cout.flags());
+
+				std::shared_ptr<Disk> disk = get_disk(opts);
+				if (disk != nullptr)
 				{
-					if (opts->output == "")
+					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+					if (volume != nullptr)
 					{
-						invalid_option(opts, "output", opts->output);
+						if (opts->output == "")
+						{
+							invalid_option(opts, "output", opts->output);
+						}
+						if (opts->fvek == "")
+						{
+							invalid_option(opts, "fvek", opts->fvek);
+						}
+						decrypt_volume(disk, volume, opts);
 					}
-					if (opts->fvek == "")
+					else
 					{
-						invalid_option(opts, "fvek", opts->fvek);
+						invalid_option(opts, "volume", opts->volume);
 					}
-					decrypt_volume(disk, volume, opts);
 				}
 				else
 				{
-					invalid_option(opts, "volume", opts->volume);
+					invalid_option(opts, "disk", opts->disk);
 				}
-			}
-			else
-			{
-				invalid_option(opts, "disk", opts->disk);
-			}
 
-			std::cout.flags(flag_backup);
-			return 0;
+				std::cout.flags(flag_backup);
+				return 0;
+			}
 		}
 	}
 }
