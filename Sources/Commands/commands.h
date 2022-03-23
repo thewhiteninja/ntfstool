@@ -131,19 +131,20 @@ namespace commands {
 		int print_mft_info_details(std::shared_ptr<MFTRecord> record, ULONG32 cluster_size);
 	}
 
-	namespace fve
-	{
-		int dispatch(std::shared_ptr<Options> opts);
-	}
-
 	namespace bitlocker
 	{
-		int dispatch(std::shared_ptr<Options> opts);
-	}
-
-	namespace bitdecrypt
-	{
-		int dispatch(std::shared_ptr<Options> opts);
+		namespace info
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
+		namespace decrypt
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
+		namespace fve
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
 	}
 
 	namespace help

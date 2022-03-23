@@ -224,7 +224,7 @@
     <ClCompile Include="Sources\Commands\command_mbr.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_fve.cpp">
+    <ClCompile Include="Sources\Commands\command_bitlocker.fve.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Utils\table.cpp">
@@ -239,7 +239,7 @@
     <ClCompile Include="Sources\Commands\command_vbr.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_bitlocker.cpp">
+    <ClCompile Include="Sources\Commands\command_bitlocker.info.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_mft.record.cpp">
@@ -257,7 +257,7 @@
     <ClCompile Include="Sources\Commands\command_undelete.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_bitdecrypt.cpp">
+    <ClCompile Include="Sources\Commands\command_bitlocker.decrypt.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\NTFS\ntfs_explorer.cpp">
@@ -326,7 +326,7 @@
     <ClCompile Include="Sources\Commands\command_streams.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_efs_masterkey.cpp">
+    <ClCompile Include="Sources\Commands\command_efs.masterkey.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\EFS\masterkey_file.cpp">
@@ -335,7 +335,7 @@
     <ClCompile Include="Sources\Commands\command_mft.btree.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_efs_key.cpp">
+    <ClCompile Include="Sources\Commands\command_efs.key.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\EFS\private_key_enc.cpp">
@@ -353,16 +353,16 @@
     <ClCompile Include="Sources\EFS\certificate_file.cpp">
       <Filter>Source Files\EFS</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_efs_backup.cpp">
+    <ClCompile Include="Sources\Commands\command_efs.backup.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Commands\commands.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_efs_certificate.cpp">
+    <ClCompile Include="Sources\Commands\command_efs.certificate.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_efs_decrypt.cpp">
+    <ClCompile Include="Sources\Commands\command_efs.decrypt.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\EFS\pkcs12_archive.cpp">
