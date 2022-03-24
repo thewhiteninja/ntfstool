@@ -93,7 +93,7 @@ Options can be entered as decimal or hex number with "0x" prefix (ex: inode).
 | [efs.key](#efs-key)  | List, display, decrypt and export private keys (Crypto/RSA). |
 | [efs.masterkey](#efs-masterkey)  | List, display and decrypt masterkeys (Protect). |
 | [reparse](#reparse)  | Parse and display reparse points from \$Extend\$Reparse. |
-| [logfile](#logfile)  | Dump $LogFile file in specified format: csv, json, raw. |
+| [logfile.dump](#logfile-dump)  | Dump $LogFile file in specified format: csv, json, raw. |
 | [usn.analyze](#usn-analyze)  | Analyze $UsnJrnl file with specified rules. Output : csv or json. |
 | [usn.dump](#usn-dump)  | Dump $UsnJrnl file in specified format: csv, json, raw. |
 | [shadow](#shadow)  | List volume shadow snapshots from selected disk and volume. |
