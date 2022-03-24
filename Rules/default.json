@@ -7,13 +7,10 @@
     "type": "cleaning_tool",
     "severity": "high",
     "rule": {
-      "filename": "(.*)ccleaner\\.exe",
+      "filename": "(.*)ccleaner\\.exe(-([A-F0-9]{8}).pf)?",
       "reason": [
-        "+RENAME_NEW_NAME",
-        "+CLOSE"
       ],
       "attributes": [
-        "-ARCHIVE"
       ]
     }
   }

@@ -17,13 +17,18 @@
 #include <iomanip>
 #include <memory>
 #include <Utils/usn_rules.h>
+#include <Utils/path_finder.h>
 
 
-int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, const std::string& rules, std::string& output)
+void process_usn(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFile> ffile, std::shared_ptr<USNRules> usn_rules, std::map<std::string, ULONG64>& matches, bool full_mode)
 {
-	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
-
-	utils::ui::title("Analyze USN journal for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	std::cout << "[-] Mode: " << (full_mode ? "full" : "fast") << std::endl;
+	std::shared_ptr<PathFinder> pf = nullptr;
+	if (full_mode)
+	{
+		pf = std::make_shared<PathFinder>(vol);
+		std::cout << "[+] " << pf->count() << " $MFT records loaded" << std::endl;
+	}
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
 
@@ -36,7 +41,6 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 	if (record == nullptr)
 	{
 		std::cout << "[!] Not found" << std::endl;
-		return 2;
 	}
 
 	std::cout << "[-] Found in file record: " << std::to_string(record->header()->MFTRecordIndex) << std::endl;
@@ -47,50 +51,18 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 
 	std::cout << "[-] $J stream size: " << utils::format::size(total_size) << " (could be sparse)" << std::endl;
 
-	std::cout << "[+] Loading rules from: " << rules << std::endl;
-	std::shared_ptr<USNRules> usn_rules = std::make_shared<USNRules>(rules);
-	if (usn_rules->size() > 0)
-	{
-		std::cout << "[-] " << usn_rules->size() << " rules loaded" << std::endl;
-	}
-	else
-	{
-		std::cout << "[!] No rule loaded. Exiting." << std::endl;
-		return 1;
-	}
 
-	std::cout << "[+] Creating " << output << std::endl;
-
-	std::shared_ptr<FormatteddFile> ffile = std::make_shared<CSVFile>(output);
-
-	ffile->set_columns(
-		{
-		"MajorVersion",
-		"MinorVersion",
-		"FileReferenceNumber",
-		"FileReferenceSequenceNumber",
-		"ParentFileReferenceNumber",
-		"ParentFileReferenceSequenceNumber",
-		"Usn",
-		"Timestamp",
-		"Reason",
-		"SourceInfo",
-		"SecurityId",
-		"FileAttributes",
-		"Filename"
-		}
-	);
 
 	ULONG64 processed_size = 0;
 	ULONG64 processed_count = 0;
 	ULONG64 matches_count = 0;
-	std::map<std::string, ULONG64> matches;
+	DWORD cluster_size = explorer->reader()->sizes.cluster_size;
 
-	for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, explorer->reader()->sizes.cluster_size, true))
+	for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, cluster_size, true))
 	{
 		processed_size += block.second;
 
-		std::cout << "\r[-] Processing entry: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches_count << " matches     ";
+		std::cout << "\r[+] Processing USN records: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches_count << " matches     ";
 
 		memcpy(clusterBuf.data() + filled_size, block.first, block.second);
 		filled_size += block.second;
@@ -115,10 +87,12 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 				wfilename.resize(usn_record->FileNameLength / sizeof(WCHAR));
 				std::string filename = utils::strings::to_utf8(wfilename);
 
+				std::vector<std::string> matched_rules;
 				for (auto& rule : usn_rules->rules())
 				{
 					if (rule->match(filename, usn_record))
 					{
+						matched_rules.push_back(rule->id());
 						matches_count++;
 						if (matches.find(rule->id()) != matches.end())
 						{
@@ -128,26 +102,30 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 						{
 							matches[rule->id()] = 1;
 						}
-
-						ffile->add_item(usn_record->MajorVersion);
-						ffile->add_item(usn_record->MinorVersion);
-						ffile->add_item(usn_record->FileReferenceNumber & 0xffffffffffff);
-						ffile->add_item(usn_record->FileReferenceNumber >> 48);
-						ffile->add_item(usn_record->ParentFileReferenceNumber & 0xffffffffffff);
-						ffile->add_item(usn_record->ParentFileReferenceNumber >> 48);
-						ffile->add_item(usn_record->Usn);
-
-						SYSTEMTIME st = { 0 };
-						utils::times::ull_to_local_systemtime(usn_record->TimeStamp.QuadPart, &st);
-						ffile->add_item(utils::times::display_systemtime(st));
-						ffile->add_item(constants::disk::usn::reasons(usn_record->Reason));
-						ffile->add_item((usn_record->SourceInfo));
-						ffile->add_item((usn_record->SecurityId));
-						ffile->add_item(constants::disk::usn::fileattributes(usn_record->FileAttributes));
-						ffile->add_item(filename);
-
-						ffile->new_line();
 					}
+				}
+				if (!matched_rules.empty())
+				{
+					ffile->add_item(usn_record->MajorVersion);
+					ffile->add_item(usn_record->MinorVersion);
+					ffile->add_item(usn_record->FileReferenceNumber & 0xffffffffffff);
+					ffile->add_item(usn_record->FileReferenceNumber >> 48);
+					ffile->add_item(usn_record->ParentFileReferenceNumber & 0xffffffffffff);
+					ffile->add_item(usn_record->ParentFileReferenceNumber >> 48);
+					ffile->add_item(usn_record->Usn);
+
+					SYSTEMTIME st = { 0 };
+					utils::times::ull_to_local_systemtime(usn_record->TimeStamp.QuadPart, &st);
+					ffile->add_item(utils::times::display_systemtime(st));
+					ffile->add_item(constants::disk::usn::reasons(usn_record->Reason));
+					ffile->add_item((usn_record->SourceInfo));
+					ffile->add_item((usn_record->SecurityId));
+					ffile->add_item(constants::disk::usn::fileattributes(usn_record->FileAttributes));
+					ffile->add_item(filename);
+
+					ffile->add_item(utils::strings::join_vec(matched_rules, "|"));
+
+					ffile->new_line();
 				}
 
 				processed_count++;
@@ -157,18 +135,67 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 				break;
 			}
 			default:
-				std::cout << std::endl << "[!] Unknown USN record version (" << std::to_string(header->MajorVersion) << ")" << std::endl;
-				return 1;
+				return;
 			}
 		}
 
 		memcpy(clusterBuf.data(), header, (size_t)filled_size);
 	}
-	std::cout << "\r[-] Processing entry: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches_count << " matches     ";
+	std::cout << "\r[+] Processing USN records: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches_count << " matches     ";
+}
+
+std::shared_ptr<USNRules> load_rules(std::shared_ptr<Options> opts)
+{
+	std::cout << "[+] Loading rules from: " << opts->rules << std::endl;
+	return std::make_shared<USNRules>(opts->rules);
+}
+
+int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
+{
+	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
+
+	utils::ui::title("Analyze USN journal for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+
+	std::shared_ptr<USNRules> usn_rules = load_rules(opts);
+	if (usn_rules && usn_rules->size() > 0)
+	{
+		std::cout << "[-] " << usn_rules->size() << " rules loaded" << std::endl;
+	}
+	else
+	{
+		std::cout << "[!] No rule loaded. Exiting." << std::endl;
+		return 1;
+	}
+
+	std::cout << "[+] Creating " << opts->output << std::endl;
+
+	std::shared_ptr<FormatteddFile> ffile = std::make_shared<CSVFile>(opts->output);
+
+	ffile->set_columns(
+		{
+		"MajorVersion",
+		"MinorVersion",
+		"FileReferenceNumber",
+		"FileReferenceSequenceNumber",
+		"ParentFileReferenceNumber",
+		"ParentFileReferenceSequenceNumber",
+		"Usn",
+		"Timestamp",
+		"Reason",
+		"SourceInfo",
+		"SecurityId",
+		"FileAttributes",
+		"Filename",
+		"Rules"
+		}
+	);
+
+	std::map<std::string, ULONG64> matches;
+	process_usn(vol, ffile, usn_rules, matches, opts->mode == "full");
 
 	std::cout << std::endl << "[+] Closing volume" << std::endl;
 
-	if (matches_count)
+	if (!matches.empty())
 	{
 		std::cout << "[+] Results:" << std::endl;
 
@@ -217,7 +244,11 @@ namespace commands
 						{
 							if (opts->rules != "")
 							{
-								analyze_usn_journal(disk, volume, opts->rules, opts->output);
+								if (opts->mode != "full" && opts->mode != "fast")
+								{
+									opts->mode = "fast";
+								}
+								analyze_usn_journal(disk, volume, opts);
 							}
 							else
 							{

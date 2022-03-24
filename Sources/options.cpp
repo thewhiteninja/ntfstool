@@ -121,6 +121,7 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 		if (is_option(argv[i], "sid")) { read_option_string(argv[i], ret->sid); continue; }
 		if (is_option(argv[i], "masterkey")) { read_option_hexbuffer(argv[i], &ret->masterkey); continue; }
 		if (is_option(argv[i], "pfx")) { read_option_string(argv[i], ret->pfx); continue; }
+		if (is_option(argv[i], "mode")) { read_option_string(argv[i], ret->mode); continue; }
 		if (is_option(argv[i], "recovery")) { read_option_string(argv[i], ret->recovery); continue; }
 		if (is_option(argv[i], "image")) { read_option_string(argv[i], ret->image); continue; }
 		if (is_option(argv[i], "bek")) { read_option_string(argv[i], ret->bek); continue; }

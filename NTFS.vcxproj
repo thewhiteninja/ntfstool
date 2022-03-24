@@ -61,6 +61,7 @@
     <ClInclude Include="Sources\Utils\formatted_file.h" />
     <ClInclude Include="Sources\Utils\index_details.h" />
     <ClInclude Include="Sources\Utils\json_file.h" />
+    <ClInclude Include="Sources\Utils\path_finder.h" />
     <ClInclude Include="Sources\Utils\progress_bar.h" />
     <ClInclude Include="Sources\Utils\table.h" />
     <ClInclude Include="Sources\Utils\btree.h" />
@@ -129,6 +130,7 @@
     <ClCompile Include="Sources\Utils\csv_file.cpp" />
     <ClCompile Include="Sources\Utils\index_details.cpp" />
     <ClCompile Include="Sources\Utils\json_file.cpp" />
+    <ClCompile Include="Sources\Utils\path_finder.cpp" />
     <ClCompile Include="Sources\Utils\table.cpp" />
     <ClCompile Include="Sources\Utils\btree.cpp" />
     <ClCompile Include="Sources\Utils\usn_rules.cpp" />
@@ -138,6 +140,7 @@
   <ItemGroup>
     <None Include="LICENSE" />
     <None Include="README.md" />
+    <None Include="Rules\default.json" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

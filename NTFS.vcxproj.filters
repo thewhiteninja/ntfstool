@@ -58,6 +58,9 @@
     <Filter Include="Source Files\EFS">
       <UniqueIdentifier>{c3b20f0c-65ae-4b68-9e00-a7cd05c0b8c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rules">
+      <UniqueIdentifier>{b75428fc-74c9-4316-9e3f-8f3cca8bfd91}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\options.h">
@@ -202,6 +205,9 @@
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Utils\usn_rules.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\path_finder.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
@@ -401,6 +407,9 @@
     <ClCompile Include="Sources\Utils\usn_rules.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Utils\path_finder.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
@@ -408,6 +417,9 @@
     </None>
     <None Include="LICENSE">
       <Filter>Other files</Filter>
+    </None>
+    <None Include="Rules\default.json">
+      <Filter>Rules</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -82,6 +82,10 @@ namespace commands {
 
 	namespace usn
 	{
+		void load_mft(std::shared_ptr<NTFSExplorer> explorer, std::unordered_map<DWORD64, DWORD64>& map_parent, std::unordered_map<DWORD64, std::string>& map_name);
+
+		std::string get_file_path(std::unordered_map<DWORD64, DWORD64>& map_parent, std::unordered_map<DWORD64, std::string>& map_name, DWORD64 parent_inode, std::string filename);
+
 		namespace dump
 		{
 			int dispatch(std::shared_ptr<Options> opts);
