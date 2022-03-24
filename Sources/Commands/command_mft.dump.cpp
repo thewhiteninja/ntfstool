@@ -142,11 +142,10 @@ int dump_mft(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::share
 			ffile->add_item(record->header()->flag & FILE_RECORD_FLAG_INUSE ? "True" : "False");
 			ffile->add_item(record->header()->flag & FILE_RECORD_FLAG_DIR ? "Directory" : "File");
 
-			auto filename = record->filename();
-			auto path = std::filesystem::path(filename);
+			auto path = std::filesystem::path(record->filename());
 
-			ffile->add_item(path.filename().string());
-			ffile->add_item(utils::strings::lower(path.extension().string()));
+			ffile->add_item(utils::strings::to_utf8(path.filename().generic_wstring()));
+			ffile->add_item(utils::strings::lower(utils::strings::to_utf8(path.extension().generic_wstring())));
 
 			ffile->add_item(record->datasize());
 
