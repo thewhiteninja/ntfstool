@@ -213,12 +213,12 @@ void utils::ui::Table::render(std::ostream& out)
 		}
 		for (i = 0; i < headers.size() - 1; i++) {
 			out.width(column_size[i]);
-			if (header_line_index < headers[i].size()) out << std::left << headers[i][header_line_index];
+			if (header_line_index < headers[i].size()) out << (column_align[i] == TableAlign::LEFT ? std::left : std::right) << headers[i][header_line_index];
 			else out << std::left << "";
 			out << " | ";
 		}
 		out.width(column_size[i]);
-		if (header_line_index < headers[i].size()) out << std::left << headers[i][header_line_index];
+		if (header_line_index < headers[i].size()) out << (column_align[i] == TableAlign::LEFT ? std::left : std::right) << headers[i][header_line_index];
 		else out << std::left << "";
 		if (border_right)
 		{
