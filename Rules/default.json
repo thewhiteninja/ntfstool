@@ -4,10 +4,57 @@
     "author": "thewhiteninja",
     "status": "experimental",
     "description": "CCleaner is a disk cleanup tool for temporary junk files, web history, logs and even wiping the disk.",
-    "type": "cleaning_tool",
+    "type": "anti-forensics",
     "severity": "high",
     "rule": {
       "filename": "(.*)ccleaner\\.exe(-([A-F0-9]{8}).pf)?",
+      "reason": [
+      ],
+      "attributes": [
+      ]
+    }
+  },
+  {
+    "id": "deleted-document",
+    "author": "thewhiteninja",
+    "status": "experimental",
+    "description": "Documents have been deleted (word, excel, powerpoint, txt, ...)",
+    "type": "deleted_file",
+    "severity": "medium",
+    "rule": {
+      "filename": "(.*)(\\.doc|\\.docx|\\.xls|\\.xlsx|\\.ppt|\\.pptx|\\.zip|\\.rar|\\.7z)",
+      "reason": [
+		"+FILE_DELETE"
+      ],
+      "attributes": [
+      ]
+    }
+  },
+  {
+    "id": "deleted-media",
+    "author": "thewhiteninja",
+    "status": "experimental",
+    "description": "Media have been deleted (video, audio, images ...)",
+    "type": "deleted_file",
+    "severity": "medium",
+    "rule": {
+      "filename": "(.*)(\\.avi|\\.mp4|\\.mkv|\\.m4v|\\.divx|\\.mp3|\\.ogg|\\.flac|\\.jpg|\\.jpeg|\\.gif|\\.png|\\.tiff|\\.psd)",
+      "reason": [
+		"+FILE_DELETE"
+      ],
+      "attributes": [
+      ]
+    }
+  },
+  {
+    "id": "executable",
+    "author": "thewhiteninja",
+    "status": "experimental",
+    "description": "Excecutable files (exe, dll, sys, bat, ps1 ...)",
+    "type": "file",
+    "severity": "low",
+    "rule": {
+      "filename": "(.*)(\\.exe|\\.dll|\\.sys|\\.vb?|\\.ps1|\\.bat|\\.scr|\\.com)",
       "reason": [
       ],
       "attributes": [

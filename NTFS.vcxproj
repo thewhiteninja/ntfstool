@@ -66,6 +66,7 @@
     <ClInclude Include="Sources\Utils\table.h" />
     <ClInclude Include="Sources\Utils\btree.h" />
     <ClInclude Include="Sources\Utils\usn_rules.h" />
+    <ClInclude Include="Sources\Utils\usn_stats.h" />
     <ClInclude Include="Sources\Utils\utils.h" />
     <ClInclude Include="Sources\Utils\zone_identifier.h" />
   </ItemGroup>
