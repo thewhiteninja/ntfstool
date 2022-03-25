@@ -18,16 +18,17 @@
 #include <memory>
 #include <Utils/usn_rules.h>
 #include <Utils/path_finder.h>
+#include <Utils/usn_stats.h>
 
 
-void process_usn(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFile> ffile, std::shared_ptr<USNRules> usn_rules, std::map<std::string, ULONG64>& matches, bool full_mode)
+void process_usn(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFile> ffile, std::shared_ptr<USNRules> usn_rules, std::map<std::string, ULONG64>& matches, std::shared_ptr<USNStats> usn_stats, bool full_mode)
 {
 	std::cout << "[-] Mode: " << (full_mode ? "full" : "fast") << std::endl;
-	std::shared_ptr<PathFinder> pf = nullptr;
+	std::shared_ptr<PathFinder> path_finder = nullptr;
 	if (full_mode)
 	{
-		pf = std::make_shared<PathFinder>(vol);
-		std::cout << "[+] " << pf->count() << " $MFT records loaded" << std::endl;
+		path_finder = std::make_shared<PathFinder>(vol);
+		std::cout << "[+] " << path_finder->count() << " $MFT records loaded" << std::endl;
 	}
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
@@ -50,9 +51,6 @@ void process_usn(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFile> ff
 	ULONG64 filled_size = 0;
 
 	std::cout << "[-] $J stream size: " << utils::format::size(total_size) << " (could be sparse)" << std::endl;
-
-
-
 	ULONG64 processed_size = 0;
 	ULONG64 processed_count = 0;
 	ULONG64 matches_count = 0;
@@ -86,6 +84,8 @@ void process_usn(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFile> ff
 				std::wstring wfilename = std::wstring(usn_record->FileName);
 				wfilename.resize(usn_record->FileNameLength / sizeof(WCHAR));
 				std::string filename = utils::strings::to_utf8(wfilename);
+
+				usn_stats->add_record(filename, usn_record);
 
 				std::vector<std::string> matched_rules;
 				for (auto& rule : usn_rules->rules())
@@ -121,7 +121,15 @@ void process_usn(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFile> ff
 					ffile->add_item((usn_record->SourceInfo));
 					ffile->add_item((usn_record->SecurityId));
 					ffile->add_item(constants::disk::usn::fileattributes(usn_record->FileAttributes));
-					ffile->add_item(filename);
+
+					if (full_mode)
+					{
+						ffile->add_item(path_finder->get_file_path(utils::strings::to_utf8(wfilename), usn_record->ParentFileReferenceNumber));
+					}
+					else
+					{
+						ffile->add_item(utils::strings::to_utf8(wfilename));
+					}
 
 					ffile->add_item(utils::strings::join_vec(matched_rules, "|"));
 
@@ -191,13 +199,34 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 	);
 
 	std::map<std::string, ULONG64> matches;
-	process_usn(vol, ffile, usn_rules, matches, opts->mode == "full");
+	std::shared_ptr<USNStats> usn_stats = std::make_shared<USNStats>();
+
+	process_usn(vol, ffile, usn_rules, matches, usn_stats, opts->mode == "full");
 
 	std::cout << std::endl << "[+] Closing volume" << std::endl;
 
+	std::cout << "[+] Summary:" << std::endl;
+
+	std::shared_ptr<utils::ui::Table> summary = std::make_shared<utils::ui::Table>();
+	summary->set_margin_left(4);
+
+	summary->add_header_line("Index");
+	summary->add_header_line("Category");
+	summary->add_header_line("Count");
+
+	int index = 0;
+	for (auto& element : usn_stats->get_stats())
+	{
+		summary->add_item_line(std::to_string(index++));
+		summary->add_item_line(element.first);
+		summary->add_item_line(std::to_string(element.second));
+		summary->new_line();
+	}
+	summary->render(std::cout);
+
 	if (!matches.empty())
 	{
-		std::cout << "[+] Results:" << std::endl;
+		std::cout << "[+] Rules results:" << std::endl;
 
 		std::shared_ptr<utils::ui::Table> results = std::make_shared<utils::ui::Table>();
 		results->set_margin_left(4);
