@@ -212,22 +212,38 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 
 	summary->add_header_line("Index");
 	summary->add_header_line("Category");
-	summary->add_header_line("Count", utils::ui::TableAlign::RIGHT);
+	summary->add_header_line("Value", utils::ui::TableAlign::RIGHT);
 	summary->add_header_line("%", utils::ui::TableAlign::RIGHT);
 
 	auto count = usn_stats->get_stat("records count");
 
 	int index = 0;
+	std::stringstream ss;
 	for (auto& element : usn_stats->get_stats())
 	{
 		summary->add_item_line(std::to_string(index++));
 		summary->add_item_line(element.first);
-		summary->add_item_line(std::to_string(element.second));
 
-		std::stringstream ss;
-		ss << std::fixed << std::setprecision(2) << (100.0 * element.second / count);
+		if (usn_stats->is_date(element))
+		{
+			SYSTEMTIME st = { 0 };
+			utils::times::ull_to_local_systemtime(element.second, &st);
+			ss.str(std::string());
+			ss << utils::times::display_systemtime(st);
+			summary->add_item_line(ss.str());
+		}
+		else
+		{
+			summary->add_item_line(std::to_string(element.second));
+		}
 
+		ss.str(std::string());
+		if (usn_stats->is_count(element))
+		{
+			ss << std::fixed << std::setprecision(2) << (100.0 * element.second / count);
+		}
 		summary->add_item_line(ss.str());
+
 		summary->new_line();
 	}
 	summary->render(std::cout);
@@ -242,13 +258,20 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 		results->add_header_line("Index");
 		results->add_header_line("Rule ID");
 		results->add_header_line("Count", utils::ui::TableAlign::RIGHT);
+		results->add_header_line("%", utils::ui::TableAlign::RIGHT);
 
 		int index = 0;
+		std::stringstream ss;
 		for (std::pair<std::string, ULONG64> element : matches)
 		{
 			results->add_item_line(std::to_string(index++));
 			results->add_item_line(element.first);
 			results->add_item_line(std::to_string(element.second));
+
+			ss.str(std::string());
+			ss << std::fixed << std::setprecision(2) << (100.0 * element.second / count);
+			results->add_item_line(ss.str());
+
 			results->new_line();
 		}
 		results->render(std::cout);
