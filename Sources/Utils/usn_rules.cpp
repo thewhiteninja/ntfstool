@@ -22,9 +22,9 @@ USNRules::USNRules(std::string filename)
 			{
 				try
 				{
+					hy_rule++;
 					auto r = std::make_shared<USNRule>(rule);
 					_rules.push_back(r);
-					hy_rule++;
 				}
 				catch (std::invalid_argument& ex)
 				{
@@ -60,14 +60,6 @@ USNRule::USNRule(nlohmann::json j)
 	{
 		throw std::invalid_argument("missing id");
 	}
-	if (j.contains("author"))
-	{
-		_author = j["author"];
-	}
-	else
-	{
-		throw std::invalid_argument("missing author");
-	}
 	if (j.contains("description"))
 	{
 		_description = j["description"];
@@ -75,22 +67,6 @@ USNRule::USNRule(nlohmann::json j)
 	else
 	{
 		throw std::invalid_argument("missing description");
-	}
-	if (j.contains("status"))
-	{
-		_status = j["status"];
-	}
-	else
-	{
-		throw std::invalid_argument("missing status");
-	}
-	if (j.contains("type"))
-	{
-		_type = j["type"];
-	}
-	else
-	{
-		throw std::invalid_argument("missing type");
 	}
 	if (j.contains("severity"))
 	{

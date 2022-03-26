@@ -17,10 +17,8 @@ class USNRule
 {
 private:
 	std::string _id;
-	std::string _author;
 	std::string _description;
 	std::string _status;
-	std::string _type;
 	std::string _severity;
 
 	std::map<std::string, std::any> _a_rules;
@@ -29,10 +27,8 @@ public:
 	explicit USNRule(nlohmann::json j);
 
 	std::string id() { return _id; };
-	std::string author() { return _author; };
 	std::string description() { return _description; };
 	std::string status() { return _status; };
-	std::string type() { return _type; };
 	std::string severity() { return _severity; };
 
 	bool match(std::string filename, PUSN_RECORD_V2 usn);
