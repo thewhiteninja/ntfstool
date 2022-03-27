@@ -21,7 +21,128 @@
 #include <Utils/usn_stats.h>
 
 
-void process_usn(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFile> ffile, std::shared_ptr<USNRules> usn_rules, std::map<std::string, ULONG64>& matches, std::shared_ptr<USNStats> usn_stats, bool full_mode)
+void process_usn_offline(std::shared_ptr<Buffer<PBYTE>> filebuf, std::string from_file, std::shared_ptr<FormatteddFile> output_file, std::shared_ptr<USNRules> usn_rules, std::map<std::string, ULONG64>& matches, std::shared_ptr<USNStats> usn_stats, bool full_mode)
+{
+	std::cout << "[-] Mode: " << (full_mode ? "full" : "fast") << std::endl;
+	if (full_mode)
+	{
+		std::cout << "[-] Full mode is disabled for usn dump";
+		full_mode = false;
+	}
+
+	std::cout << "[+] Opening " << from_file << std::endl;
+
+	ULONG64 total_size = filebuf->size();
+	ULONG64 filled_size = 0;
+
+	std::cout << "[-] USN dump filesize: " << utils::format::size(total_size) << std::endl;
+	ULONG64 processed_size = 0;
+	ULONG64 processed_count = 0;
+	ULONG64 matches_count = 0;
+	DWORD cluster_size = 4096;
+	Buffer<PBYTE> clusterBuf((DWORD64)2 * cluster_size);
+
+	for (auto& block : filebuf->process_data(cluster_size))
+	{
+		processed_size += block.second;
+
+		std::cout << "\r[+] Processing USN records: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches_count << " matches     ";
+
+		if (filled_size)
+		{
+			break;
+		}
+
+		memcpy(clusterBuf.data() + filled_size, block.first, block.second);
+		filled_size += block.second;
+
+		PUSN_RECORD_COMMON_HEADER header = (PUSN_RECORD_COMMON_HEADER)clusterBuf.data();
+		while ((filled_size > 0) && (header->RecordLength <= filled_size))
+		{
+			switch (header->MajorVersion)
+			{
+			case 0:
+			{
+				DWORD i = 0;
+				while ((i < filled_size) && (POINTER_ADD(PWORD, header, i)[0] == 0))
+				{
+					i += 2;
+				}
+				header = POINTER_ADD(PUSN_RECORD_COMMON_HEADER, header, i);
+				filled_size -= i;
+				break;
+			}
+			case 2:
+			{
+				PUSN_RECORD_V2 usn_record = (PUSN_RECORD_V2)header;
+				std::wstring wfilename = std::wstring(usn_record->FileName);
+				wfilename.resize(usn_record->FileNameLength / sizeof(WCHAR));
+				std::string filename = utils::strings::to_utf8(wfilename);
+
+				usn_stats->add_record(filename, usn_record);
+
+				std::vector<std::string> matched_rules;
+				for (auto& rule : usn_rules->rules())
+				{
+					if (rule->match(filename, usn_record))
+					{
+						matched_rules.push_back(rule->id());
+						matches_count++;
+						if (matches.find(rule->id()) != matches.end())
+						{
+							matches[rule->id()] += 1;
+						}
+						else
+						{
+							matches[rule->id()] = 1;
+						}
+					}
+				}
+				if (!matched_rules.empty())
+				{
+					output_file->add_item(usn_record->MajorVersion);
+					output_file->add_item(usn_record->MinorVersion);
+					output_file->add_item(usn_record->FileReferenceNumber & 0xffffffffffff);
+					output_file->add_item(usn_record->FileReferenceNumber >> 48);
+					output_file->add_item(usn_record->ParentFileReferenceNumber & 0xffffffffffff);
+					output_file->add_item(usn_record->ParentFileReferenceNumber >> 48);
+					output_file->add_item(usn_record->Usn);
+
+					SYSTEMTIME st = { 0 };
+					utils::times::ull_to_local_systemtime(usn_record->TimeStamp.QuadPart, &st);
+					output_file->add_item(utils::times::display_systemtime(st));
+					output_file->add_item(constants::disk::usn::reasons(usn_record->Reason));
+					output_file->add_item((usn_record->SourceInfo));
+					output_file->add_item((usn_record->SecurityId));
+					output_file->add_item(constants::disk::usn::fileattributes(usn_record->FileAttributes));
+
+					output_file->add_item(utils::strings::to_utf8(wfilename));
+
+					output_file->add_item(utils::strings::join_vec(matched_rules, "|"));
+
+					output_file->new_line();
+				}
+
+				processed_count++;
+
+				filled_size -= usn_record->RecordLength;
+				header = POINTER_ADD(PUSN_RECORD_COMMON_HEADER, header, usn_record->RecordLength);
+				break;
+			}
+			default:
+				return;
+			}
+		}
+
+		if (filled_size <= clusterBuf.size())
+		{
+			memcpy(clusterBuf.data(), header, (size_t)filled_size);
+		}
+	}
+	std::cout << "\r[+] Processing USN records: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches_count << " matches     ";
+}
+
+void process_usn_live(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFile> ffile, std::shared_ptr<USNRules> usn_rules, std::map<std::string, ULONG64>& matches, std::shared_ptr<USNStats> usn_stats, bool full_mode)
 {
 	std::cout << "[-] Mode: " << (full_mode ? "full" : "fast") << std::endl;
 	std::shared_ptr<PathFinder> path_finder = nullptr;
@@ -62,6 +183,11 @@ void process_usn(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFile> ff
 
 		std::cout << "\r[+] Processing USN records: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches_count << " matches     ";
 
+		if (filled_size)
+		{
+			break;
+		}
+
 		memcpy(clusterBuf.data() + filled_size, block.first, block.second);
 		filled_size += block.second;
 
@@ -73,7 +199,10 @@ void process_usn(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFile> ff
 			case 0:
 			{
 				DWORD i = 0;
-				while ((i < filled_size) && (((PBYTE)header)[i] == 0)) i++;
+				while ((i < filled_size) && (POINTER_ADD(PWORD, header, i)[0] == 0))
+				{
+					i += 2;
+				}
 				header = POINTER_ADD(PUSN_RECORD_COMMON_HEADER, header, i);
 				filled_size -= i;
 				break;
@@ -147,7 +276,10 @@ void process_usn(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFile> ff
 			}
 		}
 
-		memcpy(clusterBuf.data(), header, (size_t)filled_size);
+		if (filled_size <= clusterBuf.size())
+		{
+			memcpy(clusterBuf.data(), header, (size_t)filled_size);
+		}
 	}
 	std::cout << "\r[+] Processing USN records: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ") - " << matches_count << " matches     ";
 }
@@ -158,11 +290,17 @@ std::shared_ptr<USNRules> load_rules(std::shared_ptr<Options> opts)
 	return std::make_shared<USNRules>(opts->rules);
 }
 
-int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
+int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Buffer<PBYTE>> filebuf, std::shared_ptr<Options> opts)
 {
-	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
-
-	utils::ui::title("Analyze USN journal for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	if (disk == nullptr && vol == nullptr)
+	{
+		utils::ui::title("Analyze USN journal for " + opts->from);
+	}
+	else
+	{
+		if (!commands::helpers::is_ntfs(disk, vol)) return 1;
+		utils::ui::title("Analyze USN journal for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	}
 
 	std::shared_ptr<USNRules> usn_rules = load_rules(opts);
 	if (usn_rules && usn_rules->size() > 0)
@@ -177,9 +315,9 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 
 	std::cout << "[+] Creating " << opts->output << std::endl;
 
-	std::shared_ptr<FormatteddFile> ffile = std::make_shared<CSVFile>(opts->output);
+	std::shared_ptr<FormatteddFile> output_file = std::make_shared<CSVFile>(opts->output);
 
-	ffile->set_columns(
+	output_file->set_columns(
 		{
 		"MajorVersion",
 		"MinorVersion",
@@ -201,7 +339,14 @@ int analyze_usn_journal(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 	std::map<std::string, ULONG64> matches;
 	std::shared_ptr<USNStats> usn_stats = std::make_shared<USNStats>();
 
-	process_usn(vol, ffile, usn_rules, matches, usn_stats, opts->mode == "full");
+	if (filebuf != nullptr)
+	{
+		process_usn_offline(filebuf, opts->from, output_file, usn_rules, matches, usn_stats, opts->mode == "full");
+	}
+	else
+	{
+		process_usn_live(vol, output_file, usn_rules, matches, usn_stats, opts->mode == "full");
+	}
 
 	std::cout << std::endl << "[+] Closing volume" << std::endl;
 
@@ -294,42 +439,57 @@ namespace commands
 			{
 				std::ios_base::fmtflags flag_backup(std::cout.flags());
 
-				std::shared_ptr<Disk> disk = get_disk(opts);
-				if (disk != nullptr)
+				if (opts->output != "")
 				{
-					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
-					if (volume != nullptr)
+					if (opts->rules != "")
 					{
-						if (opts->output != "")
+						if (opts->mode != "full" && opts->mode != "fast")
 						{
-							if (opts->rules != "")
-							{
-								if (opts->mode != "full" && opts->mode != "fast")
-								{
-									opts->mode = "fast";
-								}
-								analyze_usn_journal(disk, volume, opts);
-							}
-							else
-							{
-								invalid_option(opts, "rules", opts->rules);
-							}
-						}
-						else
-						{
-							invalid_option(opts, "output", opts->output);
+							opts->mode = "fast";
 						}
 					}
 					else
 					{
-						invalid_option(opts, "volume", opts->volume);
+						invalid_option(opts, "rules", opts->rules);
 					}
 				}
 				else
 				{
-					invalid_option(opts, "disk", opts->disk);
+					invalid_option(opts, "output", opts->output);
 				}
 
+				if (opts->from != "")
+				{
+					std::shared_ptr<Buffer<PBYTE>> filebuf = Buffer<PBYTE>::from_file(utils::strings::from_string(opts->from));
+					if (filebuf != nullptr)
+					{
+						analyze_usn_journal(nullptr, nullptr, filebuf, opts);
+					}
+					else
+					{
+						invalid_option(opts, "from", opts->from);
+					}
+				}
+				else
+				{
+					std::shared_ptr<Disk> disk = get_disk(opts);
+					if (disk != nullptr)
+					{
+						std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
+						if (volume != nullptr)
+						{
+							analyze_usn_journal(disk, volume, nullptr, opts);
+						}
+						else
+						{
+							invalid_option(opts, "volume", opts->volume);
+						}
+					}
+					else
+					{
+						invalid_option(opts, "disk", opts->disk);
+					}
+				}
 				std::cout.flags(flag_backup);
 				return 0;
 			}

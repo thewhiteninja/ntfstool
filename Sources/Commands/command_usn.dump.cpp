@@ -34,6 +34,11 @@ void process_usn(std::shared_ptr<NTFSExplorer> explorer, std::shared_ptr<MFTReco
 
 		std::cout << "\r[+] Processing USN records: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ")     ";
 
+		if (filled_size)
+		{
+			break;
+		}
+
 		memcpy(clusterBuf.data() + filled_size, block.first, block.second);
 		filled_size += block.second;
 
@@ -45,7 +50,10 @@ void process_usn(std::shared_ptr<NTFSExplorer> explorer, std::shared_ptr<MFTReco
 			case 0:
 			{
 				DWORD i = 0;
-				while ((i < filled_size) && (((PBYTE)header)[i] == 0)) i++;
+				while ((i < filled_size) && (POINTER_ADD(PWORD, header, i)[0] == 0))
+				{
+					i += 2;
+				}
 				header = POINTER_ADD(PUSN_RECORD_COMMON_HEADER, header, i);
 				filled_size -= i;
 				break;
@@ -93,7 +101,10 @@ void process_usn(std::shared_ptr<NTFSExplorer> explorer, std::shared_ptr<MFTReco
 			}
 		}
 
-		memcpy(clusterBuf.data(), header, (size_t)filled_size);
+		if (filled_size <= clusterBuf.size())
+		{
+			memcpy(clusterBuf.data(), header, (size_t)filled_size);
+		}
 	}
 	std::cout << "\r[+] Processing USN records: " << std::to_string(processed_count) << " (" << utils::format::size(processed_size) << ")     ";
 }
