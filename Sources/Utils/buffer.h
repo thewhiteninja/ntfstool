@@ -5,8 +5,9 @@
 #include <Intsafe.h>
 
 #include <memory>
-
 #include <string>
+
+#include <cppcoro/generator.hpp>
 
 template< typename T>
 class Buffer
@@ -104,6 +105,14 @@ public:
 		if (_mem != NULL)
 		{
 			_size = size;
+		}
+	}
+
+	cppcoro::generator<std::pair<PBYTE, DWORD>> process_data(DWORD block_size)
+	{
+		for (DWORD64 offset = 0; offset < _size; offset += block_size)
+		{
+			co_yield std::pair<PBYTE, DWORD>(reinterpret_cast<PBYTE>(_mem) + offset, static_cast<DWORD>(min(_size - offset, block_size)));
 		}
 	}
 
