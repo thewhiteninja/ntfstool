@@ -153,21 +153,20 @@ void process_usn_live(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFil
 	}
 
 	std::cout << "[+] Opening " << vol->name() << std::endl;
-
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
 	std::cout << "[+] Searching for $Extend\\$UsnJrnl" << std::endl;
 
 	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_path("\\$Extend\\$UsnJrnl");
-
 	if (record == nullptr)
 	{
 		std::cout << "[!] Not found" << std::endl;
+		return;
 	}
 
 	std::cout << "[-] Found in file record: " << std::to_string(record->header()->MFTRecordIndex) << std::endl;
 
-	Buffer<PBYTE> clusterBuf((DWORD64)2 * 1024 * 1024);
+
 	ULONG64 total_size = record->datasize(MFT_ATTRIBUTE_DATA_USN_NAME, true);
 	ULONG64 filled_size = 0;
 
@@ -176,6 +175,7 @@ void process_usn_live(std::shared_ptr<Volume> vol, std::shared_ptr<FormatteddFil
 	ULONG64 processed_count = 0;
 	ULONG64 matches_count = 0;
 	DWORD cluster_size = explorer->reader()->sizes.cluster_size;
+	Buffer<PBYTE> clusterBuf((DWORD64)2 * cluster_size);
 
 	for (auto& block : record->process_data(MFT_ATTRIBUTE_DATA_USN_NAME, cluster_size, true))
 	{
