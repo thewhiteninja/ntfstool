@@ -655,7 +655,7 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::_process_data_raw(std::st
 
 cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string stream_name, DWORD block_size, bool skip_sparse)
 {
-	ULONG64 final_datasize = datasize("", true);
+	ULONG64 final_datasize = datasize(stream_name, true);
 	bool check_size = final_datasize != 0; // ex: no real size for usn
 
 	for (auto& block : _process_data_raw(stream_name, block_size, skip_sparse))

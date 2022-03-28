@@ -4,7 +4,13 @@
 
 std::string CSVFile::_escape(std::string s)
 {
-	return std::regex_replace(s, std::regex("\""), "\"\"");
+	std::stringstream ss;
+	for (auto& c : s)
+	{
+		if (c == '\\') ss << c;
+		ss << c;
+	}
+	return ss.str();
 }
 
 CSVFile::CSVFile(std::string filename, std::string separator)
