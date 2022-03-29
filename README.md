@@ -1362,9 +1362,9 @@ Current third-party libs:
 
 ### USN-analyze
 <table>
-	<tr><td>From dump : usn.analyze from=usn_dump rules=d:\rules.json output=usn.csv format=csv</td></tr>
+	<tr><td>From dump : usn.analyze from=usn_dump rules=d:\rules.json output=d:\usn_analyze_results.csv format=csv</td></tr>
 	<tr></tr>
-	<tr><td>From running system : usn.analyze disk=4 volume=1 rules=d:\rules.json output=usn.csv format=csv</td></tr>
+	<tr><td>From running system : usn.analyze disk=4 volume=1 rules=d:\rules.json output=d:\usn_analyze_results.csv format=csv</td></tr>
 <tr><td>
 
     [+] Opening \\?\Volume{498eed94-0000-0000-007e-000000000000}\
