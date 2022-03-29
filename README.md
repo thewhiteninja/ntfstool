@@ -4,7 +4,7 @@
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-brightgreen.svg?tyle=flat-square)](#)
 [![x64](https://img.shields.io/badge/Windows-64_bit-0078d7.svg)](#)
 [![x86](https://img.shields.io/badge/Windows-32_bit-0078d7.svg)](#)
-[![v1.5](https://img.shields.io/badge/Version-1.6-ff5733.svg)](#)
+[![v1.6](https://img.shields.io/badge/Version-1.6-ff5733.svg)](#)
 [![Build](https://ci.appveyor.com/api/projects/status/a3cn5dpdv146tdji?svg=true)](https://ci.appveyor.com/project/thewhiteninja/ntfstool)
 
 <img align="right" width="100" height="100" src="https://cdn-icons-png.flaticon.com/512/3850/3850133.png">
