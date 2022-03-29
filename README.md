@@ -1394,7 +1394,7 @@ Current third-party libs:
         | Index | Rule ID           | Count |    % |
         +------------------------------------------+
         | 0     | executable-create |     9 | 4.69 |
-	| 0     | ccleaner          |     1 | 0.52 |
+        | 0     | ccleaner          |     1 | 0.52 |
         +------------------------------------------+
 </td></tr>
 </table>
