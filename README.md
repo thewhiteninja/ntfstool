@@ -1367,23 +1367,35 @@ Current third-party libs:
 	<tr><td>From running system : usn.analyze disk=4 volume=1 rules=d:\rules.json output=d:\usn_analyze_results.csv format=csv</td></tr>
 <tr><td>
 
+
+    [+] Loading rules from: d:\rules.json
+    [-] 4 rules loaded
+    [+] Creating d:\usn_analyze_results.csv
+    [-] Mode: fast
     [+] Opening \\?\Volume{498eed94-0000-0000-007e-000000000000}\
     [+] Searching for $Extend\$UsnJrnl
-    [-] Found in file record: 396
-    [-] $J stream size: 171.74 KiBs (maybe sparse)
-    [+] Loading rules from: d:\rules.json
-    [-] 1 rules loaded
-    [+] Creating d:\usn_analyze_results.csv
-    [-] Processing entry: 1418 (512.00 KiBs) - 105 matches
+    [-] Found in file record: 116
+    [-] $J stream size: 31.70 KiBs (could be sparse)
+    [+] Processing USN records: 192 (31.70 KiBs) - 9 matches
     [+] Closing volume
-    [+] Results:
-        +-----------------------------------+
-        | Index | Rule ID           | Count |
-        +-----------------------------------+
-        | 0     | deleted_documents | 102   |
-        +-----------------------------------+
-        | 0     | ccleaner          | 3     |
-        +-----------------------------------+
+    [+] Summary:
+        +------------------------------------------------------+
+        | Index | Category      |               Value |      % |
+        +------------------------------------------------------+
+        | 0     | file creation |                 125 |  65.10 |
+        | 1     | file deletion |                   0 |   0.00 |
+        | 2     | file rename   |                   8 |   4.17 |
+        | 3     | latest        | 2022-03-28 23:23:12 |        |
+        | 4     | oldest        | 2022-03-28 13:20:08 |        |
+        | 5     | records count |                 192 | 100.00 |
+        +------------------------------------------------------+
+    [+] Rules results:
+        +------------------------------------------+
+        | Index | Rule ID           | Count |    % |
+        +------------------------------------------+
+        | 0     | executable-create |     9 | 4.69 |
+	| 0     | ccleaner          |     1 | 0.52 |
+        +------------------------------------------+
 </td></tr>
 </table>
 
