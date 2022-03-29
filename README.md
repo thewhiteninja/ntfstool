@@ -4,7 +4,7 @@
 [![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-brightgreen.svg?tyle=flat-square)](#)
 [![x64](https://img.shields.io/badge/Windows-64_bit-0078d7.svg)](#)
 [![x86](https://img.shields.io/badge/Windows-32_bit-0078d7.svg)](#)
-[![v1.5](https://img.shields.io/badge/Version-1.5-ff5733.svg)](#)
+[![v1.5](https://img.shields.io/badge/Version-1.6-ff5733.svg)](#)
 [![Build](https://ci.appveyor.com/api/projects/status/a3cn5dpdv146tdji?svg=true)](https://ci.appveyor.com/project/thewhiteninja/ntfstool)
 
 <img align="right" width="100" height="100" src="https://cdn-icons-png.flaticon.com/512/3850/3850133.png">
@@ -12,7 +12,7 @@
 <br />
 
 NTFSTool is a forensic tool focused on [NTFS][10] volumes.
-It supports reading partition info (mbr, partition table, vbr) but also information on master file table, Bitlocker encrypted volume, EFS encrypted files and more.
+It supports reading partition info (MBR, partition table, VBR) but also information on Master File Table, Bitlocker encrypted volume, EFS encrypted files, USN journal and more.
 
 Download the latest binaries on [AppVeyor](https://ci.appveyor.com/project/thewhiteninja/ntfstool).
 
@@ -23,8 +23,8 @@ See below for some [examples](#examples) of the features!
 
 ### Forensics
 
-NTFSTool displays the complete structure of master boot record, volume boot record, partition table and [MFT][8] file record.
-It is also possible to dump any file (even $mft or [SAM][9]) or parse [USN journal][6], [LogFile][7] including streams from Alternate Data Stream ([ADS][5]).
+NTFSTool displays the complete structure of master boot record, volume boot record, partition table and [$MFT][8] file record.
+It is also possible to dump any file (even $MFT or [SAM][9]) or parse and analyze [USN journal][6], [LogFile][7] including streams from Alternate Data Stream ([ADS][5]). $MFT can be dumped as csv or json with [Zone.Identifier][13] parsing to quickly identify downloaded files.
 The undelete command will search for any file record marked as "not in use" and allow you to retrieve the file (or part of the file if it was already rewritten).
 It support input from image file, live disk or virtual like [VeraCrypt][11] and [TrueCrypt][12], but you can also use tools like [OSFMount][3] to mount your disk image.
 Sparse and compressed files (lznt1, xpress) are also supported. 
@@ -38,6 +38,7 @@ Sparse and compressed files (lznt1, xpress) are also supported.
 [10]: https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc781134(v=ws.10)?redirectedfrom=MSDN
 [11]: https://www.veracrypt.fr/en/Home.html
 [12]: http://truecrypt.sourceforge.net/
+[13]: https://www.digital-detective.net/forensic-analysis-of-zone-identifier-stream/
 
 ### Bitlocker support
 
@@ -58,6 +59,23 @@ Or you can use the `efs.decrypt` command to decrypt a file using the backed-up k
 More information on [Mimikatz Wiki][4] 
 
 [4]: https://github.com/gentilkiwi/mimikatz/wiki/howto-~-decrypt-EFS-files#installing-the-pfx
+
+### USN Journal analysis
+
+USN journal records can be analyzed using custom rules to detect suspicious programs and actions but also to have an overview of the journal (% of file deleted, created ...)
+
+Example of rules: [Rules/default.json](Rules/default.json)
+
+```
+  {
+    "id": "ccleaner",
+    "description": "CCleaner is a disk cleanup tool for temporary junk files, web history, logs and even wiping the disk.",
+    "severity": "high",
+    "rule": {
+      "filename": "(.*)ccleaner\\.exe(-([A-F0-9]{8}).pf)?"
+    }
+  }
+```
 
 ### Shell
 
