@@ -1287,7 +1287,7 @@ Current third-party libs:
 </table>
 
 
-### reparse
+### Reparse
 <table>
 <tr><td>reparse disk=0 volume=4</td></tr>
 <tr><td>
@@ -1329,7 +1329,7 @@ Current third-party libs:
 </table>
 
 
-### logfile-dump
+### Logfile-dump
 <table>
 <tr><td>logfile.dump disk=4 volume=1 output=logfile.csv format=csv</td></tr>
 <tr><td>
@@ -1360,33 +1360,35 @@ Current third-party libs:
 </table>
 
 
-### usn-analyze
+### USN-analyze
 <table>
-<tr><td>usn.analyze disk=4 volume=1 rules=d:\rules.json output=usn.csv format=csv</td></tr>
+	<tr><td>From dump : usn.analyze from=usn_dump rules=d:\rules.json output=usn.csv format=csv</td></tr>
+	<tr></tr>
+	<tr><td>From running system : usn.analyze disk=4 volume=1 rules=d:\rules.json output=usn.csv format=csv</td></tr>
 <tr><td>
 
-	[+] Opening \\?\Volume{498eed94-0000-0000-007e-000000000000}\
-	[+] Searching for $Extend\$UsnJrnl
-	[-] Found in file record: 396
-	[-] $J stream size: 171.74 KiBs (maybe sparse)
-	[+] Loading rules from: d:\rules.json
-	[-] 1 rules loaded
-	[+] Creating d:\usn_analyze_results.csv
-	[-] Processing entry: 1418 (512.00 KiBs) - 105 matches
-	[+] Closing volume
-	[+] Results:
-	    +-----------------------------------+
-	    | Index | Rule ID           | Count |
-	    +-----------------------------------+
-	    | 0     | deleted_documents | 102   |
-	    +-----------------------------------+
-	    | 0     | ccleaner          | 3     |
-	    +-----------------------------------+
+    [+] Opening \\?\Volume{498eed94-0000-0000-007e-000000000000}\
+    [+] Searching for $Extend\$UsnJrnl
+    [-] Found in file record: 396
+    [-] $J stream size: 171.74 KiBs (maybe sparse)
+    [+] Loading rules from: d:\rules.json
+    [-] 1 rules loaded
+    [+] Creating d:\usn_analyze_results.csv
+    [-] Processing entry: 1418 (512.00 KiBs) - 105 matches
+    [+] Closing volume
+    [+] Results:
+        +-----------------------------------+
+        | Index | Rule ID           | Count |
+        +-----------------------------------+
+        | 0     | deleted_documents | 102   |
+        +-----------------------------------+
+        | 0     | ccleaner          | 3     |
+        +-----------------------------------+
 </td></tr>
 </table>
 
 
-### usn-dump
+### USN-dump
 <table>
 <tr><td>usn.dump disk=4 volume=1 output=usn.csv format=csv</td></tr>
 <tr><td>
@@ -1417,7 +1419,7 @@ Current third-party libs:
 
 
 
-### shadow
+### Shadow
 <table>
 <tr><td>shadow disk=0 volume=4</td></tr>
 <tr><td>
@@ -1451,7 +1453,7 @@ Current third-party libs:
 </td></tr>
 </table>
 
-### streams
+### Streams
 <table>
 <tr><td>streams disk=0 volume=4 from=c:\test.pdf</td></tr>
 <tr><td>
@@ -1468,7 +1470,7 @@ Current third-party libs:
 </td></tr>
 </table>
 
-### undelete
+### Undelete
 <table>
 <tr><td>undelete disk=4 volume=1</td></tr>
 <tr><td>
@@ -1505,7 +1507,7 @@ Current third-party libs:
 </table>
 
 
-### shell
+### Shell
 <table>
 <tr><td>shell disk=4 volume=1</td></tr>
 <tr><td>
@@ -1559,7 +1561,7 @@ Current third-party libs:
 </table>
 
 
-### smart
+### SMART
 <table>
 <tr><td>smart disk=1</td></tr>
 <tr><td>
