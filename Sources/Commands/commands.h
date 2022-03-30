@@ -82,7 +82,18 @@ namespace commands {
 
 	namespace usn
 	{
-		int dispatch(std::shared_ptr<Options> opts);
+		void load_mft(std::shared_ptr<NTFSExplorer> explorer, std::unordered_map<DWORD64, DWORD64>& map_parent, std::unordered_map<DWORD64, std::string>& map_name);
+
+		std::string get_file_path(std::unordered_map<DWORD64, DWORD64>& map_parent, std::unordered_map<DWORD64, std::string>& map_name, DWORD64 parent_inode, std::string filename);
+
+		namespace dump
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
+		namespace analyze
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
 	}
 
 	namespace extract
@@ -107,6 +118,11 @@ namespace commands {
 			int dispatch(std::shared_ptr<Options> opts);
 		}
 
+		namespace dump
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
+
 		namespace btree
 		{
 			int dispatch(std::shared_ptr<Options> opts);
@@ -119,19 +135,20 @@ namespace commands {
 		int print_mft_info_details(std::shared_ptr<MFTRecord> record, ULONG32 cluster_size);
 	}
 
-	namespace fve
-	{
-		int dispatch(std::shared_ptr<Options> opts);
-	}
-
 	namespace bitlocker
 	{
-		int dispatch(std::shared_ptr<Options> opts);
-	}
-
-	namespace bitdecrypt
-	{
-		int dispatch(std::shared_ptr<Options> opts);
+		namespace info
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
+		namespace decrypt
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
+		namespace fve
+		{
+			int dispatch(std::shared_ptr<Options> opts);
+		}
 	}
 
 	namespace help

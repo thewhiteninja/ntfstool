@@ -106,7 +106,7 @@ void print_hardware_disk(std::shared_ptr<Disk> disk) {
 		}
 
 		partitions->add_item_line(volume->label());
-		partitions->add_item_line(utils::strings::join(volume->mountpoints(), ", "));
+		partitions->add_item_line(utils::strings::join_vec(volume->mountpoints(), ", "));
 		partitions->add_item_line(volume->filesystem());
 		partitions->add_item_line(utils::format::hex(volume->offset()));
 		partitions->add_item_line(utils::format::hex(volume->size()) + " (" + utils::format::size(volume->size()) + ")");
@@ -227,7 +227,7 @@ void print_image_disk(std::shared_ptr<Disk> disk) {
 }
 
 void print_hardware_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
-	utils::ui::title("Info for PhysicalDrive:" + std::to_string(disk->index()) + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Info for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	if (vol->serial_number())
 	{
@@ -258,7 +258,7 @@ void print_hardware_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> v
 	std::cout << "    Mounted        : " << (vol->is_mounted() ? "True" : "False");
 	if (vol->is_mounted())
 	{
-		std::cout << " (" << utils::strings::join(vol->mountpoints(), ", ") << ")";
+		std::cout << " (" << utils::strings::join_vec(vol->mountpoints(), ", ") << ")";
 	}
 	std::cout << std::endl;
 	std::cout << "    Bitlocker      : " << (vol->bitlocker().bitlocked ? "True" : "False");

@@ -9,8 +9,7 @@ int show_certificate(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 {
 	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
-	std::cout << std::setfill('0');
-	utils::ui::title("Display certificate from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Display certificate for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
@@ -137,8 +136,7 @@ int list_certificates(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, s
 {
 	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
-	std::cout << std::setfill('0');
-	utils::ui::title("List certificates from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("List certificates for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 

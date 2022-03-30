@@ -31,7 +31,7 @@ int print_btree_info(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, st
 		return 3;
 	}
 
-	utils::ui::title("B-tree index (inode:" + std::to_string(record->header()->MFTRecordIndex) + ") from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("B-tree index (inode:" + std::to_string(record->header()->MFTRecordIndex) + ") for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::shared_ptr<utils::ui::Table> fr_attributes = std::make_shared<utils::ui::Table>();
 	fr_attributes->set_interline(true);

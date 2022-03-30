@@ -57,11 +57,18 @@
     <ClInclude Include="Sources\Utils\buffer.h" />
     <ClInclude Include="Sources\Utils\constant_names.h" />
     <ClInclude Include="Sources\Utils\crash_handler.h" />
+    <ClInclude Include="Sources\Utils\csv_file.h" />
+    <ClInclude Include="Sources\Utils\formatted_file.h" />
     <ClInclude Include="Sources\Utils\index_details.h" />
+    <ClInclude Include="Sources\Utils\json_file.h" />
+    <ClInclude Include="Sources\Utils\path_finder.h" />
     <ClInclude Include="Sources\Utils\progress_bar.h" />
     <ClInclude Include="Sources\Utils\table.h" />
     <ClInclude Include="Sources\Utils\btree.h" />
+    <ClInclude Include="Sources\Utils\usn_rules.h" />
+    <ClInclude Include="Sources\Utils\usn_stats.h" />
     <ClInclude Include="Sources\Utils\utils.h" />
+    <ClInclude Include="Sources\Utils\zone_identifier.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Bitlocker\bek.cpp" />
@@ -70,26 +77,28 @@
     <ClCompile Include="Sources\Bitlocker\password.cpp" />
     <ClCompile Include="Sources\Bitlocker\recovery.cpp" />
     <ClCompile Include="Sources\Commands\commands.cpp" />
-    <ClCompile Include="Sources\Commands\command_bitdecrypt.cpp" />
-    <ClCompile Include="Sources\Commands\command_bitlocker.cpp" />
-    <ClCompile Include="Sources\Commands\command_btree.cpp" />
-    <ClCompile Include="Sources\Commands\command_efs_backup.cpp" />
-    <ClCompile Include="Sources\Commands\command_efs_certificate.cpp" />
-    <ClCompile Include="Sources\Commands\command_efs_decrypt.cpp" />
-    <ClCompile Include="Sources\Commands\command_efs_key.cpp" />
-    <ClCompile Include="Sources\Commands\command_efs_masterkey.cpp" />
+    <ClCompile Include="Sources\Commands\command_bitlocker.decrypt.cpp" />
+    <ClCompile Include="Sources\Commands\command_bitlocker.info.cpp" />
+    <ClCompile Include="Sources\Commands\command_mft.btree.cpp" />
+    <ClCompile Include="Sources\Commands\command_efs.backup.cpp" />
+    <ClCompile Include="Sources\Commands\command_efs.certificate.cpp" />
+    <ClCompile Include="Sources\Commands\command_efs.decrypt.cpp" />
+    <ClCompile Include="Sources\Commands\command_efs.key.cpp" />
+    <ClCompile Include="Sources\Commands\command_efs.masterkey.cpp" />
     <ClCompile Include="Sources\Commands\command_extract.cpp" />
     <ClCompile Include="Sources\Commands\command_image.cpp" />
-    <ClCompile Include="Sources\Commands\command_logfile.cpp" />
+    <ClCompile Include="Sources\Commands\command_logfile.dump.cpp" />
+    <ClCompile Include="Sources\Commands\command_mft.dump.cpp" />
     <ClCompile Include="Sources\Commands\command_reparse.cpp" />
     <ClCompile Include="Sources\Commands\command_shadow.cpp" />
     <ClCompile Include="Sources\Commands\command_shell.cpp" />
-    <ClCompile Include="Sources\Commands\command_fve.cpp" />
-    <ClCompile Include="Sources\Commands\command_mft.cpp" />
+    <ClCompile Include="Sources\Commands\command_bitlocker.fve.cpp" />
+    <ClCompile Include="Sources\Commands\command_mft.record.cpp" />
     <ClCompile Include="Sources\Commands\command_smart.cpp" />
     <ClCompile Include="Sources\Commands\command_streams.cpp" />
     <ClCompile Include="Sources\Commands\command_undelete.cpp" />
-    <ClCompile Include="Sources\Commands\command_usn.cpp" />
+    <ClCompile Include="Sources\Commands\command_usn.analyze.cpp" />
+    <ClCompile Include="Sources\Commands\command_usn.dump.cpp" />
     <ClCompile Include="Sources\Commands\command_vbr.cpp" />
     <ClCompile Include="Sources\Commands\command_gpt.cpp" />
     <ClCompile Include="Sources\Commands\command_help.cpp" />
@@ -119,14 +128,20 @@
     <ClCompile Include="Sources\options.cpp" />
     <ClCompile Include="Sources\Utils\constant_names.cpp" />
     <ClCompile Include="Sources\Utils\crash_handler.cpp" />
+    <ClCompile Include="Sources\Utils\csv_file.cpp" />
     <ClCompile Include="Sources\Utils\index_details.cpp" />
+    <ClCompile Include="Sources\Utils\json_file.cpp" />
+    <ClCompile Include="Sources\Utils\path_finder.cpp" />
     <ClCompile Include="Sources\Utils\table.cpp" />
     <ClCompile Include="Sources\Utils\btree.cpp" />
+    <ClCompile Include="Sources\Utils\usn_rules.cpp" />
     <ClCompile Include="Sources\Utils\utils.cpp" />
+    <ClCompile Include="Sources\Utils\zone_identifier.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LICENSE" />
     <None Include="README.md" />
+    <None Include="Rules\default.json" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

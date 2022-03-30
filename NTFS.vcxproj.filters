@@ -58,6 +58,9 @@
     <Filter Include="Source Files\EFS">
       <UniqueIdentifier>{c3b20f0c-65ae-4b68-9e00-a7cd05c0b8c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rules">
+      <UniqueIdentifier>{b75428fc-74c9-4316-9e3f-8f3cca8bfd91}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\options.h">
@@ -189,6 +192,27 @@
     <ClInclude Include="Sources\Compression\lznt1.h">
       <Filter>Header Files\Compression</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Utils\zone_identifier.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\csv_file.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\formatted_file.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\json_file.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\usn_rules.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\path_finder.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\usn_stats.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -209,7 +233,7 @@
     <ClCompile Include="Sources\Commands\command_mbr.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_fve.cpp">
+    <ClCompile Include="Sources\Commands\command_bitlocker.fve.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Utils\table.cpp">
@@ -224,25 +248,25 @@
     <ClCompile Include="Sources\Commands\command_vbr.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_bitlocker.cpp">
+    <ClCompile Include="Sources\Commands\command_bitlocker.info.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_mft.cpp">
+    <ClCompile Include="Sources\Commands\command_mft.record.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_usn.cpp">
+    <ClCompile Include="Sources\Commands\command_usn.dump.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_shell.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_logfile.cpp">
+    <ClCompile Include="Sources\Commands\command_logfile.dump.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Commands\command_undelete.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_bitdecrypt.cpp">
+    <ClCompile Include="Sources\Commands\command_bitlocker.decrypt.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\NTFS\ntfs_explorer.cpp">
@@ -311,16 +335,16 @@
     <ClCompile Include="Sources\Commands\command_streams.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_efs_masterkey.cpp">
+    <ClCompile Include="Sources\Commands\command_efs.masterkey.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\EFS\masterkey_file.cpp">
       <Filter>Source Files\EFS</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_btree.cpp">
+    <ClCompile Include="Sources\Commands\command_mft.btree.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_efs_key.cpp">
+    <ClCompile Include="Sources\Commands\command_efs.key.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\EFS\private_key_enc.cpp">
@@ -338,16 +362,16 @@
     <ClCompile Include="Sources\EFS\certificate_file.cpp">
       <Filter>Source Files\EFS</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_efs_backup.cpp">
+    <ClCompile Include="Sources\Commands\command_efs.backup.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Commands\commands.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_efs_certificate.cpp">
+    <ClCompile Include="Sources\Commands\command_efs.certificate.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Commands\command_efs_decrypt.cpp">
+    <ClCompile Include="Sources\Commands\command_efs.decrypt.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="Sources\EFS\pkcs12_archive.cpp">
@@ -368,6 +392,27 @@
     <ClCompile Include="Sources\Compression\lznt1.cpp">
       <Filter>Source Files\Compression</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Commands\command_mft.dump.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\zone_identifier.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\csv_file.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\json_file.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Commands\command_usn.analyze.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\usn_rules.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\path_finder.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
@@ -375,6 +420,9 @@
     </None>
     <None Include="LICENSE">
       <Filter>Other files</Filter>
+    </None>
+    <None Include="Rules\default.json">
+      <Filter>Rules</Filter>
     </None>
   </ItemGroup>
 </Project>

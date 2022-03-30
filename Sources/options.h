@@ -14,6 +14,7 @@ public:
 	std::string from;
 	std::string output;
 	std::string format;
+	std::string rules;
 
 	std::string password;
 	std::string sid;
@@ -22,6 +23,7 @@ public:
 	std::string fvek;
 	std::string image;
 	std::string pfx;
+	std::string mode;
 
 	std::shared_ptr<Buffer<PBYTE>> masterkey = nullptr;
 
