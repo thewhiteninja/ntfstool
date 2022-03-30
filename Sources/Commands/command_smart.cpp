@@ -130,7 +130,7 @@ std::string read_string(PVOID buffer, DWORD len)
 
 void print_smart_data(std::shared_ptr<Disk> disk)
 {
-	utils::ui::title("SMART data from " + disk->name());
+	utils::ui::title("SMART data for " + disk->name());
 
 	HANDLE hDisk = CreateFileA(disk->name().c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_SYSTEM, 0);
 	if (hDisk != INVALID_HANDLE_VALUE)

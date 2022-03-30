@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <memory>
 
-#define VERSION "1.5"
+#define VERSION "1.6"
 
 void usage(const char* binname)
 {
@@ -17,29 +17,31 @@ void usage(const char* binname)
 	std::cerr << std::endl;
 	std::cerr << "Version: " << VERSION << " (Build date: " << __DATE__ << " " << __TIME__ << ")" << std::endl << std::endl;
 	std::cerr << "Commands:" << std::endl;
-	std::cerr << "  info            : list and display physical disks and volumes" << std::endl;
-	std::cerr << "  mbr             : display master boot record" << std::endl;
-	std::cerr << "  gpt             : display GUID partition table" << std::endl;
-	std::cerr << "  vbr             : display volume boot record" << std::endl;
-	std::cerr << "  mft.record      : display master file table" << std::endl;
-	std::cerr << "  mft.btree       : display index btree" << std::endl;
-	std::cerr << "  extract         : extract a file" << std::endl;
-	std::cerr << "  bitlocker       : display bitlocker GUID/status and test password, recovery or BEK file" << std::endl;
-	std::cerr << "  bitdecrypt      : decrypt volume to an image file" << std::endl;
-	std::cerr << "  fve             : display FVE metadata" << std::endl;
-	std::cerr << "  efs.backup      : Export EFS keys from a volume" << std::endl;
-	std::cerr << "  efs.decrypt     : Decrypt EFS encrypted file from backup key" << std::endl;
-	std::cerr << "  efs.certificate : list, display and export system certificates" << std::endl;
-	std::cerr << "  efs.key         : list, display, decrypt and export private keys" << std::endl;
-	std::cerr << "  efs.masterkey   : list, display and decrypt masterkeys" << std::endl;
-	std::cerr << "  logfile         : dump and parse log file" << std::endl;
-	std::cerr << "  usn             : dump and parse usn journal" << std::endl;
-	std::cerr << "  shadow          : list volume shadow copies" << std::endl;
-	std::cerr << "  reparse         : parse and display reparse points" << std::endl;
-	std::cerr << "  undelete        : find deleted files" << std::endl;
-	std::cerr << "  shell           : start a mini-shell" << std::endl;
-	std::cerr << "  smart           : display SMART data" << std::endl;
-	std::cerr << "  help            : display this message or command help" << std::endl;
+	std::cerr << "  info             : list and display physical disks and volumes" << std::endl;
+	std::cerr << "  mbr              : display master boot record" << std::endl;
+	std::cerr << "  gpt              : display GUID partition table" << std::endl;
+	std::cerr << "  vbr              : display volume boot record" << std::endl;
+	std::cerr << "  mft.btree        : display index btree" << std::endl;
+	std::cerr << "  mft.dump         : dump MFT (raw, csv, json)" << std::endl;
+	std::cerr << "  mft.record       : display master file table" << std::endl;
+	std::cerr << "  extract          : extract a file" << std::endl;
+	std::cerr << "  bitlocker.info   : display bitlocker GUID/status and test password, recovery or BEK file" << std::endl;
+	std::cerr << "  bitlocker.decrypt: decrypt volume to an image file" << std::endl;
+	std::cerr << "  bitlocker.fve    : display FVE metadata" << std::endl;
+	std::cerr << "  efs.backup       : Export EFS keys from a volume" << std::endl;
+	std::cerr << "  efs.decrypt      : Decrypt EFS encrypted file from backup key" << std::endl;
+	std::cerr << "  efs.certificate  : list, display and export system certificates" << std::endl;
+	std::cerr << "  efs.key          : list, display, decrypt and export private keys" << std::endl;
+	std::cerr << "  efs.masterkey    : list, display and decrypt masterkeys" << std::endl;
+	std::cerr << "  logfile.dump     : dump log file (raw, csv, json)" << std::endl;
+	std::cerr << "  usn.dump         : dump usn journal (raw, csv, json)" << std::endl;
+	std::cerr << "  usn.analyze      : analyze usn journal with specified rules (csv, json)" << std::endl;
+	std::cerr << "  shadow           : list volume shadow copies" << std::endl;
+	std::cerr << "  reparse          : parse and display reparse points" << std::endl;
+	std::cerr << "  undelete         : find deleted files" << std::endl;
+	std::cerr << "  shell            : start a mini-shell" << std::endl;
+	std::cerr << "  smart            : display SMART data" << std::endl;
+	std::cerr << "  help             : display this message or command help" << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "Need help for a command?" << std::endl;
 	std::cerr << "  help [command]" << std::endl;
@@ -122,47 +124,61 @@ void print_help_mft_btree(const char* name)
 	command_examples(name, "Display Index B-tree for disk 0, volume 2 and from \"c:\\file.bin\"", "mft.btree disk=0 volume=2 from \"c:\\file.bin\"");
 }
 
+void print_help_mft_dump(const char* name)
+{
+	command_header("mft.dump");
+	command_description(name, "mft.dump [disk id] [volume id] [output] (format)", "Dump $MFT for selected disk, volume and inode/path");
+	command_examples(name, "Dump raw $MFT for disk 0, volume 2 to a file", "mft.dump disk=0 volume=2 output=myvolume.mft");
+	command_examples(name, "Parse $MFT for disk 0, volume 2 and output results in a CSV file", "mft.dump disk=0 volume=2 output=my_mft.json format=json");
+}
+
 void print_help_bitlocker(const char* name)
 {
 	command_header("bitlocker");
-	command_description(name, "bitlocker [disk id] [volume id] (password | recovery | bek)", "Provides Bitlocker information for selected disk, volume");
-	command_examples(name, "Display Bitlocker information for disk 2, volume 4", "bitlocker disk=2 volume=4");
-	command_examples(name, "Test a password for encrypted for disk 2 and volume 4", "bitlocker disk=0 volume=2 password=123456");
-	command_examples(name, "Test a recovery key for encrypted for disk 2 and volume 4", "bitlocker disk=0 volume=2 recovery=123456-234567-345678-456789-567890-678901-789012-890123");
-	command_examples(name, "Test a BEK file for encrypted for disk 2 and volume 4", "bitlocker disk=0 volume=2 bek=H:\\3926293F-E661-4417-A36B-B41175B4D862.BEK");
+	command_description(name, "bitlocker.info [disk id] [volume id] (password | recovery | bek)", "Provides Bitlocker information for selected disk, volume");
+	command_examples(name, "Display Bitlocker information for disk 2, volume 4", "bitlocker.info disk=2 volume=4");
+	command_examples(name, "Test a password for encrypted for disk 2 and volume 4", "bitlocker.info disk=0 volume=2 password=123456");
+	command_examples(name, "Test a recovery key for encrypted for disk 2 and volume 4", "bitlocker.info disk=0 volume=2 recovery=123456-234567-345678-456789-567890-678901-789012-890123");
+	command_examples(name, "Test a BEK file for encrypted for disk 2 and volume 4", "bitlocker.info disk=0 volume=2 bek=H:\\3926293F-E661-4417-A36B-B41175B4D862.BEK");
 }
 
 void print_help_bitdecrypt(const char* name)
 {
-	command_header("bitdecrypt");
-	command_description(name, "bitdecrypt [disk id] [volume id] [fvek] [output]", "Decrypt Bitlocker encrypted volume to a file using the Full Volume Encryption Key (FVEK)");
-	command_examples(name, "Decrypt disk 2, volume 4 to decrypted.img", "bitdecrypt disk=2 volume=4 fvek=21DA18B8434D864D11654FE84AAB1BDDF135DFDE912EBCAD54A6D87CB8EF64AC output=decrypted.img");
+	command_header("bitlocker.decrypt");
+	command_description(name, "bitlocker.decrypt [disk id] [volume id] [fvek] [output]", "Decrypt Bitlocker encrypted volume to a file using the Full Volume Encryption Key (FVEK)");
+	command_examples(name, "Decrypt disk 2, volume 4 to decrypted.img", "bitlocker.decrypt disk=2 volume=4 fvek=21DA18B8434D864D11654FE84AAB1BDDF135DFDE912EBCAD54A6D87CB8EF64AC output=decrypted.img");
 }
 
 void print_help_fve(const char* name)
 {
-	command_header("fve");
-	command_description(name, "fve [disk id] [volume id] (block)", "Display FVE metadata information for an Bitlocker encrypted volume");
-	command_examples(name, "Display FVE metadata for disk 0, volume 1", "fve disk=0 volume=1");
-	command_examples(name, "Display FVE metadata for disk 2, volume 4 and FVE block 2", "fve disk=2 volume=4 fve_block=2");
+	command_header("bitlocker.fve");
+	command_description(name, "bitlocker.fve [disk id] [volume id] (block)", "Display FVE metadata information for an Bitlocker encrypted volume");
+	command_examples(name, "Display FVE metadata for disk 0, volume 1", "bitlocker.fve disk=0 volume=1");
+	command_examples(name, "Display FVE metadata for disk 2, volume 4 and FVE block 2", "bitlocker.fve disk=2 volume=4 fve_block=2");
 }
 
 void print_help_logfile(const char* name)
 {
-	command_header("logfile");
-	command_description(name, "logfile [disk id] [volume id] [output] (format)", "Dump or parse the $LogFile of a NTFS volume ");
-	command_examples(name, "Dump raw $LogFile for disk 1, volume 2 to log.dat", "logfile disk=1 volume=2 output=log.dat");
-	command_examples(name, "Parse logfile for disk 2, volume 4 and output results in csv file", "logfile disk=2 volume=4 output=log.csv format=csv");
+	command_header("logfile.dump");
+	command_description(name, "logfile.dump [disk id] [volume id] [output] (format)", "Dump and parse $LogFile of a NTFS volume  (raw, csv, json)");
+	command_examples(name, "Dump raw $LogFile for disk 1, volume 2 to log.dat", "logfile.dump disk=1 volume=2 output=log.dat");
+	command_examples(name, "Parse $LogFile for disk 2, volume 4 and output results in csv file", "logfile.dump disk=2 volume=4 output=log.csv format=csv");
 }
 
-void print_help_usn(const char* name)
+void print_help_usn_dump(const char* name)
 {
-	command_header("usn");
-	command_description(name, "usn [disk id] [volume id] [output] (format)", "Dump or parse the $UsnJrnl of a NTFS volume (raw, csv, json)");
-	command_examples(name, "Dump raw $UsnJrnl for disk 1, volume 2 to usn.dat", "usn disk=1 volume=2 output=usn.dat");
-	command_examples(name, "Parse usn journal for disk 2, volume 4 and output results in json file", "usn disk=2 volume=4 output=usn.json format=json");
+	command_header("usn.dump");
+	command_description(name, "usn.dump [disk id] [volume id] [output] (format)", "Dump and parse $UsnJrnl of a NTFS volume (raw, csv, json)");
+	command_examples(name, "Dump raw $UsnJrnl for disk 1, volume 2 to usn.dat", "us.dumpn disk=1 volume=2 output=usn.dat");
+	command_examples(name, "Parse $UsnJrnl for disk 2, volume 4 and output results in json file", "usn.dump disk=2 volume=4 output=usn.json format=json");
 }
 
+void print_help_usn_analyze(const char* name)
+{
+	command_header("usn.analyze");
+	command_description(name, "usn.analyze [disk id] [volume id] [rules] [output] (format)", "Parse and filter $UsnJrnl of a NTFS volume with specified rules (csv, json)");
+	command_examples(name, "Parse and filer $UsnJrnl for disk 2, volume 4 and output results in json file", "usn.analyze disk=2 volume=4 rules=myrules.json output=usn.json format=json");
+}
 
 void print_help_efs_masterkey(const char* name)
 {
@@ -283,31 +299,33 @@ namespace commands
 			}
 			else
 			{
-				if (opts->subcommand == "help") { print_help_help(name.c_str()); return; }
-				if (opts->subcommand == "info") { print_help_info(name.c_str()); return; }
-				if (opts->subcommand == "mbr") { print_help_mbr(name.c_str()); return; }
-				if (opts->subcommand == "gpt") { print_help_gpt(name.c_str()); return; }
-				if (opts->subcommand == "vbr") { print_help_vbr(name.c_str()); return; }
-				if (opts->subcommand == "mft") { print_help_mft_record(name.c_str()); return; }
-				if (opts->subcommand == "btree") { print_help_mft_btree(name.c_str()); return; }
-				if (opts->subcommand == "extract") { print_help_extract(name.c_str()); return; }
-				if (opts->subcommand == "bitlocker") { print_help_bitlocker(name.c_str()); return; }
 				if (opts->subcommand == "bitdecrypt") { print_help_bitdecrypt(name.c_str()); return; }
-				if (opts->subcommand == "fve") { print_help_fve(name.c_str()); return; }
-				if (opts->subcommand == "image") { print_help_image(name.c_str()); return; }
-				if (opts->subcommand == "shadow") { print_help_shadow(name.c_str()); return; }
-				if (opts->subcommand == "logfile") { print_help_logfile(name.c_str()); return; }
-				if (opts->subcommand == "reparse") { print_help_reparse(name.c_str()); return; }
-				if (opts->subcommand == "usn") { print_help_usn(name.c_str()); return; }
+				if (opts->subcommand == "bitlocker") { print_help_bitlocker(name.c_str()); return; }
 				if (opts->subcommand == "efs.backup") { print_help_efs_backup(name.c_str()); return; }
 				if (opts->subcommand == "efs.certificate") { print_help_efs_certificate(name.c_str()); return; }
 				if (opts->subcommand == "efs.decrypt") { print_help_efs_decrypt(name.c_str()); return; }
 				if (opts->subcommand == "efs.key") { print_help_efs_key(name.c_str()); return; }
 				if (opts->subcommand == "efs.masterkey") { print_help_efs_masterkey(name.c_str()); return; }
-				if (opts->subcommand == "undelete") { print_help_undelete(name.c_str()); return; }
+				if (opts->subcommand == "extract") { print_help_extract(name.c_str()); return; }
+				if (opts->subcommand == "fve") { print_help_fve(name.c_str()); return; }
+				if (opts->subcommand == "gpt") { print_help_gpt(name.c_str()); return; }
+				if (opts->subcommand == "help") { print_help_help(name.c_str()); return; }
+				if (opts->subcommand == "image") { print_help_image(name.c_str()); return; }
+				if (opts->subcommand == "info") { print_help_info(name.c_str()); return; }
+				if (opts->subcommand == "logfile.dump") { print_help_logfile(name.c_str()); return; }
+				if (opts->subcommand == "mbr") { print_help_mbr(name.c_str()); return; }
+				if (opts->subcommand == "mft.btree") { print_help_mft_btree(name.c_str()); return; }
+				if (opts->subcommand == "mft.dump") { print_help_mft_dump(name.c_str()); return; }
+				if (opts->subcommand == "mft.record") { print_help_mft_record(name.c_str()); return; }
+				if (opts->subcommand == "reparse") { print_help_reparse(name.c_str()); return; }
+				if (opts->subcommand == "shadow") { print_help_shadow(name.c_str()); return; }
 				if (opts->subcommand == "shell") { print_help_shell(name.c_str()); return; }
 				if (opts->subcommand == "smart") { print_help_smart(name.c_str()); return; }
 				if (opts->subcommand == "streams") { print_help_streams(name.c_str()); return; }
+				if (opts->subcommand == "undelete") { print_help_undelete(name.c_str()); return; }
+				if (opts->subcommand == "usn.analyze") { print_help_usn_analyze(name.c_str()); return; }
+				if (opts->subcommand == "usn.dump") { print_help_usn_dump(name.c_str()); return; }
+				if (opts->subcommand == "vbr") { print_help_vbr(name.c_str()); return; }
 
 				usage(name.c_str());
 			}

@@ -1,0 +1,132 @@
+[
+  {
+    "id": "mimikatz",
+    "description": "Mimikatz can be use to dump credentials, lateral movement and privilege escalation.",
+    "severity": "high",
+    "rule": {
+      "filename": "(.*)mimikatz\\.exe(-([A-F0-9]{8}).pf)?"
+    }
+  },
+  {
+    "id": "lazagne",
+    "description": "LaZagne is an open source application used to retrieve passwords on a local computer.",
+    "severity": "high",
+    "rule": {
+      "filename": "(.*)lazagne\\.exe(-([A-F0-9]{8}).pf)?"
+    }
+  },
+  {
+    "id": "process-hacker",
+    "description": "Process Hacker can be use as a recon tool to identify and kill processes like anti-virus.",
+    "severity": "high",
+    "rule": {
+      "filename": "(.*)processhacker\\.exe(-([A-F0-9]{8}).pf)?"
+    }
+  },
+  {
+    "id": "processxp",
+    "description": "Process Explorer can be use as a recon tool to identify and kill processes like anti-virus.",
+    "severity": "high",
+    "rule": {
+      "filename": "(.*)processxp(64(a)?)?\\.exe(-([A-F0-9]{8}).pf)?"
+    }
+  },
+  {
+    "id": "processdump",
+    "description": "Procdump can be use to dump a process like lsass.exe to extract credentials.",
+    "severity": "high",
+    "rule": {
+      "filename": "(.*)procdump\\.exe(-([A-F0-9]{8}).pf)?"
+    }
+  },
+  {
+    "id": "lsass-dump",
+    "description": "Dumped LSASS.exe process.",
+    "severity": "high",
+    "rule": {
+      "filename": "lsass.dmp|lsass.dump"
+    }
+  },
+  {
+    "id": "cve-2021-34484",
+    "description": "UserProfileSvcEoP is a local privilege escalation tool that exploits cve-2021-34484.",
+    "severity": "high",
+    "rule": {
+      "filename": "(.*)userprofilesvceop\\.exe(-([A-F0-9]{8}).pf)?"
+    }
+  },
+  {
+    "id": "ccleaner",
+    "description": "CCleaner is a disk cleanup tool for temporary junk files, web history, logs and even wiping the disk.",
+    "severity": "high",
+    "rule": {
+      "filename": "(.*)ccleaner\\.exe(-([A-F0-9]{8}).pf)?"
+    }
+  },
+  {
+    "id": "sam-dump",
+    "description": "Dump of SAM database.",
+    "severity": "high",
+    "rule": {
+      "filename": "sam\\.hiv|sam\\.dump|sam\\.dmp"
+    }
+  },
+  {
+    "id": "hash-txt",
+    "description": "Dump of account hashes by Mimikatz.",
+    "severity": "medium",
+    "rule": {
+      "filename": "hash\\.txt"
+    }
+  },
+  {
+    "id": "jaws",
+    "description": "JAWS is PowerShell script designed to identify potential privilege escalation vectors on Windows systems.",
+    "severity": "high",
+    "rule": {
+      "filename": "jaws-enum\\.ps1"
+    }
+  },
+  {
+    "id": "winpeas",
+    "description": "WinPEAS is a script that search for possible paths to escalate privileges on Windows hosts.",
+    "severity": "high",
+    "rule": {
+      "filename": "winpeas(.*)\\.(exe|bat)"
+    }
+  },
+  {
+    "id": "deleted-document",
+    "description": "Documents have been deleted (word, excel, powerpoint, txt, ...)",
+    "severity": "medium",
+    "rule": {
+      "filename": "(.*)(\\.doc|\\.docx|\\.xls|\\.xlsx|\\.ppt|\\.pptx|\\.zip|\\.rar|\\.7z)",
+      "reason": [
+        "+FILE_DELETE"
+      ]
+    }
+  },
+  {
+    "id": "deleted-media",
+    "description": "Media have been deleted (video, audio, images ...)",
+    "severity": "medium",
+    "rule": {
+      "filename": "(.*)(\\.avi|\\.mp4|\\.mkv|\\.m4v|\\.divx|\\.mp3|\\.ogg|\\.flac|\\.jpg|\\.jpeg|\\.gif|\\.png|\\.tiff|\\.psd)",
+      "reason": [
+        "+FILE_DELETE"
+      ]
+    }
+  },
+  {
+    "id": "executable-create",
+    "description": "Excecutable files have been created (exe, dll, sys, bat, ps1 ...)",
+    "severity": "low",
+    "rule": {
+      "filename": "(.*)(\\.exe|\\.dll|\\.sys|\\.vb?|\\.ps1|\\.bat|\\.scr|\\.com)",
+      "reason": [
+        "+FILE_CREATE",
+        "-DATA_EXTEND"
+      ]
+    }
+  }
+]

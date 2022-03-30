@@ -299,9 +299,9 @@ void print_bootsector_bitlocker(PBOOT_SECTOR_BITLOCKER pbs)
 	print_boot_code((PBYTE)pbs, size_to_disass, 0x7c5a);
 }
 
-void print_bootsector(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol) {
-	std::cout << std::setfill('0');
-	utils::ui::title("VBR from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+void print_bootsector(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
+{
+	utils::ui::title("VBR for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	if (vol->filesystem() == "FAT32") print_bootsector_fat32((PBOOT_SECTOR_FAT32)vol->bootsector());
 	else if (vol->filesystem() == "FAT16") print_bootsector_fat1x((PBOOT_SECTOR_FAT1X)vol->bootsector());

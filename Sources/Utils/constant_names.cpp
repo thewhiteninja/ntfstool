@@ -154,7 +154,7 @@ std::string constants::disk::smart::capabilities(DWORD cap)
 		if (cap & c.first) ret.push_back(c.second);
 	}
 
-	return utils::strings::join(ret, ", ");
+	return utils::strings::join_vec(ret, ", ");
 }
 
 
@@ -578,27 +578,27 @@ std::string constants::disk::usn::reasons(DWORD reason)
 	std::vector<std::string> ret;
 
 	const std::map<DWORD, const PCHAR> reasons_map = {
-		{ 0x1, "DATA_OVERWRITE"},
-		{ 0x2, "DATA_EXTEND"},
-		{ 0x4, "DATA_TRUNCATION"},
-		{ 0x10, "NAMED_DATA_OVERWRITE"},
-		{ 0x20, "NAMED_DATA_EXTEND"},
-		{ 0x40, "NAMED_DATA_TRUNCATION"},
-		{ 0x100, "FILE_CREATE"},
-		{ 0x200, "FILE_DELETE"},
-		{ 0x400, "EA_CHANGE"},
-		{ 0x800, "SECURITY_CHANGE"},
-		{ 0x1000, "RENAME_OLD_NAME"},
-		{ 0x2000, "RENAME_NEW_NAME"},
-		{ 0x4000, "INDEXABLE_CHANGE"},
-		{ 0x8000, "BASIC_INFO_CHANGE"},
-		{ 0x10000, "HARD_LINK_CHANGE"},
-		{ 0x20000, "COMPRESSION_CHANGE"},
-		{ 0x40000, "ENCRYPTION_CHANGE"},
-		{ 0x80000, "OBJECT_ID_CHANGE"},
-		{ 0x100000, "REPARSE_POINT_CHANGE"},
-		{ 0x200000, "STREAM_CHANGE"},
-		{ 0x80000000, "CLOSE"}
+		{ USN_REASON_DATA_OVERWRITE, "DATA_OVERWRITE"},
+		{ USN_REASON_DATA_EXTEND, "DATA_EXTEND"},
+		{ USN_REASON_DATA_TRUNCATION, "DATA_TRUNCATION"},
+		{ USN_REASON_NAMED_DATA_OVERWRITE, "NAMED_DATA_OVERWRITE"},
+		{ USN_REASON_NAMED_DATA_EXTEND, "NAMED_DATA_EXTEND"},
+		{ USN_REASON_NAMED_DATA_TRUNCATION, "NAMED_DATA_TRUNCATION"},
+		{ USN_REASON_FILE_CREATE, "FILE_CREATE"},
+		{ USN_REASON_FILE_DELETE, "FILE_DELETE"},
+		{ USN_REASON_EA_CHANGE, "EA_CHANGE"},
+		{ USN_REASON_SECURITY_CHANGE, "SECURITY_CHANGE"},
+		{ USN_REASON_RENAME_OLD_NAME, "RENAME_OLD_NAME"},
+		{ USN_REASON_RENAME_NEW_NAME, "RENAME_NEW_NAME"},
+		{ USN_REASON_INDEXABLE_CHANGE, "INDEXABLE_CHANGE"},
+		{ USN_REASON_BASIC_INFO_CHANGE, "BASIC_INFO_CHANGE"},
+		{ USN_REASON_HARD_LINK_CHANGE, "HARD_LINK_CHANGE"},
+		{ USN_REASON_COMPRESSION_CHANGE, "COMPRESSION_CHANGE"},
+		{ USN_REASON_ENCRYPTION_CHANGE, "ENCRYPTION_CHANGE"},
+		{ USN_REASON_OBJECT_ID_CHANGE, "OBJECT_ID_CHANGE"},
+		{ USN_REASON_REPARSE_POINT_CHANGE, "REPARSE_POINT_CHANGE"},
+		{ USN_REASON_STREAM_CHANGE, "STREAM_CHANGE"},
+		{ USN_REASON_CLOSE, "CLOSE"}
 	};
 
 	for (auto& r : reasons_map)
@@ -606,7 +606,42 @@ std::string constants::disk::usn::reasons(DWORD reason)
 		if (reason & r.first) ret.push_back(r.second);
 	}
 
-	return utils::strings::join(ret, "+");
+	return utils::strings::join_vec(ret, "+");
+}
+
+DWORD constants::disk::usn::reasons_inv(std::string r)
+{
+	const std::map<std::string, DWORD> reasons_map = {
+		{ "DATA_OVERWRITE", USN_REASON_DATA_OVERWRITE},
+		{ "DATA_EXTEND", USN_REASON_DATA_EXTEND },
+		{ "DATA_TRUNCATION", USN_REASON_DATA_TRUNCATION},
+		{ "NAMED_DATA_OVERWRITE", USN_REASON_NAMED_DATA_OVERWRITE},
+		{ "NAMED_DATA_EXTEND", USN_REASON_NAMED_DATA_EXTEND },
+		{ "NAMED_DATA_TRUNCATION", USN_REASON_NAMED_DATA_TRUNCATION },
+		{ "FILE_CREATE", USN_REASON_FILE_CREATE },
+		{ "FILE_DELETE", USN_REASON_FILE_DELETE },
+		{ "EA_CHANGE", USN_REASON_EA_CHANGE },
+		{ "SECURITY_CHANGE", USN_REASON_SECURITY_CHANGE },
+		{ "RENAME_OLD_NAME", USN_REASON_RENAME_OLD_NAME },
+		{ "RENAME_NEW_NAME", USN_REASON_RENAME_NEW_NAME },
+		{ "INDEXABLE_CHANGE", USN_REASON_INDEXABLE_CHANGE},
+		{ "BASIC_INFO_CHANGE", USN_REASON_BASIC_INFO_CHANGE },
+		{ "HARD_LINK_CHANGE", USN_REASON_HARD_LINK_CHANGE },
+		{ "COMPRESSION_CHANGE", USN_REASON_COMPRESSION_CHANGE },
+		{ "ENCRYPTION_CHANGE", USN_REASON_ENCRYPTION_CHANGE},
+		{ "OBJECT_ID_CHANGE", USN_REASON_OBJECT_ID_CHANGE },
+		{ "REPARSE_POINT_CHANGE", USN_REASON_REPARSE_POINT_CHANGE},
+		{ "STREAM_CHANGE", USN_REASON_STREAM_CHANGE},
+		{ "CLOSE", USN_REASON_CLOSE }
+	};
+
+	auto flag = reasons_map.find(r);
+	if (flag != reasons_map.end())
+	{
+		return flag->second;
+	}
+
+	return 0;
 }
 
 std::string constants::disk::usn::fileattributes(DWORD attributes)
@@ -638,7 +673,40 @@ std::string constants::disk::usn::fileattributes(DWORD attributes)
 		if (attributes & r.first) ret.push_back(r.second);
 	}
 
-	return utils::strings::join(ret, "+");
+	return utils::strings::join_vec(ret, "+");
+}
+
+DWORD  constants::disk::usn::fileattributes_inv(std::string a)
+{
+	std::vector<std::string> ret;
+
+	const std::map<std::string, DWORD> attributes_map = {
+		{ "READONLY", 0x1,},
+		{ "HIDDEN", 0x2},
+		{ "SYSTEM", 0x4},
+		{ "DIRECTORY", 0x10},
+		{ "ARCHIVE", 0x20},
+		{ "DEVICE", 0x40},
+		{ "NORMAL", 0x80},
+		{ "TEMPORARY", 0x100},
+		{ "SPARSE_FILE", 0x200},
+		{ "REPARSE_POINT", 0x400},
+		{ "COMPRESSED", 0x800},
+		{ "OFFLINE", 0x1000},
+		{ "NOT_CONTENT_INDEXED", 0x2000},
+		{ "ENCRYPTED", 0x4000},
+		{ "INTEGRITY_STREAM", 0x8000},
+		{ "VIRTUAL", 0x10000},
+		{ "NO_SCRUB_DATA", 0x20000},
+	};
+
+	auto flag = attributes_map.find(a);
+	if (flag != attributes_map.end())
+	{
+		return flag->second;
+	}
+
+	return 0;
 }
 
 std::string constants::disk::logfile::operation(WORD w)
@@ -820,7 +888,7 @@ std::string constants::efs::cert_prop_flags(DWORD f)
 	if (f & CRYPT_MACHINE_KEYSET) ret.push_back("CRYPT_MACHINE_KEYSET");
 	else ret.push_back("CRYPT_USER_KEYSET");
 	if (f & CRYPT_SILENT) ret.push_back("CRYPT_SILENT");
-	return utils::strings::join(ret, " | ");
+	return utils::strings::join_vec(ret, " | ");
 }
 
 std::string constants::efs::cert_prop_keyspec(DWORD k)

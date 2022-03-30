@@ -121,11 +121,13 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 		if (is_option(argv[i], "sid")) { read_option_string(argv[i], ret->sid); continue; }
 		if (is_option(argv[i], "masterkey")) { read_option_hexbuffer(argv[i], &ret->masterkey); continue; }
 		if (is_option(argv[i], "pfx")) { read_option_string(argv[i], ret->pfx); continue; }
+		if (is_option(argv[i], "mode")) { read_option_string(argv[i], ret->mode); continue; }
 		if (is_option(argv[i], "recovery")) { read_option_string(argv[i], ret->recovery); continue; }
 		if (is_option(argv[i], "image")) { read_option_string(argv[i], ret->image); continue; }
 		if (is_option(argv[i], "bek")) { read_option_string(argv[i], ret->bek); continue; }
 		if (is_option(argv[i], "fvek")) { read_option_string(argv[i], ret->fvek); continue; }
 		if (is_option(argv[i], "format")) { read_option_string(argv[i], ret->format); continue; }
+		if (is_option(argv[i], "rules")) { read_option_string(argv[i], ret->rules); continue; }
 		if (!strncmp(argv[i], "--sam", 5)) { ret->sam = true; continue; }
 		if (!strncmp(argv[i], "--system", 8)) { ret->system = true; continue; }
 		if (is_help(argv[i])) { ret->show_usage = true; continue; }

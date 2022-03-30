@@ -212,16 +212,6 @@ namespace utils
 			}
 		}
 
-		std::string join(std::vector<std::string> items, const std::string separator)
-		{
-			std::ostringstream out;
-			if (items.size() > 0) out << items[0];
-			for (unsigned int i = 1; i < items.size(); i++) {
-				out << separator << items[i];
-			}
-			return out.str();
-		}
-
 		std::vector<std::string> split(const std::string& text, TCHAR delimiter)
 		{
 			std::vector<std::string> result;
@@ -623,6 +613,7 @@ namespace utils
 
 		void title(std::string s, std::ostream& out)
 		{
+			std::cout << std::setfill('0');
 			out << s << std::endl;
 			out << line(utils::strings::utf8_string_size(s));
 			out << std::endl;

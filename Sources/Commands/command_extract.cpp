@@ -20,8 +20,7 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 {
 	if (!commands::helpers::is_ntfs(disk, vol)) return 1;
 
-	std::cout << std::setfill('0');
-	utils::ui::title("Extract file from " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+	utils::ui::title("Extract file for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
 
 	std::cout << "[+] Opening " << (vol->name().empty() ? reinterpret_cast<Disk*>(vol->parent())->name() : vol->name()) << std::endl;
 
@@ -30,6 +29,11 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 	auto [filepath, stream_name] = utils::files::split_file_and_stream(opts->from);
 
 	std::cout << "[-] Record Num  : " << record->header()->MFTRecordIndex << " (" << utils::format::hex(record->header()->MFTRecordIndex, true) << ")" << std::endl;
+
+	if (stream_name != "")
+	{
+		std::cout << "[-] Stream      : " << stream_name << std::endl;
+	}
 
 	std::cout << "[-] Destination : " << opts->output << std::endl;
 

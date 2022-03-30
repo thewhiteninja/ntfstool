@@ -196,7 +196,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 						if ((entry->name_type() == 2) && (win32_named_entries.find(entry->record_number()) != win32_named_entries.end())) continue;
 
 						std::shared_ptr<MFTRecord> entry_rec = explorer->mft()->record_from_number(entry->record_number());
-						std::vector<std::string> ads_names = entry_rec->alternate_data_names();
+						std::vector<std::string> ads_names = entry_rec->ads_names();
 
 						tab->add_item_line(std::to_string(entry_rec->header()->MFTRecordIndex));
 						if (entry_rec->header()->flag & MFT_RECORD_IS_DIRECTORY)
@@ -257,7 +257,7 @@ int explorer(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 							if (stdinfo->u.Permission.system) perms.push_back("Sy");
 							if (stdinfo->u.Permission.temp) perms.push_back("Tm");
 
-							tab->add_item_line(utils::strings::join(perms, " "));
+							tab->add_item_line(utils::strings::join_vec(perms, " "));
 						}
 						else
 						{
