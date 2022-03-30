@@ -406,13 +406,14 @@ Current third-party libs:
     [+] Processing data: 1.00 MiB
     [+] Closing volume
 </td></tr>
-<tr><td>Sample of mft.csv</td></tr>
+<tr><td>Sample of mft.csv (check the end of the last line for Zone.Identifier data)</td></tr>
 <tr><td><pre>RecordIndex,InUse,Type,Filename,Ext,Size,Parents,Time_MFT,Time_Create,Time_Alter,Time_Read,Att_Archive,Att_Compressed,Att_Device,Att_Encrypted,Att_Hidden,Att_Normal,Att_NotIndexed,Att_Offline,Att_Readonly,Att_Reparse,Att_Sparse,Att_System,Att_Temp,USN,Hardlinks,ADS,ZoneId,ReferrerUrl,HostUrl
 0,"True","File","$MFT","",1048576,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""
 1,"True","File","$MFTMirr","",4096,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""
 2,"True","File","$LogFile","",67108864,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""
 3,"True","File","$Volume","",0,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""
-4,"True","File","$AttrDef","",2560,"5","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","2022-03-17 01:25:10","False","False","False","False","True","False","False","False","False","False","False","True","False",0,1,"","","",""</pre>
+...
+397,"True","File","vswhere.exe",".exe",457824,"103911","2020-10-19 18:42:19","2019-06-11 10:07:50","2019-06-11 10:07:52","2021-12-27 14:54:49","True","False","False","False","False","False","False","False","False","False","False","False","False",35944347632,1,"Zone.Identifier","3","https://github.com/microsoft/vswhere/releases","https://github-production-release-asset-2e65be.s3.amazonaws.com/78482723/06868000-5585-11e9-9001-982f1fcb7ef1?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20190611%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20190611T100747Z&X-Amz-Expires=300&X-Amz-Signature=bc494e9edaafb03874097ae46466c5562d34252f14f21140c70e6a1a1fc5e5c4&X-Amz-SignedHeaders=host&actor_id=40250307&response-content-disposition=attachment%3B%20filename%3Dvswhere.exe&response-content-type=application%2Foctet-stream"</pre>
 </td></tr>
 </table>
 
