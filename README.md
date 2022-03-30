@@ -77,6 +77,8 @@ Example of rules: [Rules/default.json](Rules/default.json)
   }
 ```
 
+See an example of run here: [usn.analyze](#usn-analyze)
+
 ### Shell
 
 There is a limited shell with few commands (exit, cd, ls, cat, pwd, cp, quit, rec).
@@ -1395,7 +1397,7 @@ Current third-party libs:
         +------------------------------------------+
         | 0     | executable-create |     9 | 4.69 |
         | 1     | ccleaner          |     2 | 1.04 |
-	| 2     | lsass-dump        |     1 | 0.52 |
+        | 2     | lsass-dump        |     1 | 0.52 |
         +------------------------------------------+
 </td></tr>
 </table>
