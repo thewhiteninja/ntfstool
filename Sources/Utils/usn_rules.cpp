@@ -1,7 +1,9 @@
+#define NOMINMAX
 #include "usn_rules.h"
 
-#include <regex>
 #include <Utils/constant_names.h>
+
+#include <re2/re2.h>
 
 USNRules::USNRules(std::string filename)
 {
@@ -83,11 +85,12 @@ USNRule::USNRule(nlohmann::json j)
 		{
 			if (it.key() == "filename")
 			{
-				try
+				auto regexp = std::make_shared<RE2>(it.value().get<std::string>());
+				if (regexp->ok())
 				{
-					_a_rules[it.key()] = std::regex(it.value().get<std::string>());
+					_a_rules[it.key()] = regexp;
 				}
-				catch (std::regex_error)
+				else
 				{
 					throw std::invalid_argument("filename rule \"" + it.value().get<std::string>() + "\" is not a valid regex");
 				}
@@ -214,7 +217,8 @@ bool USNRule::match(std::string filename, PUSN_RECORD_V2 usn)
 	{
 		if (it->first == "filename")
 		{
-			if (!std::regex_match(filename, std::any_cast<std::regex>(it->second)))
+			auto rx = std::any_cast<std::shared_ptr<RE2>>(it->second);
+			if (!RE2::FullMatch(filename, *rx.get()))
 			{
 				return false;
 			}
