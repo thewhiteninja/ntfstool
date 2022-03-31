@@ -4,7 +4,7 @@
     "description": "Mimikatz can be use to dump credentials, lateral movement and privilege escalation.",
     "severity": "high",
     "rule": {
-      "filename": "(.*)mimikatz\\.exe(-([A-F0-9]{8}).pf)?"
+      "filename": "mimikatz\\.exe(-([A-F0-9]{8}).pf)?"
     }
   },
   {
@@ -12,7 +12,7 @@
     "description": "LaZagne is an open source application used to retrieve passwords on a local computer.",
     "severity": "high",
     "rule": {
-      "filename": "(.*)lazagne\\.exe(-([A-F0-9]{8}).pf)?"
+      "filename": "lazagne\\.exe(-([A-F0-9]{8}).pf)?"
     }
   },
   {
@@ -20,7 +20,7 @@
     "description": "Process Hacker can be use as a recon tool to identify and kill processes like anti-virus.",
     "severity": "high",
     "rule": {
-      "filename": "(.*)processhacker\\.exe(-([A-F0-9]{8}).pf)?"
+      "filename": "processhacker\\.exe(-([A-F0-9]{8}).pf)?"
     }
   },
   {
@@ -28,7 +28,7 @@
     "description": "Process Explorer can be use as a recon tool to identify and kill processes like anti-virus.",
     "severity": "high",
     "rule": {
-      "filename": "(.*)processxp(64(a)?)?\\.exe(-([A-F0-9]{8}).pf)?"
+      "filename": "processxp(64(a)?)?\\.exe(-([A-F0-9]{8}).pf)?"
     }
   },
   {
@@ -36,7 +36,7 @@
     "description": "Procdump can be use to dump a process like lsass.exe to extract credentials.",
     "severity": "high",
     "rule": {
-      "filename": "(.*)procdump\\.exe(-([A-F0-9]{8}).pf)?"
+      "filename": "procdump\\.exe(-([A-F0-9]{8}).pf)?"
     }
   },
   {
@@ -44,7 +44,7 @@
     "description": "Dumped LSASS.exe process.",
     "severity": "high",
     "rule": {
-      "filename": "lsass.dmp|lsass.dump"
+      "filename": "lsass(\\.(dmp|dump))?"
     }
   },
   {
@@ -52,7 +52,7 @@
     "description": "UserProfileSvcEoP is a local privilege escalation tool that exploits cve-2021-34484.",
     "severity": "high",
     "rule": {
-      "filename": "(.*)userprofilesvceop\\.exe(-([A-F0-9]{8}).pf)?"
+      "filename": "userprofilesvceop\\.exe(-([A-F0-9]{8}).pf)?"
     }
   },
   {
@@ -60,7 +60,7 @@
     "description": "CCleaner is a disk cleanup tool for temporary junk files, web history, logs and even wiping the disk.",
     "severity": "high",
     "rule": {
-      "filename": "(.*)ccleaner\\.exe(-([A-F0-9]{8}).pf)?"
+      "filename": "ccleaner\\.exe(-([A-F0-9]{8}).pf)?"
     }
   },
   {
@@ -68,7 +68,7 @@
     "description": "Dump of SAM database.",
     "severity": "high",
     "rule": {
-      "filename": "sam\\.hiv|sam\\.dump|sam\\.dmp"
+      "filename": "sam(\\.(hiv|dump|dmp))?"
     }
   },
   {
@@ -100,7 +100,7 @@
     "description": "Documents have been deleted (word, excel, powerpoint, txt, ...)",
     "severity": "medium",
     "rule": {
-      "filename": "(.*)(\\.doc|\\.docx|\\.xls|\\.xlsx|\\.ppt|\\.pptx|\\.zip|\\.rar|\\.7z)",
+      "filename": "(.*)\\.(doc|docx|xls|xlsx|ppt|pptx|zip|rar|7z)",
       "reason": [
         "+FILE_DELETE"
       ]
@@ -111,18 +111,18 @@
     "description": "Media have been deleted (video, audio, images ...)",
     "severity": "medium",
     "rule": {
-      "filename": "(.*)(\\.avi|\\.mp4|\\.mkv|\\.m4v|\\.divx|\\.mp3|\\.ogg|\\.flac|\\.jpg|\\.jpeg|\\.gif|\\.png|\\.tiff|\\.psd)",
+      "filename": "(.*)\\.(avi|mp4|mkv|m4v|divx|mp3|ogg|flac|jpg|jpeg|gif|png|tiff|psd)",
       "reason": [
         "+FILE_DELETE"
       ]
     }
   },
   {
-    "id": "executable-create",
+    "id": "new-executable",
     "description": "Excecutable files have been created (exe, dll, sys, bat, ps1 ...)",
     "severity": "low",
     "rule": {
-      "filename": "(.*)(\\.exe|\\.dll|\\.sys|\\.vb?|\\.ps1|\\.bat|\\.scr|\\.com)",
+      "filename": "(.*)\\.(exe|dll|sys|vb?|ps1|bat|scr|com)",
       "reason": [
         "+FILE_CREATE",
         "-DATA_EXTEND"
