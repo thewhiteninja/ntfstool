@@ -19,6 +19,10 @@
     {
       "name": "distorm",
       "platform": "windows"
+    },
+    {
+      "name": "re2",
+      "platform": "windows"
     }
   ]
 }
