@@ -149,11 +149,12 @@ Feel free to open an issue or ask for a new feature!
 
 At build time, VisualStudio will detect the `vcpkg.json` file and install required packages automatically.
 
-Current third-party libs:
+Third-party libraries:
 - [openssl](https://www.openssl.org/): OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
 - [nlohmann-json](https://github.com/nlohmann/json): JSON for Modern C++
 - [distorm](https://github.com/gdabah/distorm): Powerful Disassembler Library For x86/AMD64
 - [cppcoro](https://github.com/lewissbaker/cppcoro): A library of C++ coroutine abstractions for the coroutines TS.
+- [re2](https://github.com/google/re2): RE2 is a fast, safe, thread-friendly alternative to backtracking regular expression engines.
 
 
 ## Examples
