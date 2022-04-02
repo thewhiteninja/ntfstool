@@ -883,7 +883,7 @@ Third-party libraries:
 
 ### EFS-decrypt
 <table>
-<tr><td>efs.decrypt efs.decrypt disk=0 volume=4 from=c:\cat.png pfx=z:\my_backup.pfx password=backup output=c:\socute.png</td></tr>
+<tr><td>efs.decrypt disk=0 volume=4 from=c:\cat.png pfx=z:\my_backup.pfx password=backup output=c:\socute.png</td></tr>
 <tr><td>
 
     [+] Loading PKCS12 input file
