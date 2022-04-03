@@ -107,6 +107,15 @@ typedef struct _FVE_ENTRY_OFFSET_SIZE
 	BYTE		data[1];
 } FVE_ENTRY_OFFSET_SIZE, * PFVE_ENTRY_OFFSET_SIZE;
 
+typedef struct _FVE_ENTRY_RECOVERY_BACKUP
+{
+	FILETIME	timestamp0;
+	FILETIME	timestamp1;
+	WORD		location;
+	WORD		unknown;
+	FVE_ENTRY	next_entry_header;
+} FVE_ENTRY_RECOVERY_BACKUP, * PFVE_ENTRY_RECOVERY_BACKUP;
+
 typedef struct _FVE_KEY_DATA
 {
 	BYTE last_sha256_hash[32];

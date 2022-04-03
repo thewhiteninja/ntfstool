@@ -102,6 +102,8 @@ namespace constants {
 
 		std::string fve_value_type(ULONG32 t);
 
+		std::string fve_metadata_recovery_location(WORD l);
+
 		std::string fve_key_protection_type(ULONG32 t);
 	}
 }
