@@ -179,19 +179,28 @@ std::vector<std::string> get_fve_entry_values(PFVE_ENTRY entry, const std::strin
 		ret.push_back("Key           : " + utils::format::hex(((PFVE_ENTRY_EXTERNAL_KEY)entry->data)->key, entry->size - 32, false));
 		break;
 	}
-	case FVE_METADATA_ENTRY_VALUE_TYPE_UPDATE:
-	case FVE_METADATA_ENTRY_VALUE_TYPE_ERROR:
-	case FVE_METADATA_ENTRY_VALUE_TYPE_ASYMMETRIC_ENCRYPTION:
-	case FVE_METADATA_ENTRY_VALUE_TYPE_EXPORTED_KEY:
-	case FVE_METADATA_ENTRY_VALUE_TYPE_PUBLIC_KEY:
-		break;
 	case FVE_METADATA_ENTRY_VALUE_TYPE_OFFSET_AND_SIZE:
 	{
 		ret.push_back("Offset        : " + utils::format::hex(((PFVE_ENTRY_OFFSET_SIZE)entry->data)->offset));
 		ret.push_back("Size          : " + utils::format::hex(((PFVE_ENTRY_OFFSET_SIZE)entry->data)->size));
 		break;
 	}
+	case FVE_METADATA_ENTRY_VALUE_TYPE_RECOVERY_BACKUP:
+	{
+		SYSTEMTIME st;
+		ret.push_back("Location      : " + constants::bitlocker::fve_metadata_recovery_location(((PFVE_ENTRY_RECOVERY_BACKUP)entry->data)->location));
+		utils::times::filetime_to_local_systemtime(((PFVE_ENTRY_RECOVERY_BACKUP)entry->data)->timestamp0, &st);
+		ret.push_back("Start         : " + utils::times::display_systemtime(st));
+		utils::times::filetime_to_local_systemtime(((PFVE_ENTRY_RECOVERY_BACKUP)entry->data)->timestamp1, &st);
+		ret.push_back("End           : " + utils::times::display_systemtime(st));
+		break;
+	}
 	case FVE_METADATA_ENTRY_VALUE_TYPE_CONCAT_HASH_KEY:
+	case FVE_METADATA_ENTRY_VALUE_TYPE_UPDATE:
+	case FVE_METADATA_ENTRY_VALUE_TYPE_ERROR:
+	case FVE_METADATA_ENTRY_VALUE_TYPE_ASYMMETRIC_ENCRYPTION:
+	case FVE_METADATA_ENTRY_VALUE_TYPE_EXPORTED_KEY:
+	case FVE_METADATA_ENTRY_VALUE_TYPE_PUBLIC_KEY:
 	default:
 		ret.push_back("Unknown Value Type (" + std::to_string(entry->value_type) + ")");
 	}
@@ -259,6 +268,8 @@ namespace commands
 					std::shared_ptr<Volume> volume = disk->volumes(opts->volume);
 					if (volume != nullptr)
 					{
+						if (opts->fve_block == -1) opts->fve_block = 0;
+
 						if ((opts->fve_block >= 0) && (opts->fve_block < 3))
 						{
 							print_bitlocker_vbr(disk, volume, opts->fve_block);

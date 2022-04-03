@@ -438,6 +438,7 @@ std::string constants::bitlocker::fve_value_type(ULONG32 t)
 	case FVE_METADATA_ENTRY_VALUE_TYPE_EXTERNAL_KEY: return "External Key";
 	case FVE_METADATA_ENTRY_VALUE_TYPE_UPDATE: return "Update";
 	case FVE_METADATA_ENTRY_VALUE_TYPE_ERROR: return "Error";
+	case FVE_METADATA_ENTRY_VALUE_TYPE_RECOVERY_BACKUP: return "Recovery Backup";
 	case FVE_METADATA_ENTRY_VALUE_TYPE_ASYMMETRIC_ENCRYPTION: return "Asymmetric Encryption";
 	case FVE_METADATA_ENTRY_VALUE_TYPE_EXPORTED_KEY: return "Exported Key";
 	case FVE_METADATA_ENTRY_VALUE_TYPE_PUBLIC_KEY: return "Public Key";
@@ -445,6 +446,20 @@ std::string constants::bitlocker::fve_value_type(ULONG32 t)
 	case FVE_METADATA_ENTRY_VALUE_TYPE_CONCAT_HASH_KEY: return "Concat Hash Key";
 	default:
 		return "Unknown (" + std::to_string(t) + ")";
+	}
+}
+
+std::string constants::bitlocker::fve_metadata_recovery_location(WORD l)
+{
+	switch (l)
+	{
+	case 0x01: return "Active Directory";
+	case 0x02: return "One Drive";
+	case 0x04: return "Azure Active Directory";
+	case 0x08: return "File";
+	case 0x10: return "Printed";
+	default:
+		return "Unknown";
 	}
 }
 
