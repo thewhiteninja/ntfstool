@@ -64,15 +64,15 @@ More information on [Mimikatz Wiki][4]
 
 USN journal records can be analyzed using custom rules to detect suspicious programs and actions but also to have an overview of the journal (% of file deleted, created ...)
 
-Example of rules: [Rules/default.json](Rules/default.json)
+Default rules: [Rules/default.json](Rules/default.json)
 
 ```
   {
-    "id": "ccleaner",
-    "description": "CCleaner is a disk cleanup tool for temporary junk files, web history, logs and even wiping the disk.",
+    "id": "lsass-dump",
+    "description": "Dumped LSASS.exe process.",
     "severity": "high",
     "rule": {
-      "filename": "(.*)ccleaner\\.exe(-([A-F0-9]{8}).pf)?"
+      "filename": "lsass(\\.(dmp|dump))?"
     }
   }
 ```
@@ -840,10 +840,11 @@ Third-party libraries:
     |    |         |      |                     |                 |                 f5fdbbc7f9a61a77c914fa347479c7ac |
     |    |         |      |                     |                 |                 6124ff46865e805367f7bef1         |
     |    |         |      |                     |                 |                                                  |
-    |    |         |      |                     |                 | Property #3 - Unknown (00000015)                 |
-    |    |         |      |                     |                 |  - 28                                            |
+    |    |         |      |                     |                 | Property #3 - Recovery Backup - 28               |
     |    |         |      |                     |                 | --------                                         |
-    |    |         |      |                     |                 | Unknown Value Type (21)                          |
+    |    |         |      |                     |                 | Location      : File                             |
+    |    |         |      |                     |                 | Start         : 2022-04-03 12:52:50              |
+    |    |         |      |                     |                 | End           : 2022-04-03 12:52:50              |
     +----------------------------------------------------------------------------------------------------------------+
     | 4  | 1       | 80   | FKEV                | AES-CCM         | Nonce as Hex  : 01d5ecbb00f71550                 |
     |    |         |      |                     |                 | Nonce as Time : 2020-02-26 16:39:59              |
