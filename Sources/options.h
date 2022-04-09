@@ -12,6 +12,7 @@ public:
 	std::string command;
 	std::string subcommand;
 	std::string from;
+	std::string stream;
 	std::string output;
 	std::string format;
 	std::string rules;
