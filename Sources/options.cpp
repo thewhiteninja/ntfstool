@@ -113,6 +113,7 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 	{
 		if (is_option(argv[i], "output")) { read_option_string(argv[i], ret->output); continue; }
 		if (is_option(argv[i], "from")) { read_option_string(argv[i], ret->from); continue; }
+		if (is_option(argv[i], "stream")) { read_option_string(argv[i], ret->stream); continue; }
 		if (is_option(argv[i], "disk")) { read_option_int32(argv[i], &ret->disk); continue; }
 		if (is_option(argv[i], "volume")) { read_option_int32(argv[i], &ret->volume); continue; }
 		if (is_option(argv[i], "inode")) { read_option_int64(argv[i], &ret->inode); continue; }

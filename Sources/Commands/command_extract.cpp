@@ -26,7 +26,12 @@ int extract_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::s
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 	std::shared_ptr<MFTRecord> record = commands::helpers::find_record(explorer, opts);
+
 	auto [filepath, stream_name] = utils::files::split_file_and_stream(opts->from);
+	if (opts->stream != "")
+	{
+		stream_name = opts->stream;
+	}
 
 	std::cout << "[-] Record Num  : " << record->header()->MFTRecordIndex << " (" << utils::format::hex(record->header()->MFTRecordIndex, true) << ")" << std::endl;
 
