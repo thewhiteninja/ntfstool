@@ -80,34 +80,72 @@ VirtualDisk::VirtualDisk(VirtualDiskType type, PWCHAR device_name, PWCHAR volume
 		_product_id = "TrueCrypt";
 		break;
 	}
+	case VirtualDiskType::Dummy:
+	{
+		_product_id = "Dummy";
+		break;
+	}
 	default:
 	{
 		_product_id = "Unknown";
 	}
 	}
 
-	size_t volume_name_len = wcslen(volume_name) - 1;
-	volume_name[volume_name_len] = L'\0';
+	if (type == VirtualDiskType::Dummy)
+	{
+		_size = 0;
+	}
+	else if ((type == VirtualDiskType::VeraCrypt) || (type == VirtualDiskType::TrueCrypt))
+	{
+		size_t volume_name_len = wcslen(volume_name) - 1;
+		volume_name[volume_name_len] = L'\0';
 
-	HANDLE hVol = CreateFileW(volume_name, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		HANDLE hVol = CreateFileW(volume_name, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		if (hVol != INVALID_HANDLE_VALUE)
+		{
+			DWORD ior = 0;
+			_size = 0;
+			if (DeviceIoControl(hVol, IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, NULL, 0, &_geometry, sizeof(DISK_GEOMETRY_EX), &ior, NULL))
+			{
+				_size = _geometry.DiskSize.QuadPart;
+			}
+
+			PARTITION_INFORMATION_EX pex;
+			pex.PartitionStyle = PARTITION_STYLE_RAW;
+			pex.PartitionNumber = 0;
+			pex.StartingOffset.QuadPart = 0;
+			pex.PartitionLength.QuadPart = _geometry.DiskSize.QuadPart;
+
+			volume_name[volume_name_len] = L'\\';
+
+			std::shared_ptr<Volume> v = std::make_shared<Volume>(hVol, pex, 0, this, volume_name);
+			_volumes.push_back(v);
+			CloseHandle(hVol);
+		}
+	}
+}
+
+void VirtualDisk::add_volume_image(std::string filename)
+{
+	std::wstring wfilename = utils::strings::from_string(filename);
+
+	HANDLE hVol = CreateFileW(wfilename.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (hVol != INVALID_HANDLE_VALUE)
 	{
-		DWORD ior = 0;
+		LARGE_INTEGER fileSize = { 0 };
 		_size = 0;
-		if (DeviceIoControl(hVol, IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, NULL, 0, &_geometry, sizeof(DISK_GEOMETRY_EX), &ior, NULL))
+		if (GetFileSizeEx(hVol, &fileSize))
 		{
-			_size = _geometry.DiskSize.QuadPart;
+			_size = fileSize.QuadPart;
 		}
 
 		PARTITION_INFORMATION_EX pex;
 		pex.PartitionStyle = PARTITION_STYLE_RAW;
 		pex.PartitionNumber = 0;
 		pex.StartingOffset.QuadPart = 0;
-		pex.PartitionLength.QuadPart = _geometry.DiskSize.QuadPart;
+		pex.PartitionLength.QuadPart = _size;
 
-		volume_name[volume_name_len] = L'\\';
-
-		std::shared_ptr<Volume> v = std::make_shared<Volume>(hVol, pex, 0, this, volume_name);
+		std::shared_ptr<Volume> v = std::make_shared<Volume>(hVol, pex, 0, this, (PWCHAR)(wfilename.c_str()));
 		_volumes.push_back(v);
 		CloseHandle(hVol);
 	}

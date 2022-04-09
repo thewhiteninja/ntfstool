@@ -13,7 +13,15 @@ NTFSExplorer::NTFSExplorer(std::shared_ptr<Volume> volume)
 	}
 	else
 	{
-		_reader = std::make_shared<NTFSReader>(utils::strings::from_string(reinterpret_cast<Disk*>(volume->parent())->name()), volume->offset());
+		auto pdisk = reinterpret_cast<Disk*>(volume->parent());
+		if (pdisk->is_virtual())
+		{
+			_reader = std::make_shared<NTFSReader>(utils::strings::from_string(volume->name()), volume->offset());
+		}
+		else
+		{
+			_reader = std::make_shared<NTFSReader>(utils::strings::from_string(reinterpret_cast<Disk*>(volume->parent())->name()), volume->offset());
+		}
 	}
 	_MFT = std::make_shared<MFT>(_reader);
 }

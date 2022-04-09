@@ -68,11 +68,35 @@ namespace core
 
 			std::shared_ptr<Disk> from_image(std::string filename)
 			{
-				HANDLE hDisk = CreateFileW(utils::strings::from_string(filename).c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-				if (hDisk != INVALID_HANDLE_VALUE)
+				std::wstring wfilename = utils::strings::from_string(filename);
+
+				HANDLE hImage = CreateFileW(wfilename.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+				if (hImage != INVALID_HANDLE_VALUE)
 				{
-					std::shared_ptr<Disk> d = std::make_shared<Disk>(hDisk, filename);
-					CloseHandle(hDisk);
+					bool is_volume_image = false;
+
+					std::shared_ptr<Buffer<PBYTE>> first_sector = std::make_shared<Buffer<PBYTE>>(0x200);
+					DWORD read_size = 0;
+					if (ReadFile(hImage, first_sector->data(), 0x200, &read_size, NULL))
+					{
+						is_volume_image = core::win::volumes::is_volume_image(first_sector->data());
+					}
+
+					std::shared_ptr<Disk> d = nullptr;
+					if (!is_volume_image)
+					{
+						d = std::make_shared<Disk>(hImage, filename);
+					}
+					else
+					{
+						std::wstring wfilename = utils::strings::from_string(filename);
+
+						std::shared_ptr<VirtualDisk> vd = std::make_shared<VirtualDisk>(VirtualDiskType::Dummy, (PWCHAR)L"DummyDisk", (PWCHAR)L"DummyVol");
+						vd->add_volume_image(filename);
+						d = vd;
+					}
+
+					CloseHandle(hImage);
 					return d;
 				}
 				return nullptr;
