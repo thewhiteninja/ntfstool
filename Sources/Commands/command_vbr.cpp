@@ -123,13 +123,18 @@ void print_bootsector_ntfs(PBOOT_SECTOR_NTFS pbs)
 
 	print_strings((PBYTE)pbs, string_offsets);
 
-	unsigned int size_to_disass = min(*std::min_element(string_offsets.begin(), string_offsets.end()), 0x1f6);
+	unsigned int size_to_disass = 0x1f6;
+	if (string_offsets.size())
+	{
+		size_to_disass = min(*std::min_element(string_offsets.begin(), string_offsets.end()), size_to_disass);
+	}
+
 	while (((PBYTE)pbs)[size_to_disass - 1] == 0 && size_to_disass > 0)
 	{
 		size_to_disass--;
 	}
 
-	print_boot_code(pbs->bootCode, size_to_disass, 0x7c54);
+	print_boot_code(pbs->bootCode, size_to_disass - 84, 0x7c54);
 }
 
 void print_bootsector_fat32(PBOOT_SECTOR_FAT32 pbs)
