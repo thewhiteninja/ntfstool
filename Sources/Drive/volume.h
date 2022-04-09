@@ -79,6 +79,8 @@ namespace core
 		namespace volumes
 		{
 			std::vector<std::shared_ptr<Volume>> list();
+
+			bool is_volume_image(BYTE* sector);
 		}
 	}
 }

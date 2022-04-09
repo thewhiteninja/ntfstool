@@ -129,9 +129,6 @@ std::vector<std::string> get_fve_entry_values(PFVE_ENTRY entry, const std::strin
 		ret.push_back("Key           : " + utils::format::hex(((PFVE_ENTRY_AES_CCM)entry->data)->key, entry->size - 36, false));
 		break;
 	}
-	case FVE_METADATA_ENTRY_VALUE_TYPE_TPM_ENCODED_KEY:
-	case FVE_METADATA_ENTRY_VALUE_TYPE_VALIDATION:
-		break;
 	case FVE_METADATA_ENTRY_VALUE_TYPE_VOLUME_MASTER_KEY:
 	{
 		GUID key_id = ((PFVE_ENTRY_VMK)entry->data)->key_id;
@@ -201,6 +198,8 @@ std::vector<std::string> get_fve_entry_values(PFVE_ENTRY entry, const std::strin
 	case FVE_METADATA_ENTRY_VALUE_TYPE_ASYMMETRIC_ENCRYPTION:
 	case FVE_METADATA_ENTRY_VALUE_TYPE_EXPORTED_KEY:
 	case FVE_METADATA_ENTRY_VALUE_TYPE_PUBLIC_KEY:
+	case FVE_METADATA_ENTRY_VALUE_TYPE_TPM_ENCODED_KEY:
+	case FVE_METADATA_ENTRY_VALUE_TYPE_VALIDATION:
 	default:
 		ret.push_back("Unknown Value Type (" + std::to_string(entry->value_type) + ")");
 	}

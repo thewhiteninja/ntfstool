@@ -61,6 +61,7 @@ public:
 	bool has_protective_mbr()					const { return _protective_mbr; }
 	DWORD64 size()								const { return _size; };
 	DWORD partition_type()						const { return _partition_type; };
+	virtual bool is_virtual()					const { return false; }
 
 	PDISK_GEOMETRY_EX geometry() { return &_geometry; }
 	PMBR mbr() { return &_mbr; }

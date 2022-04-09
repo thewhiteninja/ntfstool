@@ -26,6 +26,17 @@ namespace core
 
 				return volumes;
 			}
+
+			bool is_volume_image(BYTE* sector)
+			{
+				if (!memcpy_s((PBOOT_SECTOR_FAT32(sector))->oemID, 8, "mkfs.fat", 8)) return true;
+				if (!memcpy_s((PBOOT_SECTOR_FAT32(sector))->oemID, 8, "mkdosfs", 8)) return true;
+				if (!memcpy_s((PBOOT_SECTOR_FAT32(sector))->oemID, 8, "NTFS    ", 8)) return true;
+				if (!memcpy_s((PBOOT_SECTOR_FAT32(sector))->oemID, 8, "MSWIN4.0", 8)) return true;
+				if (!memcpy_s((PBOOT_SECTOR_FAT32(sector))->oemID, 8, "MSWIN4.1", 8)) return true;
+
+				return false;
+			}
 		}
 	}
 }
