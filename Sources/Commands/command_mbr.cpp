@@ -42,8 +42,7 @@ void print_mbr(std::shared_ptr<Disk> disk)
 	for (int i = 0; i < 4; i++) {
 		if (mbr->partition[i].partition_type != 0)
 		{
-			n_partitions++;
-			partitions->add_item_line(std::to_string(n_partitions));
+			partitions->add_item_line(std::to_string(n_partitions++));
 			partitions->add_item_line((mbr->partition[i].status == 0x80 ? "Yes" : "No"));
 			partitions->add_item_line("Principal");
 			partitions->add_item_line(constants::disk::mbr_type(mbr->partition[i].partition_type));
@@ -57,8 +56,7 @@ void print_mbr(std::shared_ptr<Disk> disk)
 	}
 	for (EBR& ebr : disk->ebrs())
 	{
-		n_partitions++;
-		partitions->add_item_line(std::to_string(n_partitions));
+		partitions->add_item_line(std::to_string(n_partitions++));
 		partitions->add_item_line((ebr.partition[0].status == 0x80 ? "Yes" : "No"));
 		partitions->add_item_line("Logical");
 		partitions->add_item_line(constants::disk::mbr_type(ebr.partition[0].partition_type));
