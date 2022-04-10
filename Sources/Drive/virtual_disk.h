@@ -8,7 +8,7 @@ class VirtualDisk : public Disk
 {
 private:
 public:
-	VirtualDisk(VirtualDiskType type, PWCHAR device_name, PWCHAR volume_name);
+	VirtualDisk(VirtualDiskType type, PWCHAR volume_name);
 
 	void add_volume_image(std::string filename);
 

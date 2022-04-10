@@ -32,11 +32,11 @@ std::vector<std::shared_ptr<Disk>> core::win::virtualdisk::list()
 				{
 					if (!wcsncmp(DeviceName, L"\\Device\\VeraCryptVolume", 23))
 					{
-						vdisks.push_back(std::make_shared<VirtualDisk>(VirtualDiskType::VeraCrypt, DeviceName, VolumeName));
+						vdisks.push_back(std::make_shared<VirtualDisk>(VirtualDiskType::VeraCrypt, VolumeName));
 					}
 					else if (!wcsncmp(DeviceName, L"\\Device\\TrueCryptVolume", 23))
 					{
-						vdisks.push_back(std::make_shared<VirtualDisk>(VirtualDiskType::TrueCrypt, DeviceName, VolumeName));
+						vdisks.push_back(std::make_shared<VirtualDisk>(VirtualDiskType::TrueCrypt, VolumeName));
 					}
 				}
 
@@ -64,7 +64,7 @@ std::vector<std::shared_ptr<Disk>> core::win::virtualdisk::list()
 	return vdisks;
 }
 
-VirtualDisk::VirtualDisk(VirtualDiskType type, PWCHAR device_name, PWCHAR volume_name)
+VirtualDisk::VirtualDisk(VirtualDiskType type, PWCHAR volume_name)
 {
 	_partition_type = PARTITION_STYLE_RAW;
 
@@ -73,29 +73,29 @@ VirtualDisk::VirtualDisk(VirtualDiskType type, PWCHAR device_name, PWCHAR volume
 	case VirtualDiskType::VeraCrypt:
 	{
 		_product_id = "VeraCrypt";
+		_name = "VeraCrypt";
 		break;
 	}
 	case VirtualDiskType::TrueCrypt:
 	{
 		_product_id = "TrueCrypt";
+		_name = "TrueCrypt";
 		break;
 	}
 	case VirtualDiskType::Dummy:
 	{
-		_product_id = "Dummy";
+		_product_id = "ImageFile";
+		_name = "ImageFile";
 		break;
 	}
 	default:
 	{
 		_product_id = "Unknown";
+		_name = "Unknown";
 	}
 	}
 
-	if (type == VirtualDiskType::Dummy)
-	{
-		_size = 0;
-	}
-	else if ((type == VirtualDiskType::VeraCrypt) || (type == VirtualDiskType::TrueCrypt))
+	if ((type == VirtualDiskType::VeraCrypt) || (type == VirtualDiskType::TrueCrypt))
 	{
 		size_t volume_name_len = wcslen(volume_name) - 1;
 		volume_name[volume_name_len] = L'\0';
