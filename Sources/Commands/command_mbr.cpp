@@ -22,11 +22,10 @@ void print_mbr(std::shared_ptr<Disk> disk)
 
 	PMBR mbr = disk->mbr();
 
-	std::cout << "    Disk signature  : " << utils::format::hex(_byteswap_ulong(mbr->disk_signature)) << std::endl;
-	std::cout << "    Reserved bytes  : " << utils::format::hex(_byteswap_ushort(mbr->reserved)) << std::endl;
+	std::cout << "Disk signature  : " << utils::format::hex(_byteswap_ulong(mbr->disk_signature)) << std::endl;
+	std::cout << "Reserved bytes  : " << utils::format::hex(_byteswap_ushort(mbr->reserved)) << std::endl;
 
 	std::shared_ptr<utils::ui::Table> partitions = std::make_shared<utils::ui::Table>();
-	partitions->set_margin_left(4);
 
 	partitions->add_header_line("Id");
 	partitions->add_header_line("Boot");
@@ -68,7 +67,7 @@ void print_mbr(std::shared_ptr<Disk> disk)
 		partitions->new_line();
 	}
 
-	std::cout << std::endl << "    Partition table";
+	std::cout << std::endl << "Partition table";
 	if (disk->has_protective_mbr())
 	{
 		std::cout << " (Protective MBR)";
@@ -77,15 +76,15 @@ void print_mbr(std::shared_ptr<Disk> disk)
 	partitions->render(std::cout);
 	std::cout << std::endl;
 
-	std::cout << "    MBR signature  : " << std::setw(4) << std::hex << _byteswap_ushort(mbr->mbr_signature) << std::endl;
+	std::cout << "MBR signature  : " << std::setw(4) << std::hex << _byteswap_ushort(mbr->mbr_signature) << std::endl;
 
-	std::cout << std::endl << "    Strings:" << std::endl;
+	std::cout << std::endl << "Strings:" << std::endl;
 	std::vector<unsigned long> string_offsets;
 	for (int i = 0; i < 3; i++) string_offsets.push_back((mbr->code[0x1b5 + i] & 0xff) + 0x100);
 
 	if (std::all_of(string_offsets.begin(), string_offsets.end(), [string_offsets](int x) { return (x & 0xff) == 0; }))
 	{
-		std::cout << "        No strings found" << std::endl;
+		std::cout << "    No strings found" << std::endl;
 	}
 	else
 	{
@@ -93,7 +92,7 @@ void print_mbr(std::shared_ptr<Disk> disk)
 		{
 			if ((offset < 0x1b5) && offset > 0)
 			{
-				std::cout << "        [" << utils::format::hex((BYTE)(offset & 0xff)) << "] : " << std::string((PCHAR)mbr->code + offset) << std::endl;
+				std::cout << "    [" << utils::format::hex((BYTE)(offset & 0xff)) << "] : " << std::string((PCHAR)mbr->code + offset) << std::endl;
 			}
 		}
 	}
@@ -103,18 +102,18 @@ void print_mbr(std::shared_ptr<Disk> disk)
 
 	std::cout << std::endl;
 
-	if (utils::ui::ask_question("    Disassemble Bootstrap Code"))
+	if (utils::ui::ask_question("Disassemble Bootstrap Code"))
 	{
 		if (size_to_disass)
 		{
 			std::cout << std::endl;
 			for (std::string& line : utils::disass::buffer(mbr->code, size_to_disass, Decode16Bits, 0))
 			{
-				std::cout << "        " << line << std::endl;
+				std::cout << "    " << line << std::endl;
 			}
 		}
 		else {
-			std::cout << "        Empty code" << std::endl;
+			std::cout << "    Empty code" << std::endl;
 		}
 	}
 }
