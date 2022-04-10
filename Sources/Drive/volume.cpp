@@ -29,11 +29,11 @@ namespace core
 
 			bool is_volume_image(BYTE* sector)
 			{
-				if (!memcpy_s((PBOOT_SECTOR_FAT32(sector))->oemID, 8, "mkfs.fat", 8)) return true;
-				if (!memcpy_s((PBOOT_SECTOR_FAT32(sector))->oemID, 8, "mkdosfs", 8)) return true;
-				if (!memcpy_s((PBOOT_SECTOR_FAT32(sector))->oemID, 8, "NTFS    ", 8)) return true;
-				if (!memcpy_s((PBOOT_SECTOR_FAT32(sector))->oemID, 8, "MSWIN4.0", 8)) return true;
-				if (!memcpy_s((PBOOT_SECTOR_FAT32(sector))->oemID, 8, "MSWIN4.1", 8)) return true;
+				if (!memcmp((PBOOT_SECTOR_FAT32(sector))->oemID, "mkfs.fat", 8)) return true;
+				if (!memcmp((PBOOT_SECTOR_FAT32(sector))->oemID, "mkdosfs\x00", 8)) return true;
+				if (!memcmp((PBOOT_SECTOR_FAT32(sector))->oemID, "NTFS    ", 8)) return true;
+				if (!memcmp((PBOOT_SECTOR_FAT32(sector))->oemID, "MSWIN4.0", 8)) return true;
+				if (!memcmp((PBOOT_SECTOR_FAT32(sector))->oemID, "MSWIN4.1", 8)) return true;
 
 				return false;
 			}
