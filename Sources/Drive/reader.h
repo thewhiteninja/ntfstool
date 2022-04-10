@@ -28,5 +28,7 @@ public:
 
 	bool seek(ULONG64 position);
 
+	DWORD64 get_volume_offset() { return _image_volume_offset; }
+
 	bool read(LPVOID lpBuffer, ULONG32 nNumberOfBytesToRead);
 };

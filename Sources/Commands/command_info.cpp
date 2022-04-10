@@ -148,19 +148,19 @@ void print_image_disk(std::shared_ptr<Disk> disk) {
 		if (GetFileTime(hDisk, &creation, &access, &write))
 		{
 			utils::times::filetime_to_local_systemtime(creation, &creation_s);
-			std::cout << "    Creation    : " << utils::times::display_systemtime(creation_s) << std::endl;
+			std::cout << "Creation    : " << utils::times::display_systemtime(creation_s) << std::endl;
 			utils::times::filetime_to_local_systemtime(write, &write_s);
-			std::cout << "    Modification: " << utils::times::display_systemtime(write_s) << std::endl;
+			std::cout << "Modification: " << utils::times::display_systemtime(write_s) << std::endl;
 			utils::times::filetime_to_local_systemtime(access, &access_s);
-			std::cout << "    Access      : " << utils::times::display_systemtime(access_s) << std::endl;
+			std::cout << "Access      : " << utils::times::display_systemtime(access_s) << std::endl;
 			std::cout << std::endl;
-			if (utils::ui::ask_question("    Hash SHA256"))
+			if (utils::ui::ask_question("Hash SHA256"))
 			{
 				BYTE hashbuf[256 / 8 + 1] = { 0 };
 				std::cout << std::endl;
-				std::cout << "    Hash SHA256 : Calculating ...";
+				std::cout << "Hash SHA256 : Calculating ...";
 				hash_file_sha256(disk->name(), hashbuf);
-				std::cout << "\r" << "    Hash SHA256 : " << utils::format::hex(hashbuf, 32) << std::endl;
+				std::cout << "\r" << "Hash SHA256 : " << utils::format::hex(hashbuf, 32) << std::endl;
 				std::cout << std::endl;
 			}
 			else
@@ -171,12 +171,11 @@ void print_image_disk(std::shared_ptr<Disk> disk) {
 		CloseHandle(hDisk);
 	}
 
-	std::cout << "    Size        : " << disk->size() << " (" << utils::format::size(disk->size()) << ")" << std::endl;
-	std::cout << "    Volume      : " << constants::disk::partition_type(disk->partition_type()) << std::endl;
+	std::cout << "Size        : " << disk->size() << " (" << utils::format::size(disk->size()) << ")" << std::endl;
+	std::cout << "Volume      : " << constants::disk::partition_type(disk->partition_type()) << std::endl;
 	std::cout << std::endl;
 
 	std::shared_ptr<utils::ui::Table> partitions = std::make_shared<utils::ui::Table>();
-	partitions->set_margin_left(4);
 	partitions->add_header_line("Id");
 	switch (disk->partition_type()) {
 	case PARTITION_STYLE_MBR:
@@ -231,37 +230,37 @@ void print_hardware_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> v
 
 	if (vol->serial_number())
 	{
-		std::cout << "    Serial Number  : ";
+		std::cout << "Serial Number  : ";
 		std::cout << utils::format::hex(vol->serial_number() >> 16) << "-" << utils::format::hex(vol->serial_number() & 0xffff) << std::endl;
 	}
 	if (vol->filesystem().length() > 0)
 	{
-		std::cout << "    Filesystem     : " << vol->filesystem() << std::endl;
+		std::cout << "Filesystem     : " << vol->filesystem() << std::endl;
 	}
 	if (vol->partition_type() == PARTITION_STYLE_MBR)
 	{
-		std::cout << "    Bootable       : " << (vol->bootable() ? "True" : "False") << std::endl;
+		std::cout << "Bootable       : " << (vol->bootable() ? "True" : "False") << std::endl;
 	}
 	if (vol->partition_type() == PARTITION_STYLE_GPT)
 	{
-		std::cout << "    GUID           : " << vol->guid_type() << std::endl;
+		std::cout << "GUID           : " << vol->guid_type() << std::endl;
 	}
-	std::cout << "    Type           : " << constants::disk::drive_type(vol->type()) << std::endl;
+	std::cout << "Type           : " << constants::disk::drive_type(vol->type()) << std::endl;
 	if (vol->label().length() > 0)
 	{
-		std::cout << "    Label          : " << vol->label() << std::endl;
+		std::cout << "Label          : " << vol->label() << std::endl;
 	}
-	std::cout << "    Offset         : " << vol->offset() << " (" << utils::format::size(vol->offset()) << ")" << std::endl;
-	std::cout << "    Size           : " << vol->size() << " (" << utils::format::size(vol->size()) << ")" << std::endl;
-	std::cout << "    Free           : " << vol->free() << " (" << utils::format::size(vol->free()) << ")" << std::endl;
+	std::cout << "Offset         : " << vol->offset() << " (" << utils::format::size(vol->offset()) << ")" << std::endl;
+	std::cout << "Size           : " << vol->size() << " (" << utils::format::size(vol->size()) << ")" << std::endl;
+	std::cout << "Free           : " << vol->free() << " (" << utils::format::size(vol->free()) << ")" << std::endl;
 
-	std::cout << "    Mounted        : " << (vol->is_mounted() ? "True" : "False");
+	std::cout << "Mounted        : " << (vol->is_mounted() ? "True" : "False");
 	if (vol->is_mounted())
 	{
 		std::cout << " (" << utils::strings::join_vec(vol->mountpoints(), ", ") << ")";
 	}
 	std::cout << std::endl;
-	std::cout << "    Bitlocker      : " << (vol->bitlocker().bitlocked ? "True" : "False");
+	std::cout << "Bitlocker      : " << (vol->bitlocker().bitlocked ? "True" : "False");
 	if (vol->bitlocker().bitlocked)
 	{
 		std::cout << " (" << (vol->filesystem().length() == 0 ? "Locked" : "Unlocked") << ")";
@@ -274,20 +273,20 @@ void print_image_volume(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol)
 
 	if (vol->filesystem().length() > 0)
 	{
-		std::cout << "    Filesystem     : " << vol->filesystem() << std::endl;
+		std::cout << "Filesystem     : " << vol->filesystem() << std::endl;
 	}
 	if (vol->partition_type() == PARTITION_STYLE_MBR)
 	{
-		std::cout << "    Bootable       : " << (vol->bootable() ? "True" : "False") << std::endl;
+		std::cout << "Bootable       : " << (vol->bootable() ? "True" : "False") << std::endl;
 	}
 	if (vol->partition_type() == PARTITION_STYLE_GPT)
 	{
-		std::cout << "    GUID           : " << vol->guid_type() << std::endl;
+		std::cout << "GUID           : " << vol->guid_type() << std::endl;
 	}
 
-	std::cout << "    Offset         : " << vol->offset() << " (" << utils::format::size(vol->offset()) << ")" << std::endl;
-	std::cout << "    Size           : " << vol->size() << " (" << utils::format::size(vol->size()) << ")" << std::endl;
-	std::cout << "    Bitlocker      : " << (vol->bitlocker().bitlocked ? "True" : "False");
+	std::cout << "Offset         : " << vol->offset() << " (" << utils::format::size(vol->offset()) << ")" << std::endl;
+	std::cout << "Size           : " << vol->size() << " (" << utils::format::size(vol->size()) << ")" << std::endl;
+	std::cout << "Bitlocker      : " << (vol->bitlocker().bitlocked ? "True" : "False");
 	if (vol->bitlocker().bitlocked)
 	{
 		std::cout << " (" << (vol->filesystem().length() == 0 ? "Locked" : "Unlocked") << ")";

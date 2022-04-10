@@ -36,7 +36,7 @@ MFTRecord::~MFTRecord()
 
 uint64_t MFTRecord::raw_address()
 {
-	return _reader->boot_record()->MFTCluster * _reader->sizes.cluster_size + (_record->data()->MFTRecordIndex * _reader->sizes.record_size);
+	return _reader->get_volume_offset() + (_reader->boot_record()->MFTCluster * _reader->sizes.cluster_size + (_record->data()->MFTRecordIndex * _reader->sizes.record_size));
 }
 
 uint64_t MFTRecord::raw_address(PMFT_RECORD_ATTRIBUTE_HEADER pAttr, uint64_t offset)
