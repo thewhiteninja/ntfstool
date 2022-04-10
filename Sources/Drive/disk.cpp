@@ -91,7 +91,7 @@ namespace core
 					{
 						std::wstring wfilename = utils::strings::from_string(filename);
 
-						std::shared_ptr<VirtualDisk> vd = std::make_shared<VirtualDisk>(VirtualDiskType::Dummy, (PWCHAR)L"DummyDisk", (PWCHAR)L"DummyVol");
+						std::shared_ptr<VirtualDisk> vd = std::make_shared<VirtualDisk>(VirtualDiskType::Dummy, (PWCHAR)L"DummyVol");
 						vd->add_volume_image(filename);
 						d = vd;
 					}
