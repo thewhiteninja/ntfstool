@@ -25,6 +25,7 @@
     <ClInclude Include="Sources\Bitlocker\fve.h" />
     <ClInclude Include="Sources\Bitlocker\password.h" />
     <ClInclude Include="Sources\Bitlocker\recovery.h" />
+    <ClInclude Include="Sources\Bitlocker\unprotected.h" />
     <ClInclude Include="Sources\Commands\commands.h" />
     <ClInclude Include="Sources\Compression\lznt1.h" />
     <ClInclude Include="Sources\Compression\ntdll_defs.h" />
@@ -76,6 +77,7 @@
     <ClCompile Include="Sources\Bitlocker\decryption.cpp" />
     <ClCompile Include="Sources\Bitlocker\password.cpp" />
     <ClCompile Include="Sources\Bitlocker\recovery.cpp" />
+    <ClCompile Include="Sources\Bitlocker\unprotected.cpp" />
     <ClCompile Include="Sources\Commands\commands.cpp" />
     <ClCompile Include="Sources\Commands\command_bitlocker.decrypt.cpp" />
     <ClCompile Include="Sources\Commands\command_bitlocker.info.cpp" />

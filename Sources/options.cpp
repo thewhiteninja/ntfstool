@@ -130,6 +130,7 @@ std::shared_ptr<Options> parse_options(int argc, char** argv) {
 		if (is_option(argv[i], "format")) { read_option_string(argv[i], ret->format); continue; }
 		if (is_option(argv[i], "rules")) { read_option_string(argv[i], ret->rules); continue; }
 		if (!strncmp(argv[i], "--sam", 5)) { ret->sam = true; continue; }
+		if (!strncmp(argv[i], "--unprotected", 13)) { ret->unprotected = true; continue; }
 		if (!strncmp(argv[i], "--system", 8)) { ret->system = true; continue; }
 		if (is_help(argv[i])) { ret->show_usage = true; continue; }
 		if (ret->subcommand == "") { ret->subcommand = std::string(argv[i]); continue; }

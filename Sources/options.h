@@ -35,6 +35,7 @@ public:
 
 	bool show_usage = false;
 	bool sam = false;
+	bool unprotected = false;
 	bool system = false;
 
 	explicit Options();
