@@ -213,6 +213,9 @@
     <ClInclude Include="Sources\Utils\usn_stats.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Bitlocker\unprotected.h">
+      <Filter>Header Files\Bitlocker</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -412,6 +415,9 @@
     </ClCompile>
     <ClCompile Include="Sources\Utils\path_finder.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Bitlocker\unprotected.cpp">
+      <Filter>Source Files\Bitlocker</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

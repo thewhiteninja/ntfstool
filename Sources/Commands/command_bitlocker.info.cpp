@@ -20,6 +20,126 @@
 #include "Utils/table.h"
 #include <Bitlocker\recovery.h>
 #include "commands.h"
+#include <Bitlocker/unprotected.h>
+
+void print_test_bitlocker_unprotected(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
+{
+	utils::ui::title("Bitlocker Unprotected Test for " + disk->name() + " > Volume:" + std::to_string(vol->index()));
+
+	PBOOT_SECTOR_COMMON pbsc = (PBOOT_SECTOR_COMMON)vol->bootsector();
+	if (strncmp((char*)pbsc->oemID, "-FVE-FS-", 8) == 0)
+	{
+		std::cout << "FVE Version    : " << vol->bitlocker().metadata[0].block_header.version << std::endl;
+		std::cout << "State          : " << constants::bitlocker::state(vol->bitlocker().metadata[0].block_header.curr_state) << std::endl;
+		std::cout << "Size           : " << vol->size() << " (" << utils::format::size(vol->size()) << ")" << std::endl;
+		std::cout << "Encrypted Size : " << vol->bitlocker().metadata[0].block_header.encrypted_volume_size << " (" << utils::format::size(vol->bitlocker().metadata[0].block_header.encrypted_volume_size) << ")" << std::endl;
+		std::cout << "Algorithm      : " << constants::bitlocker::algorithm(vol->bitlocker().metadata[0].header.algorithm) << std::endl;
+		SYSTEMTIME st;
+		utils::times::filetime_to_local_systemtime(vol->bitlocker().metadata[0].header.timestamp, &st);
+		std::cout << "Timestamp      : " << utils::times::display_systemtime(st) << std::endl;
+		std::cout << std::endl;
+
+		std::shared_ptr<utils::ui::Table> table = std::make_shared<utils::ui::Table>();
+		table->set_interline(true);
+
+		table->add_header_line("Id");
+		table->add_header_line("Type");
+		table->add_header_line("GUID");
+		table->add_header_line("Password");
+		table->add_header_line("Result");
+
+		PFVE_ENTRY fvek_entry = nullptr;
+		for (auto& entry : vol->bitlocker().metadata[0].entries)
+		{
+			if (entry->data()->entry_type == FVE_METADATA_ENTRY_TYPE_FKEV && entry->data()->value_type == FVE_METADATA_ENTRY_VALUE_TYPE_AES_CCM_ENCRYPTED_KEY)
+			{
+				fvek_entry = entry->data();
+			}
+		}
+
+
+		unsigned int n = 0;
+		for (auto& entry : vol->bitlocker().metadata[0].entries)
+		{
+			if (entry->data()->entry_type == FVE_METADATA_ENTRY_TYPE_VMK && entry->data()->value_type == FVE_METADATA_ENTRY_VALUE_TYPE_VOLUME_MASTER_KEY)
+			{
+				n++;
+				if (((PFVE_ENTRY_VMK)entry->data()->data)->protection_type == FVE_METADATA_KEY_PROTECTION_TYPE_CLEARTEXT)
+				{
+					table->add_item_line(std::to_string(n));
+					table->add_item_line(constants::bitlocker::fve_key_protection_type(((PFVE_ENTRY_VMK)entry->data()->data)->protection_type));
+					table->add_item_line(utils::id::guid_to_string(((PFVE_ENTRY_VMK)entry->data()->data)->key_id));
+
+					ULONG64 nonce_time = 0;
+					ULONG32 nonce_ctr = 0;
+					ULONG32 enc_size = 0;
+					BYTE* mac_val = NULL;
+					BYTE* enc_key = NULL;
+					BYTE unprotected_key[32] = { 0 };
+
+					int sub_entry_size_left = entry->data()->size - 36;
+					PFVE_ENTRY psubentry = (PFVE_ENTRY)(((PFVE_ENTRY_VMK)entry->data()->data)->subentries);
+					while (sub_entry_size_left > 0)
+					{
+						if (psubentry->value_type == FVE_METADATA_ENTRY_VALUE_TYPE_AES_CCM_ENCRYPTED_KEY)
+						{
+							nonce_time = ULARGE_INTEGER{ ((PFVE_ENTRY_AES_CCM)psubentry->data)->nonce_time.dwLowDateTime, ((PFVE_ENTRY_AES_CCM)psubentry->data)->nonce_time.dwHighDateTime }.QuadPart;
+							nonce_ctr = ((PFVE_ENTRY_AES_CCM)psubentry->data)->nonce_counter;
+							mac_val = ((PFVE_ENTRY_AES_CCM)psubentry->data)->mac;
+							enc_key = ((PFVE_ENTRY_AES_CCM)psubentry->data)->key;
+							enc_size = psubentry->size - 36;
+							break;
+						}
+						else if (psubentry->value_type == FVE_METADATA_ENTRY_VALUE_TYPE_KEY)
+						{
+							memcpy_s(unprotected_key, 32, ((PFVE_ENTRY_KEY)psubentry->data)->key, psubentry->size - 12);
+						}
+						sub_entry_size_left -= psubentry->size;
+						psubentry = POINTER_ADD(PFVE_ENTRY, psubentry, psubentry->size);
+					}
+
+					table->add_item_line("**unprotected**");
+
+					std::vector<std::string> content;
+
+					content.push_back("Ok");
+
+					content.push_back("");
+
+					unsigned char vmk_buffer[256] = { 0 };
+					get_vmk_from_unprotected_key(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, unprotected_key, vmk_buffer);
+					content.push_back("VMK  : " + utils::format::hex(((PFVE_VMK)vmk_buffer)->vmk, 32));
+
+					if (fvek_entry != nullptr)
+					{
+						unsigned char fvek_buffer[256] = { 0 };
+
+						nonce_time = ULARGE_INTEGER{ ((PFVE_ENTRY_AES_CCM)fvek_entry->data)->nonce_time.dwLowDateTime, ((PFVE_ENTRY_AES_CCM)fvek_entry->data)->nonce_time.dwHighDateTime }.QuadPart;
+						nonce_ctr = ((PFVE_ENTRY_AES_CCM)fvek_entry->data)->nonce_counter;
+						mac_val = ((PFVE_ENTRY_AES_CCM)fvek_entry->data)->mac;
+						enc_key = ((PFVE_ENTRY_AES_CCM)fvek_entry->data)->key;
+						enc_size = fvek_entry->size - 36;
+
+						get_fvek_from_vmk(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, ((PFVE_VMK)vmk_buffer)->vmk, fvek_buffer);
+						content.push_back("FVEK : " + utils::format::hex(((PFVE_FVEK)fvek_buffer)->fvek, ((PFVE_FVEK)fvek_buffer)->size - 0xc));
+					}
+
+					table->add_item_multiline(content);
+
+					table->new_line();
+				}
+			}
+		}
+
+		utils::ui::title("Tested with unprotected key:");
+		table->render(std::cout);
+		std::cout << std::endl;
+	}
+	else
+	{
+		std::cout << "[!] Volume is not Bitlocked" << std::endl;
+	}
+}
 
 void print_test_bitlocker_password(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol, std::shared_ptr<Options> opts)
 {
@@ -534,6 +654,7 @@ int test_password(std::shared_ptr<Options> opts)
 			if (opts->password != "") print_test_bitlocker_password(disk, volume, opts);
 			else if (opts->recovery != "") print_test_bitlocker_recovery(disk, volume, opts);
 			else if (opts->bek != "") print_test_bitlocker_bek(disk, volume, opts);
+			else if (opts->unprotected) print_test_bitlocker_unprotected(disk, volume, opts);
 		}
 		else
 		{
@@ -583,7 +704,7 @@ namespace commands
 		{
 			int dispatch(std::shared_ptr<Options> opts)
 			{
-				if (opts->password != "" || opts->recovery != "" || opts->bek != "")
+				if (opts->password != "" || opts->recovery != "" || opts->bek != "" || opts->unprotected)
 				{
 					test_password(opts);
 				}
