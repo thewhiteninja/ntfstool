@@ -10,6 +10,7 @@
 #include <vector>
 #include <algorithm>
 #include <cctype>
+#include <fstream>
 #include <distorm.h>
 
 #include <Mstcpip.h>
@@ -717,6 +718,68 @@ void utils::crypto::xor_buffer(PVOID data, DWORD datalen, PVOID key, DWORD keyle
 	for (DWORD i = 0; i < datalen; i++)
 	{
 		PBYTE(data)[i] ^= PBYTE(key)[i % keylen];
+	}
+}
+
+void utils::crypto::hash::sha256_file(std::string filename, BYTE output[SHA256_DIGEST_LENGTH])
+{
+	Buffer<PCHAR> buffer(4096 * 16);
+	EVP_MD_CTX* ctx = EVP_MD_CTX_create();
+	if (ctx)
+	{
+		EVP_DigestInit(ctx, EVP_sha256());
+		std::ifstream is(filename.c_str(), std::ifstream::binary);
+		if (is.is_open() && buffer.is_valid())
+		{
+			while (!is.eof())
+			{
+				is.read(buffer.data(), buffer.size());
+				EVP_DigestUpdate(ctx, buffer.data(), static_cast<size_t>(is.gcount()));
+			}
+			unsigned int rsize = 0;
+			EVP_DigestFinal(ctx, output, &rsize);
+			is.close();
+		}
+		EVP_MD_CTX_destroy(ctx);
+	}
+}
+
+void utils::crypto::hash::sha256_buffer(PBYTE input, size_t input_len, BYTE output[SHA256_DIGEST_LENGTH])
+{
+	EVP_MD_CTX* ctx = EVP_MD_CTX_create();
+	if (ctx)
+	{
+		EVP_DigestInit(ctx, EVP_sha256());
+		EVP_DigestUpdate(ctx, input, input_len);
+		unsigned int rsize = 0;
+		EVP_DigestFinal(ctx, output, &rsize);
+		EVP_MD_CTX_destroy(ctx);
+	}
+}
+
+void utils::crypto::hash::sha1_buffer(PBYTE input, size_t input_len, BYTE output[SHA_DIGEST_LENGTH])
+{
+	EVP_MD_CTX* ctx = EVP_MD_CTX_create();
+	if (ctx)
+	{
+		EVP_DigestInit(ctx, EVP_sha1());
+		EVP_DigestUpdate(ctx, input, input_len);
+		unsigned int rsize = 0;
+		EVP_DigestFinal(ctx, output, &rsize);
+		EVP_MD_CTX_destroy(ctx);
+	}
+}
+
+void utils::crypto::hash::md4_buffer(PBYTE input, size_t input_len, BYTE output[MD4_DIGEST_LENGTH])
+{
+	EVP_MD_CTX* ctx = EVP_MD_CTX_create();
+	if (ctx)
+	{
+		EVP_DigestInit(ctx, EVP_md4());
+		EVP_DigestUpdate(ctx, input, input_len);
+		unsigned int rsize = 0;
+		EVP_DigestFinal(ctx, output, &rsize);
+		EVP_MD_CTX_destroy(ctx);
 	}
 }
 
