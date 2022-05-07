@@ -7,17 +7,15 @@ void bitlocker_derive_key(unsigned char* password_hash, unsigned char* password_
 	uint64_t ic = 0;
 
 	memset(&fkd, 0, sizeof(FVE_KEY_DATA));
-	memcpy(fkd.initial_sha256_hash, password_hash, 32);
-	memcpy(fkd.salt, password_salt, 16);
+	memcpy_s(fkd.initial_sha256_hash, 32, password_hash, 32);
+	memcpy_s(fkd.salt, 16, password_salt, 16);
 
 	for (ic = 0; ic < iterations; ic++) {
-		SHA256_Init(&ctx);
 		fkd.iteration_count = ic;
-		SHA256_Update(&ctx, &fkd, sizeof(FVE_KEY_DATA));
-		SHA256_Final(fkd.last_sha256_hash, &ctx);
+		utils::crypto::hash::sha256_buffer((PBYTE)(&fkd), sizeof(FVE_KEY_DATA), fkd.last_sha256_hash);
 	}
 
-	memcpy(key, fkd.last_sha256_hash, 32);
+	memcpy_s(key, 32, fkd.last_sha256_hash, 32);
 }
 
 void bitlocker_decrypt_data(PBYTE encrypted_data, ULONG32 encrypted_data_size, PBYTE key, PBYTE mac, PBYTE nonce, PBYTE decrypted_data)

@@ -34,10 +34,7 @@ void bitlocker_prepare_recovery_key(std::string recovery, unsigned char* recover
 		}
 	}
 
-	SHA256_CTX ctx = { 0 };
-	SHA256_Init(&ctx);
-	SHA256_Update(&ctx, recovery_hash, 16);
-	SHA256_Final(recovery_hash, &ctx);
+	utils::crypto::hash::sha256_buffer(recovery_hash, 16, recovery_hash);
 }
 
 bool test_bitlocker_recovery(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& recovery)

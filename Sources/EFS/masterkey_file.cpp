@@ -4,18 +4,12 @@ void MasterKey::hash_password(std::u16string& password, std::shared_ptr<Buffer<P
 {
 	if (policy & POLICY_HASH)
 	{
-		SHA_CTX ctx = { 0 };
-		SHA1_Init(&ctx);
-		SHA1_Update(&ctx, password.c_str(), password.size() * 2);
-		SHA1_Final(output->data(), &ctx);
+		utils::crypto::hash::sha1_buffer((PBYTE)password.c_str(), password.size() * 2, output->data());
 		output->shrink(SHA_DIGEST_LENGTH);
 	}
 	else
 	{
-		MD4_CTX ctx = { 0 };
-		MD4_Init(&ctx);
-		MD4_Update(&ctx, password.c_str(), password.size() * 2);
-		MD4_Final(output->data(), &ctx);
+		utils::crypto::hash::md4_buffer((PBYTE)password.c_str(), password.size() * 2, output->data());
 		output->shrink(MD4_DIGEST_LENGTH);
 	}
 }

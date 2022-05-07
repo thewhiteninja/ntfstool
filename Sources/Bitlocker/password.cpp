@@ -7,13 +7,8 @@ void bitlocker_prepare_password(std::string password, unsigned char* password_ha
 {
 	std::u16string password_utf16_le = utils::strings::str_to_utf16(password);
 
-	SHA256_CTX ctx = { 0 };
-	SHA256_Init(&ctx);
-	SHA256_Update(&ctx, password_utf16_le.c_str(), password_utf16_le.size() * 2);
-	SHA256_Final(password_hash, &ctx);
-	SHA256_Init(&ctx);
-	SHA256_Update(&ctx, password_hash, 32);
-	SHA256_Final(password_hash, &ctx);
+	utils::crypto::hash::sha256_buffer((PBYTE)password_utf16_le.c_str(), password_utf16_le.size() * 2, password_hash);
+	utils::crypto::hash::sha256_buffer(password_hash, 32, password_hash);
 }
 
 bool test_bitlocker_password(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& password)

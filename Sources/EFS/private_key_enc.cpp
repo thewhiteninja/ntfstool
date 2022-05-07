@@ -56,10 +56,7 @@ PrivateKeyEnc::PrivateKeyEnc(PBYTE data, DWORD size)
 
 void PrivateKeyEnc::hash_masterkey(std::shared_ptr<Buffer<PBYTE>> masterkey, std::shared_ptr<Buffer<PBYTE>> masterkey_hash)
 {
-	SHA_CTX ctx = { 0 };
-	SHA1_Init(&ctx);
-	SHA1_Update(&ctx, masterkey->data(), masterkey->size());
-	SHA1_Final(masterkey_hash->data(), &ctx);
+	utils::crypto::hash::sha1_buffer(masterkey->data(), masterkey->size(), masterkey_hash->data());
 }
 
 void PrivateKeyEnc::derive_intermediate_key(DWORD hashAlg, std::shared_ptr<Buffer<PBYTE>> masterkey_hash, std::shared_ptr<Buffer<PBYTE>> salt, std::shared_ptr<Buffer<PBYTE>> derive_intermediate_key)
