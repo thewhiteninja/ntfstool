@@ -6,7 +6,7 @@ std::vector<std::shared_ptr<Disk>> core::win::virtualdisk::list()
 	std::vector<std::shared_ptr<Disk>> vdisks;
 
 	DWORD  CharCount = 0;
-	size_t Index = 0;
+	size_t last_char_index = 0;
 	WCHAR  PathNames[2 * MAX_PATH] = L"";
 	WCHAR  DeviceName[MAX_PATH] = L"";
 	WCHAR  VolumeName[MAX_PATH] = L"";
@@ -17,16 +17,16 @@ std::vector<std::shared_ptr<Disk>> core::win::virtualdisk::list()
 	{
 		for (;;)
 		{
-			Index = wcslen(VolumeName) - 1;
+			last_char_index = wcslen(VolumeName) - 1;
 
-			if (VolumeName[0] == L'\\' || VolumeName[1] == L'\\' || VolumeName[2] == L'?' || VolumeName[3] == L'\\' || VolumeName[Index] == L'\\')
+			if ((VolumeName[0] == L'\\') && (VolumeName[1] == L'\\') && (VolumeName[2] == L'?') && (VolumeName[3] == L'\\') && (VolumeName[last_char_index] == L'\\'))
 			{
-				VolumeName[Index] = L'\0';
+				VolumeName[last_char_index] = L'\0';
 				if (!QueryDosDeviceW(&VolumeName[4], DeviceName, ARRAYSIZE(DeviceName)))
 				{
 					break;
 				}
-				VolumeName[Index] = L'\\';
+				VolumeName[last_char_index] = L'\\';
 
 				if (GetVolumePathNamesForVolumeNameW(VolumeName, PathNames, 2 * MAX_PATH, &CharCount))
 				{

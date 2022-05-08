@@ -8,11 +8,11 @@
 
 static unsigned char EFS_IV[16] = { 0x12, 0x13, 0x16, 0xe9, 0x7b, 0x65, 0x16, 0x58, 0x61, 0x89, 0x91, 0x44, 0xbe, 0xad, 0x89, 0x19 };
 
-std::shared_ptr<Buffer<PEFS_FEK>> decrypt_fek(const RSA* private_key, std::shared_ptr<Buffer<PBYTE>> encrypted_fek)
+std::shared_ptr<Buffer<PEFS_FEK>> decrypt_fek(EVP_PKEY* private_key, std::shared_ptr<Buffer<PBYTE>> encrypted_fek)
 {
 	if (encrypted_fek && private_key)
 	{
-		RSA* private_key_tmp = const_cast<RSA*>(private_key);
+		RSA* private_key_tmp = const_cast<RSA*>(EVP_PKEY_get0_RSA(private_key));
 		std::shared_ptr<Buffer<PEFS_FEK>> decrypted_fek = std::make_shared<Buffer<PEFS_FEK>>(encrypted_fek->size());
 		int ret = RSA_private_decrypt(encrypted_fek->size(), encrypted_fek->data(), decrypted_fek->address(), private_key_tmp, RSA_PKCS1_PADDING);
 		if (ret == -1)
@@ -170,7 +170,7 @@ int load_key_and_decrypt_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume
 					if (ddf_id == keyid)
 					{
 						std::cout << "[+] Decrypting FEK" << std::endl;
-						std::shared_ptr<Buffer<PEFS_FEK>> decrypted_fek = decrypt_fek(EVP_PKEY_get0_RSA(pkcs12->key()), fek_enc);
+						std::shared_ptr<Buffer<PEFS_FEK>> decrypted_fek = decrypt_fek(pkcs12->key(), fek_enc);
 						if (decrypted_fek)
 						{
 							std::cout << "[-] FEK" << std::endl;
