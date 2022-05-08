@@ -234,7 +234,19 @@ public:
 
 	std::string to_string() const
 	{
-		std::string s = std::string((char*)_mem, _size);
-		return s;
+		return std::string(reinterpret_cast<char*>(_mem), _size);
+	}
+
+	std::string dump_to_string(std::string title = "", unsigned int block_size = 16, unsigned int limit = 0xffffffff)
+	{
+		std::ostringstream os;
+
+		os << title << ":" << std::endl;
+		for (unsigned int i = 0; i < _size; i += block_size)
+		{
+			os << utils::convert::to_hex(_mem + i, min(_size - i, block_size)) << std::endl;
+		}
+
+		return os.str();
 	}
 };
