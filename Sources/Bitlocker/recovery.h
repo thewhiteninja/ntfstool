@@ -15,4 +15,4 @@ void bitlocker_prepare_recovery_key(std::string recovery, unsigned char* recover
 
 bool test_bitlocker_recovery(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& recovery);
 
-void get_vmk_from_recovery(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& recovery, PBYTE vmk);
+void get_vmk_from_recovery(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& recovery, PBYTE vmk, ULONG32 vmk_len);

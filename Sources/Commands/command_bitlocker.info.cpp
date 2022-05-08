@@ -107,7 +107,7 @@ void print_test_bitlocker_unprotected(std::shared_ptr<Disk> disk, std::shared_pt
 					content.push_back("");
 
 					unsigned char vmk_buffer[256] = { 0 };
-					get_vmk_from_unprotected_key(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, unprotected_key, vmk_buffer);
+					get_vmk_from_unprotected_key(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, unprotected_key, vmk_buffer, 256);
 					content.push_back("VMK  : " + utils::format::hex(((PFVE_VMK)vmk_buffer)->vmk, 32));
 
 					if (fvek_entry != nullptr)
@@ -120,7 +120,7 @@ void print_test_bitlocker_unprotected(std::shared_ptr<Disk> disk, std::shared_pt
 						enc_key = ((PFVE_ENTRY_AES_CCM)fvek_entry->data)->key;
 						enc_size = fvek_entry->size - 36;
 
-						get_fvek_from_vmk(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, ((PFVE_VMK)vmk_buffer)->vmk, fvek_buffer);
+						get_fvek_from_vmk(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, ((PFVE_VMK)vmk_buffer)->vmk, fvek_buffer, 256);
 						content.push_back("FVEK : " + utils::format::hex(((PFVE_FVEK)fvek_buffer)->fvek, ((PFVE_FVEK)fvek_buffer)->size - 0xc));
 					}
 
@@ -227,7 +227,7 @@ void print_test_bitlocker_password(std::shared_ptr<Disk> disk, std::shared_ptr<V
 						content.push_back("");
 
 						unsigned char vmk_buffer[256] = { 0 };
-						get_vmk_from_password(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, salt, opts->password, vmk_buffer);
+						get_vmk_from_password(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, salt, opts->password, vmk_buffer, 256);
 						content.push_back("VMK  : " + utils::format::hex(((PFVE_VMK)vmk_buffer)->vmk, 32));
 
 						if (fvek_entry != nullptr)
@@ -240,7 +240,7 @@ void print_test_bitlocker_password(std::shared_ptr<Disk> disk, std::shared_ptr<V
 							enc_key = ((PFVE_ENTRY_AES_CCM)fvek_entry->data)->key;
 							enc_size = fvek_entry->size - 36;
 
-							get_fvek_from_vmk(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, ((PFVE_VMK)vmk_buffer)->vmk, fvek_buffer);
+							get_fvek_from_vmk(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, ((PFVE_VMK)vmk_buffer)->vmk, fvek_buffer, 256);
 							content.push_back("FVEK : " + utils::format::hex(((PFVE_FVEK)fvek_buffer)->fvek, ((PFVE_FVEK)fvek_buffer)->size - 0xc));
 						}
 					}
@@ -348,7 +348,7 @@ void print_test_bitlocker_recovery(std::shared_ptr<Disk> disk, std::shared_ptr<V
 						content.push_back("");
 
 						unsigned char vmk_buffer[256] = { 0 };
-						get_vmk_from_recovery(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, salt, opts->recovery, vmk_buffer);
+						get_vmk_from_recovery(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, salt, opts->recovery, vmk_buffer, 256);
 						content.push_back("VMK  : " + utils::format::hex(((PFVE_VMK)vmk_buffer)->vmk, 32));
 
 						if (fvek_entry != nullptr)
@@ -361,7 +361,7 @@ void print_test_bitlocker_recovery(std::shared_ptr<Disk> disk, std::shared_ptr<V
 							enc_key = ((PFVE_ENTRY_AES_CCM)fvek_entry->data)->key;
 							enc_size = fvek_entry->size - 36;
 
-							get_fvek_from_vmk(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, ((PFVE_VMK)vmk_buffer)->vmk, fvek_buffer);
+							get_fvek_from_vmk(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, ((PFVE_VMK)vmk_buffer)->vmk, fvek_buffer, 256);
 							content.push_back("FVEK : " + utils::format::hex(((PFVE_FVEK)fvek_buffer)->fvek, ((PFVE_FVEK)fvek_buffer)->size - 0xc));
 						}
 					}
@@ -469,7 +469,7 @@ void print_test_bitlocker_bek(std::shared_ptr<Disk> disk, std::shared_ptr<Volume
 						content.push_back("");
 
 						unsigned char vmk_buffer[256] = { 0 };
-						get_vmk_from_bek(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, salt, opts->bek, vmk_buffer);
+						get_vmk_from_bek(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, salt, opts->bek, vmk_buffer, 256);
 						content.push_back("VMK  : " + utils::format::hex(((PFVE_VMK)vmk_buffer)->vmk, 32));
 
 						if (fvek_entry != nullptr)
@@ -482,7 +482,7 @@ void print_test_bitlocker_bek(std::shared_ptr<Disk> disk, std::shared_ptr<Volume
 							enc_key = ((PFVE_ENTRY_AES_CCM)fvek_entry->data)->key;
 							enc_size = fvek_entry->size - 36;
 
-							get_fvek_from_vmk(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, ((PFVE_VMK)vmk_buffer)->vmk, fvek_buffer);
+							get_fvek_from_vmk(nonce_time, nonce_ctr, mac_val, enc_key, enc_size, ((PFVE_VMK)vmk_buffer)->vmk, fvek_buffer, 256);
 							content.push_back("FVEK : " + utils::format::hex(((PFVE_FVEK)fvek_buffer)->fvek, ((PFVE_FVEK)fvek_buffer)->size - 0xc));
 						}
 					}
