@@ -57,8 +57,9 @@ void MasterKey::decrypt_masterkey(const EVP_CIPHER* dec, std::shared_ptr<Buffer<
 	int clear_master_key_size = clear_masterkey->size();
 	EVP_CIPHER_CTX* pctx = EVP_CIPHER_CTX_new();
 	EVP_DecryptInit(pctx, dec, masterkey_key->data(), masterkey_key->data() + EVP_CIPHER_key_length(dec));
+	EVP_CIPHER_CTX_set_padding(pctx, 0);
 	EVP_DecryptUpdate(pctx, clear_masterkey->data(), &clear_master_key_size, encrypted_masterkey->data(), encrypted_masterkey->size());
-	EVP_DecryptFinal(pctx, clear_masterkey->data(), &clear_master_key_size);
+	EVP_DecryptFinal(pctx, clear_masterkey->data() + clear_master_key_size, &clear_master_key_size);
 	EVP_CIPHER_CTX_cleanup(pctx);
 }
 

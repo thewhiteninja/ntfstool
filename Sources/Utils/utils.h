@@ -25,6 +25,7 @@
 #include <openssl/des.h>
 #include <openssl/sha.h>
 #include <openssl/md4.h>
+#include <openssl/sha.h>
 
 
 #define POINTER_ADD(t, p, v)	(reinterpret_cast<t>(reinterpret_cast<uint64_t>(p) + v))
