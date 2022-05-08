@@ -159,8 +159,8 @@ typedef struct
 
 void bitlocker_derive_key(unsigned char* password_hash, unsigned char* password_salt, unsigned int iterations, unsigned char* key);
 
-void bitlocker_decrypt_data(PBYTE encrypted_data, ULONG32 encrypted_data_size, PBYTE key, PBYTE mac, PBYTE nonce, PBYTE decrypted_data);
+void bitlocker_decrypt_data(PBYTE encrypted_data, ULONG32 encrypted_data_size, PBYTE key, PBYTE mac, PBYTE nonce, PBYTE decrypted_data, ULONG32 decrypted_data_len);
 
 bool bitlocker_mac_check(PBYTE clear_mac, PBYTE key, PBYTE nonce, PBYTE data, ULONG32 data_size);
 
-void get_fvek_from_vmk(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_fvek, ULONG32 enc_size, PBYTE vmk, PBYTE fvek);
+void get_fvek_from_vmk(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_fvek, ULONG32 enc_size, PBYTE vmk, PBYTE fvek, ULONG32 fvek_len);

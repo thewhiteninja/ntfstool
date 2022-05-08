@@ -15,13 +15,13 @@ bool test_bitlocker_bek(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PB
 		*((PULONG64)nonce) = nonce_time;
 		*((PULONG32)(nonce + 8)) = nonce_ctr;
 
-		bitlocker_decrypt_data(enc_vmk, enc_size, bek->data(), mac_val, nonce, vmk_buffer);
+		bitlocker_decrypt_data(enc_vmk, enc_size, bek->data(), mac_val, nonce, vmk_buffer, 256);
 		return bitlocker_mac_check(vmk_buffer, bek->data(), nonce, vmk_buffer + 16, enc_size);
 	}
 	return false;
 }
 
-void get_vmk_from_bek(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, std::string bekfile, PBYTE vmk)
+void get_vmk_from_bek(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, std::string bekfile, PBYTE vmk, ULONG32 vmk_len)
 {
 	std::shared_ptr<Buffer<PBYTE>> bek = read_bek_file(utils::strings::from_string(bekfile));
 	if (bek != nullptr)
@@ -30,7 +30,7 @@ void get_vmk_from_bek(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYT
 		*((PULONG64)nonce) = nonce_time;
 		*((PULONG32)(nonce + 8)) = nonce_ctr;
 
-		bitlocker_decrypt_data(enc_vmk, enc_size, bek->data(), mac_val, nonce, vmk);
+		bitlocker_decrypt_data(enc_vmk, enc_size, bek->data(), mac_val, nonce, vmk, vmk_len);
 	}
 }
 
