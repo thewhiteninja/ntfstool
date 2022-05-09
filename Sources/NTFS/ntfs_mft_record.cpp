@@ -674,6 +674,27 @@ cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_data(std::string 
 	}
 }
 
+cppcoro::generator<std::pair<PBYTE, DWORD>> MFTRecord::process_virtual_data(std::string stream_name, DWORD block_size, bool skip_sparse)
+{
+	ULONG64 final_datasize = datasize(stream_name, false);
+	bool check_size = final_datasize != 0; // ex: no real size for usn
+
+	for (auto& block : _process_data_raw(stream_name, block_size, skip_sparse))
+	{
+		if (block.second > final_datasize && check_size)
+		{
+			block.second = static_cast<DWORD>(final_datasize);
+		}
+
+		co_yield block;
+
+		if (check_size)
+		{
+			final_datasize -= block.second;
+		}
+	}
+}
+
 std::shared_ptr<Buffer<PBYTE>> MFTRecord::data(std::string stream_name, bool real_size)
 {
 	std::shared_ptr<Buffer<PBYTE>> ret = nullptr;
