@@ -58,5 +58,4 @@ public:
 	int export_public_to_PEM(std::string filename);
 
 	EVP_PKEY* export_private();
-
 };
