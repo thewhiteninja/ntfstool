@@ -11,31 +11,24 @@ PrivateKey::PrivateKey(PBYTE data, DWORD size)
 
 	unsigned int offset = 20;
 	_modulus = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 8);
-	_modulus->reverse_bytes();
 	offset += _header.ModulusLen;
 
 	_prime1 = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 16);
-	_prime1->reverse_bytes();
 	offset += _header.Bitsize / 16 + 4;
 
 	_prime2 = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 16);
-	_prime2->reverse_bytes();
 	offset += _header.Bitsize / 16 + 4;
 
 	_exponent1 = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 16);
-	_exponent1->reverse_bytes();
 	offset += _header.Bitsize / 16 + 4;
 
 	_exponent2 = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 16);
-	_exponent2->reverse_bytes();
 	offset += _header.Bitsize / 16 + 4;
 
 	_coefficient = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 16);
-	_coefficient->reverse_bytes();
 	offset += _header.Bitsize / 16 + 4;
 
 	_private_exponent = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 8);
-	_private_exponent->reverse_bytes();
 	offset += _header.Bitsize / 8 + 4;
 }
 
@@ -49,7 +42,7 @@ int PrivateKey::export_private_to_PEM(std::string filename)
 		BIO* out = BIO_new_file((filename + ".priv.pem").c_str(), "wb");
 		if (out)
 		{
-			if (!PEM_write_bio_PrivateKey(out, pkey, EVP_des_ede3_cbc(), NULL, 0, 0, NULL))
+			if (!PEM_write_bio_PrivateKey(out, pkey, NULL, NULL, 0, 0, NULL))
 			{
 				ret = 3;
 			}
@@ -104,58 +97,28 @@ EVP_PKEY* PrivateKey::export_private()
 
 	if (pctx)
 	{
-		BIGNUM* p = BN_new();
-		BIGNUM* q = BN_new();
-		BIGNUM* n = BN_new();
-		BIGNUM* e = BN_new();
-		BIGNUM* d = BN_new();
-		BIGNUM* dmp1 = BN_new();
-		BIGNUM* dmq1 = BN_new();
-		BIGNUM* iqmp = BN_new();
-
-		if (p && q && n && e && d && dmp1 && dmq1 && iqmp)
-		{
-			auto rev_e = _byteswap_ulong(_header.Exponent);
-			BN_bin2bn((unsigned char*)&rev_e, 4, e);
-			BN_bin2bn(_modulus->data(), _modulus->size(), n);
-			BN_bin2bn(_prime1->data(), _prime1->size(), p);
-			BN_bin2bn(_prime2->data(), _prime2->size(), q);
-			BN_bin2bn(_private_exponent->data(), _private_exponent->size(), d);
-			BN_bin2bn(_exponent1->data(), _exponent1->size(), dmp1);
-			BN_bin2bn(_exponent2->data(), _exponent2->size(), dmq1);
-			BN_bin2bn(_coefficient->data(), _coefficient->size(), iqmp);
-
 #pragma warning( push )
 #pragma warning( disable : 4838 )
-			OSSL_PARAM params[9] = {
-				OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_FACTOR, p, BN_num_bytes(p)),
-				OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_FACTOR1, q, BN_num_bytes(q)),
-				OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_N, n, BN_num_bytes(n)),
-				OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_E, e, BN_num_bytes(e)),
-				OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_D, d, BN_num_bytes(d)),
-				OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_EXPONENT, dmp1, BN_num_bytes(dmp1)),
-				OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_EXPONENT1, dmq1, BN_num_bytes(dmq1)),
-				OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_COEFFICIENT, iqmp, BN_num_bytes(iqmp)),
-				OSSL_PARAM_END
-			};
+		OSSL_PARAM params[9] = {
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_FACTOR1, _prime1->data(), _prime1->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_FACTOR2, _prime2->data(), _prime2->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_N, _modulus->data(), _modulus->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_E, &_header.Exponent, 4),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_D, _private_exponent->data(), _private_exponent->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_EXPONENT1, _exponent1->data(), _exponent1->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_EXPONENT2, _exponent2->data(), _exponent2->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_COEFFICIENT1, _coefficient->data(), _coefficient->size()),
+			OSSL_PARAM_END
+		};
 #pragma warning( pop )
-			if (EVP_PKEY_fromdata_init(pctx))
+		if (EVP_PKEY_fromdata_init(pctx))
+		{
+			if (EVP_PKEY_fromdata(pctx, &pkey, EVP_PKEY_KEYPAIR, params))
 			{
-				if (EVP_PKEY_fromdata(pctx, &pkey, EVP_PKEY_KEY_PARAMETERS, params))
-				{
-					ret = pkey;
-				}
+				ret = pkey;
 			}
-
-			BN_free(p);
-			BN_free(q);
-			BN_free(n);
-			BN_free(e);
-			BN_free(d);
-			BN_free(dmp1);
-			BN_free(dmq1);
-			BN_free(iqmp);
 		}
+
 		EVP_PKEY_CTX_free(pctx);
 	}
 
