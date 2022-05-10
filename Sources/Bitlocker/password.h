@@ -9,7 +9,7 @@
 #include "Utils/buffer.h"
 #include "Utils/utils.h"
 
-void get_vmk_from_password(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& password, PBYTE vmk);
+void get_vmk_from_password(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& password, PBYTE vmk, ULONG32 vmk_len);
 
 bool test_bitlocker_password(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& password);
 std::shared_ptr<Buffer<PBYTE>> read_bek_file(std::wstring filename);

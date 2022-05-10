@@ -4,12 +4,10 @@
 #include "options.h"
 #include "Utils/constant_names.h"
 #include "openssl/sha.h"
+#include "openssl/evp.h"
 
 #include <cstdint>
 #include <string>
-#include <iostream>
-#include <iomanip>
-#include <fstream>
 #include <memory>
 
 void print_disks_short(std::vector<std::shared_ptr<Disk>> disks) {
@@ -118,24 +116,6 @@ void print_hardware_disk(std::shared_ptr<Disk> disk) {
 	std::cout << std::endl;
 }
 
-void hash_file_sha256(std::string filename, PBYTE output)
-{
-	Buffer<PCHAR> buffer(4096 * 16);
-	SHA256_CTX ctx;
-	SHA256_Init(&ctx);
-
-	std::ifstream is(filename.c_str(), std::ifstream::binary);
-	if (is.is_open() && buffer.is_valid())
-	{
-		while (!is.eof())
-		{
-			is.read(buffer.data(), buffer.size());
-			SHA256_Update(&ctx, buffer.data(), static_cast<size_t>(is.gcount()));
-		}
-		SHA256_Final(output, &ctx);
-		is.close();
-	}
-}
 
 void print_image_disk(std::shared_ptr<Disk> disk) {
 	utils::ui::title("Info for image: " + disk->name());
@@ -156,11 +136,11 @@ void print_image_disk(std::shared_ptr<Disk> disk) {
 			std::cout << std::endl;
 			if (utils::ui::ask_question("Hash SHA256"))
 			{
-				BYTE hashbuf[256 / 8 + 1] = { 0 };
+				BYTE hashbuf[SHA256_DIGEST_LENGTH] = { 0 };
 				std::cout << std::endl;
 				std::cout << "Hash SHA256 : Calculating ...";
-				hash_file_sha256(disk->name(), hashbuf);
-				std::cout << "\r" << "Hash SHA256 : " << utils::format::hex(hashbuf, 32) << std::endl;
+				utils::crypto::hash::sha256_file(disk->name(), hashbuf);
+				std::cout << "\r" << "Hash SHA256 : " << utils::format::hex(hashbuf, SHA256_DIGEST_LENGTH) << std::endl;
 				std::cout << std::endl;
 			}
 			else

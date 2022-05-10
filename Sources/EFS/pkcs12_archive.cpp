@@ -144,19 +144,11 @@ EVP_PKEY* PKCS12Archive::_build_evp_key(std::shared_ptr<PrivateKey> privatekey_f
 {
 	if (privatekey_file)
 	{
-		EVP_PKEY* key = EVP_PKEY_new();
-		RSA* rsa_key = privatekey_file->export_private_to_RSA();
-		if (rsa_key)
+		EVP_PKEY* pkey = privatekey_file->export_private();
+		if (pkey)
 		{
-			if (EVP_PKEY_assign_RSA(key, rsa_key))
-			{
-				EVP_PKEY_add1_attr_by_NID(key, NID_ms_csp_name, MBSTRING_ASC, (const unsigned char*)"Microsoft Enhanced Cryptographic Provider v1.0", -1);
-				return key;
-			}
-		}
-		if (key)
-		{
-			EVP_PKEY_free(key);
+			EVP_PKEY_add1_attr_by_NID(pkey, NID_ms_csp_name, MBSTRING_ASC, (const unsigned char*)"Microsoft Enhanced Cryptographic Provider v1.0", -1);
+			return pkey;
 		}
 	}
 	return nullptr;

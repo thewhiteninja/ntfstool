@@ -1,6 +1,9 @@
 #include "EFS/private_key.h"
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
+#include <openssl/provider.h>
+#include <openssl/param_build.h>
+#include <openssl/core_names.h>
 
 PrivateKey::PrivateKey(PBYTE data, DWORD size)
 {
@@ -8,31 +11,24 @@ PrivateKey::PrivateKey(PBYTE data, DWORD size)
 
 	unsigned int offset = 20;
 	_modulus = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 8);
-	_modulus->reverse_bytes();
 	offset += _header.ModulusLen;
 
 	_prime1 = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 16);
-	_prime1->reverse_bytes();
 	offset += _header.Bitsize / 16 + 4;
 
 	_prime2 = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 16);
-	_prime2->reverse_bytes();
 	offset += _header.Bitsize / 16 + 4;
 
 	_exponent1 = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 16);
-	_exponent1->reverse_bytes();
 	offset += _header.Bitsize / 16 + 4;
 
 	_exponent2 = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 16);
-	_exponent2->reverse_bytes();
 	offset += _header.Bitsize / 16 + 4;
 
 	_coefficient = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 16);
-	_coefficient->reverse_bytes();
 	offset += _header.Bitsize / 16 + 4;
 
 	_private_exponent = std::make_shared<Buffer<PBYTE>>(data + offset, _header.Bitsize / 8);
-	_private_exponent->reverse_bytes();
 	offset += _header.Bitsize / 8 + 4;
 }
 
@@ -40,38 +36,13 @@ int PrivateKey::export_private_to_PEM(std::string filename)
 {
 	int ret = 1;
 
-	RSA* rsa = RSA_new();
-	if (rsa != nullptr)
+	EVP_PKEY* pkey = export_private();
+	if (pkey != nullptr)
 	{
-		BIGNUM* p, * q, * n, * e, * d, * dmp1, * dmq1, * iqmp;
-
-		p = BN_new();
-		q = BN_new();
-		n = BN_new();
-		e = BN_new();
-		d = BN_new();
-		dmp1 = BN_new();
-		dmq1 = BN_new();
-		iqmp = BN_new();
-
-		auto rev_e = _byteswap_ulong(_header.Exponent);
-		BN_bin2bn((unsigned char*)&rev_e, 4, e);
-		BN_bin2bn(_modulus->data(), _modulus->size(), n);
-		BN_bin2bn(_prime1->data(), _prime1->size(), p);
-		BN_bin2bn(_prime2->data(), _prime2->size(), q);
-		BN_bin2bn(_private_exponent->data(), _private_exponent->size(), d);
-		BN_bin2bn(_exponent1->data(), _exponent1->size(), dmp1);
-		BN_bin2bn(_exponent2->data(), _exponent2->size(), dmq1);
-		BN_bin2bn(_coefficient->data(), _coefficient->size(), iqmp);
-
-		RSA_set0_factors(rsa, p, q);
-		RSA_set0_key(rsa, n, e, d);
-		RSA_set0_crt_params(rsa, dmp1, dmq1, iqmp);
-
 		BIO* out = BIO_new_file((filename + ".priv.pem").c_str(), "wb");
 		if (out)
 		{
-			if (!PEM_write_bio_RSAPrivateKey(out, rsa, nullptr, nullptr, 0, nullptr, nullptr))
+			if (!PEM_write_bio_PrivateKey(out, pkey, NULL, NULL, 0, 0, NULL))
 			{
 				ret = 3;
 			}
@@ -85,7 +56,6 @@ int PrivateKey::export_private_to_PEM(std::string filename)
 		{
 			ret = 2;
 		}
-		RSA_free(rsa);
 	}
 	return ret;
 }
@@ -94,24 +64,13 @@ int PrivateKey::export_public_to_PEM(std::string filename)
 {
 	int ret = 1;
 
-	RSA* rsa = RSA_new();
-	if (rsa != nullptr)
+	EVP_PKEY* pkey = export_private();
+	if (pkey != nullptr)
 	{
-		BIGNUM* n, * e;
-
-		n = BN_new();
-		e = BN_new();
-
-		auto rev_e = _byteswap_ulong(_header.Exponent);
-		BN_bin2bn((unsigned char*)&rev_e, 4, e);
-		BN_bin2bn(_modulus->data(), _modulus->size(), n);
-
-		RSA_set0_key(rsa, n, e, nullptr);
-
 		BIO* out = BIO_new_file((filename + ".pub.pem").c_str(), "wb");
 		if (out)
 		{
-			if (!PEM_write_bio_RSA_PUBKEY(out, rsa))
+			if (!PEM_write_bio_PUBKEY(out, pkey))
 			{
 				ret = 3;
 			}
@@ -125,44 +84,43 @@ int PrivateKey::export_public_to_PEM(std::string filename)
 		{
 			ret = 2;
 		}
-		RSA_free(rsa);
 	}
-
 	return ret;
 }
 
-RSA* PrivateKey::export_private_to_RSA()
+EVP_PKEY* PrivateKey::export_private()
 {
-	RSA* rsa = RSA_new();
+	EVP_PKEY* ret = nullptr;
 
-	if (rsa != nullptr)
+	EVP_PKEY* pkey = nullptr;
+	EVP_PKEY_CTX* pctx = EVP_PKEY_CTX_new_from_name(NULL, "RSA", NULL);
+
+	if (pctx)
 	{
-		BIGNUM* p, * q, * n, * e, * d, * dmp1, * dmq1, * iqmp;
+#pragma warning( push )
+#pragma warning( disable : 4838 )
+		OSSL_PARAM params[9] = {
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_FACTOR1, _prime1->data(), _prime1->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_FACTOR2, _prime2->data(), _prime2->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_N, _modulus->data(), _modulus->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_E, &_header.Exponent, 4),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_D, _private_exponent->data(), _private_exponent->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_EXPONENT1, _exponent1->data(), _exponent1->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_EXPONENT2, _exponent2->data(), _exponent2->size()),
+			OSSL_PARAM_BN(OSSL_PKEY_PARAM_RSA_COEFFICIENT1, _coefficient->data(), _coefficient->size()),
+			OSSL_PARAM_END
+		};
+#pragma warning( pop )
+		if (EVP_PKEY_fromdata_init(pctx))
+		{
+			if (EVP_PKEY_fromdata(pctx, &pkey, EVP_PKEY_KEYPAIR, params))
+			{
+				ret = pkey;
+			}
+		}
 
-		p = BN_new();
-		q = BN_new();
-		n = BN_new();
-		e = BN_new();
-		d = BN_new();
-		dmp1 = BN_new();
-		dmq1 = BN_new();
-		iqmp = BN_new();
-
-		auto rev_e = _byteswap_ulong(_header.Exponent);
-		BN_bin2bn((unsigned char*)&rev_e, 4, e);
-		BN_bin2bn(_modulus->data(), _modulus->size(), n);
-		BN_bin2bn(_prime1->data(), _prime1->size(), p);
-		BN_bin2bn(_prime2->data(), _prime2->size(), q);
-		BN_bin2bn(_private_exponent->data(), _private_exponent->size(), d);
-		BN_bin2bn(_exponent1->data(), _exponent1->size(), dmp1);
-		BN_bin2bn(_exponent2->data(), _exponent2->size(), dmq1);
-		BN_bin2bn(_coefficient->data(), _coefficient->size(), iqmp);
-
-		RSA_set0_factors(rsa, p, q);
-		RSA_set0_key(rsa, n, e, d);
-		RSA_set0_crt_params(rsa, dmp1, dmq1, iqmp);
-
-		return rsa;
+		EVP_PKEY_CTX_free(pctx);
 	}
-	return nullptr;
+
+	return ret;
 }

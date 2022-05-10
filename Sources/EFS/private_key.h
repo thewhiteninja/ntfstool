@@ -57,5 +57,5 @@ public:
 
 	int export_public_to_PEM(std::string filename);
 
-	RSA* export_private_to_RSA();
+	EVP_PKEY* export_private();
 };

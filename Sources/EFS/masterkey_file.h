@@ -9,8 +9,6 @@
 #include "Utils/buffer.h"
 #include "Utils/utils.h"
 
-#include <openssl/sha.h>
-#include <openssl/md4.h>
 #include <openssl/hmac.h>
 
 #define POLICY_HASH (4)

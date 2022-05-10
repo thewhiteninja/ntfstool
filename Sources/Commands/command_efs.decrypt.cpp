@@ -8,24 +8,28 @@
 
 static unsigned char EFS_IV[16] = { 0x12, 0x13, 0x16, 0xe9, 0x7b, 0x65, 0x16, 0x58, 0x61, 0x89, 0x91, 0x44, 0xbe, 0xad, 0x89, 0x19 };
 
-std::shared_ptr<Buffer<PEFS_FEK>> decrypt_fek(const RSA* private_key, std::shared_ptr<Buffer<PBYTE>> encrypted_fek)
+std::shared_ptr<Buffer<PEFS_FEK>> decrypt_fek(EVP_PKEY* private_key, std::shared_ptr<Buffer<PBYTE>> encrypted_fek)
 {
+	std::shared_ptr<Buffer<PEFS_FEK>> ret = nullptr;
+
 	if (encrypted_fek && private_key)
 	{
-		RSA* private_key_tmp = const_cast<RSA*>(private_key);
-		std::shared_ptr<Buffer<PEFS_FEK>> decrypted_fek = std::make_shared<Buffer<PEFS_FEK>>(encrypted_fek->size());
-		int ret = RSA_private_decrypt(encrypted_fek->size(), encrypted_fek->data(), decrypted_fek->address(), private_key_tmp, RSA_PKCS1_PADDING);
-		if (ret == -1)
+		EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new(private_key, NULL);
+		if (ctx)
 		{
-			return nullptr;
-		}
-		else
-		{
-			decrypted_fek->shrink(ret);
-			return decrypted_fek;
+			EVP_PKEY_decrypt_init(ctx);
+			std::shared_ptr<Buffer<PEFS_FEK>> decrypted_fek = std::make_shared<Buffer<PEFS_FEK>>(encrypted_fek->size());
+
+			size_t outl = decrypted_fek->size();
+			if (EVP_PKEY_decrypt(ctx, reinterpret_cast<PBYTE>(decrypted_fek->data()), &outl, encrypted_fek->data(), encrypted_fek->size()))
+			{
+				decrypted_fek->shrink(static_cast<DWORD>(outl));
+				ret = decrypted_fek;
+			}
+			EVP_PKEY_CTX_free(ctx);
 		}
 	}
-	return nullptr;
+	return ret;
 }
 
 void decrypt_block(std::pair<PBYTE, DWORD> block, std::shared_ptr<Buffer<PEFS_FEK>> fek, DWORD64 index, ULONG32 cluster_size)
@@ -59,8 +63,8 @@ int decrypt_file(std::shared_ptr<MFTRecord> record, std::shared_ptr<Buffer<PEFS_
 		DWORD64 written_bytes = 0ULL;
 		DWORD res_write = 0;
 		DWORD index_block = 0;
-		DWORD64 clear_size = record->datasize();
-		for (auto data_block : record->process_data("", cluster_size, true))
+		DWORD64 clear_size = record->datasize("", false);
+		for (auto data_block : record->process_virtual_data("", cluster_size, true))
 		{
 			if (data_block.second == cluster_size)
 			{
@@ -170,7 +174,7 @@ int load_key_and_decrypt_file(std::shared_ptr<Disk> disk, std::shared_ptr<Volume
 					if (ddf_id == keyid)
 					{
 						std::cout << "[+] Decrypting FEK" << std::endl;
-						std::shared_ptr<Buffer<PEFS_FEK>> decrypted_fek = decrypt_fek(EVP_PKEY_get0_RSA(pkcs12->key()), fek_enc);
+						std::shared_ptr<Buffer<PEFS_FEK>> decrypted_fek = decrypt_fek(pkcs12->key(), fek_enc);
 						if (decrypted_fek)
 						{
 							std::cout << "[-] FEK" << std::endl;

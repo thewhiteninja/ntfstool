@@ -23,6 +23,9 @@
 #include <openssl/evp.h>
 #include <openssl/aes.h>
 #include <openssl/des.h>
+#include <openssl/sha.h>
+#include <openssl/md4.h>
+#include <openssl/sha.h>
 
 
 #define POINTER_ADD(t, p, v)	(reinterpret_cast<t>(reinterpret_cast<uint64_t>(p) + v))
@@ -184,6 +187,17 @@ namespace utils
 	namespace crypto
 	{
 		void xor_buffer(PVOID data, DWORD datalen, PVOID key, DWORD keylen);
+
+		namespace hash
+		{
+			void sha256_file(std::string filename, BYTE output[SHA256_DIGEST_LENGTH]);
+
+			void sha256_buffer(PBYTE input, size_t input_len, BYTE output[SHA256_DIGEST_LENGTH]);
+
+			void sha1_buffer(PBYTE input, size_t input_len, BYTE output[SHA_DIGEST_LENGTH]);
+
+			void md4_buffer(PBYTE input, size_t input_len, BYTE output[MD4_DIGEST_LENGTH]);
+		}
 
 		namespace cryptoapi
 		{

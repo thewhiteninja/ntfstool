@@ -4,18 +4,12 @@ void MasterKey::hash_password(std::u16string& password, std::shared_ptr<Buffer<P
 {
 	if (policy & POLICY_HASH)
 	{
-		SHA_CTX ctx = { 0 };
-		SHA1_Init(&ctx);
-		SHA1_Update(&ctx, password.c_str(), password.size() * 2);
-		SHA1_Final(output->data(), &ctx);
+		utils::crypto::hash::sha1_buffer((PBYTE)password.c_str(), password.size() * 2, output->data());
 		output->shrink(SHA_DIGEST_LENGTH);
 	}
 	else
 	{
-		MD4_CTX ctx = { 0 };
-		MD4_Init(&ctx);
-		MD4_Update(&ctx, password.c_str(), password.size() * 2);
-		MD4_Final(output->data(), &ctx);
+		utils::crypto::hash::md4_buffer((PBYTE)password.c_str(), password.size() * 2, output->data());
 		output->shrink(MD4_DIGEST_LENGTH);
 	}
 }
@@ -63,8 +57,9 @@ void MasterKey::decrypt_masterkey(const EVP_CIPHER* dec, std::shared_ptr<Buffer<
 	int clear_master_key_size = clear_masterkey->size();
 	EVP_CIPHER_CTX* pctx = EVP_CIPHER_CTX_new();
 	EVP_DecryptInit(pctx, dec, masterkey_key->data(), masterkey_key->data() + EVP_CIPHER_key_length(dec));
+	EVP_CIPHER_CTX_set_padding(pctx, 0);
 	EVP_DecryptUpdate(pctx, clear_masterkey->data(), &clear_master_key_size, encrypted_masterkey->data(), encrypted_masterkey->size());
-	EVP_DecryptFinal(pctx, clear_masterkey->data(), &clear_master_key_size);
+	EVP_DecryptFinal(pctx, clear_masterkey->data() + clear_master_key_size, &clear_master_key_size);
 	EVP_CIPHER_CTX_cleanup(pctx);
 }
 

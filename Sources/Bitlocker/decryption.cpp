@@ -24,7 +24,7 @@ void diffuser_b_decrypt(uint8_t* sector, uint16_t sector_size, uint32_t* buffer)
 {
 	int Bcycles = 3;
 	uint16_t Rb[] = { 0, 10, 0, 25 };
-	uint16_t int_size = sector_size / 4;
+	uint16_t int_size = sector_size >> 2;
 
 	while (Bcycles--)
 	{

@@ -124,6 +124,8 @@ public:
 
 	cppcoro::generator<std::pair<PBYTE, DWORD>> process_data(std::string stream_name = "", DWORD blocksize = 1024 * 1024, bool skip_sparse = false);
 
+	cppcoro::generator<std::pair<PBYTE, DWORD>> process_virtual_data(std::string stream_name = "", DWORD blocksize = 1024 * 1024, bool skip_sparse = false);
+
 	std::vector<std::string> ads_names();
 
 	std::vector<std::shared_ptr<IndexEntry>> index();

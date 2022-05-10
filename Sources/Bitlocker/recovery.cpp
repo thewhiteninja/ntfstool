@@ -34,10 +34,7 @@ void bitlocker_prepare_recovery_key(std::string recovery, unsigned char* recover
 		}
 	}
 
-	SHA256_CTX ctx = { 0 };
-	SHA256_Init(&ctx);
-	SHA256_Update(&ctx, recovery_hash, 16);
-	SHA256_Final(recovery_hash, &ctx);
+	utils::crypto::hash::sha256_buffer(recovery_hash, 16, recovery_hash);
 }
 
 bool test_bitlocker_recovery(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& recovery)
@@ -54,14 +51,14 @@ bool test_bitlocker_recovery(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_va
 
 		bitlocker_prepare_recovery_key(recovery, key_buffer);
 		bitlocker_derive_key(key_buffer, salt, 1048576, key_buffer);
-		bitlocker_decrypt_data(enc_vmk, enc_size, key_buffer, mac_val, nonce, vmk_buffer);
+		bitlocker_decrypt_data(enc_vmk, enc_size, key_buffer, mac_val, nonce, vmk_buffer, 256);
 		return bitlocker_mac_check(vmk_buffer, key_buffer, nonce, vmk_buffer + 16, enc_size);
 	}
 
 	return false;
 }
 
-void get_vmk_from_recovery(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& recovery, PBYTE vmk)
+void get_vmk_from_recovery(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val, PBYTE enc_vmk, ULONG32 enc_size, PBYTE salt, const std::string& recovery, PBYTE vmk, ULONG32 vmk_len)
 {
 	if (bitlocker_check_recovery_key(recovery))
 	{
@@ -73,6 +70,6 @@ void get_vmk_from_recovery(ULONG64 nonce_time, ULONG32 nonce_ctr, PBYTE mac_val,
 
 		bitlocker_prepare_recovery_key(recovery, key_buffer);
 		bitlocker_derive_key(key_buffer, salt, 1048576, key_buffer);
-		bitlocker_decrypt_data(enc_vmk, enc_size, key_buffer, mac_val, nonce, vmk);
+		bitlocker_decrypt_data(enc_vmk, enc_size, key_buffer, mac_val, nonce, vmk, vmk_len);
 	}
 }
