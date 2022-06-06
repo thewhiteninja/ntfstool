@@ -1,6 +1,6 @@
 #pragma once
 
-#include <WinSock2.h>
+
 #include <Windows.h>
 
 #define DRIVE_HEAD_REG				0xA0

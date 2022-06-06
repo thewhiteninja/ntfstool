@@ -10,7 +10,7 @@
 #include <iostream>
 #include <distorm.h>
 
-#include <WinSock2.h>
+
 #include <ws2tcpip.h>
 #include <Windows.h>
 #include <tchar.h>
