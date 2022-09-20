@@ -1514,6 +1514,19 @@ Third-party libraries:
     +---------------------------------------------------------------------------------------------------------------+
 
 </td></tr>
+<tr><td>undelete disk=2 volume=1 format=csv output=mydeletedfiles.csv</td></tr>
+<tr><td>
+
+    [+] Opening \\?\Volume{498eed94-0000-0000-007e-000000000000}\
+    [-] $MFT size     :34.00 MiBs (~34816 records)
+    [-] $BITMAP size  :14.32 MiBs
+    [+] Searching deleted files
+    [-] Processed data: 35651584 (100%)
+    [-] Duration      : 425ms
+    [+] Deleted files : 127
+    [+] Writing results to mydeletedfiles.csv (csv) file
+    [+] Done
+</td></tr>
 <tr><td>undelete disk=4 volume=1 inode=41 output=restored_kitten.jpg</td></tr>
 <tr><td>
 

@@ -16,6 +16,9 @@
 #include "Utils/constant_names.h"
 #include "Utils/table.h"
 #include <Commands/commands.h>
+#include <Utils/formatted_file.h>
+#include <Utils/csv_file.h>
+#include <Utils/json_file.h>
 
 
 std::string get_full_path(DWORD index, std::map<DWORD, std::string>& index_to_name, std::map<DWORD, DWORD>& index_to_parent)
@@ -207,41 +210,96 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 
 	std::cout << "[-] Duration      : " << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - prof_start).count() / 1000 << "ms" << std::endl;
 
-	std::cout << "[+] Deleted Files : " << deleted_files.size() << std::endl;
+
 
 	if (deleted_files.size() > 0)
 	{
-		std::cout << std::endl;
+		std::cout << "[+] Deleted files : " << deleted_files.size() << std::endl;
 
-		std::shared_ptr<utils::ui::Table> df_table = std::make_shared<utils::ui::Table>();
-		df_table->set_interline(true);
-
-		df_table->add_header_line("Id");
-		df_table->add_header_line("MFT Index");
-		df_table->add_header_line("Type");
-		df_table->add_header_line("Filename");
-		df_table->add_header_line("Size");
-		df_table->add_header_line("Deletion Date");
-		df_table->add_header_line("% Recoverable");
-
-		ULONG n = 0;
-		for (auto& deleted_file : deleted_files)
+		if (opts->format == "csv" || opts->format == "json")
 		{
-			df_table->add_item_line(std::to_string(n++));
-			df_table->add_item_line(utils::format::hex(std::get<0>(deleted_file)));
-			df_table->add_item_line((std::get<1>(deleted_file) ? "Dir" : " "));
-			df_table->add_item_line(get_full_path(std::get<0>(deleted_file), index_to_name, index_to_parent));
-			df_table->add_item_line((std::get<1>(deleted_file) ? " " : utils::format::size(std::get<2>(deleted_file))));
-			df_table->add_item_line(utils::times::display_systemtime(std::get<3>(deleted_file)));
+			std::cout << "[+] Writing results to " << opts->output << " (" << opts->format << ") file" << std::endl;
 
-			std::ostringstream percent;
-			percent << std::fixed << std::setprecision(2) << std::get<4>(deleted_file);
-			df_table->add_item_line(percent.str());
-			df_table->new_line();
+			std::shared_ptr<FormatteddFile> ffile;
+
+			if (opts->format == "csv")
+			{
+				ffile = std::make_shared<CSVFile>(opts->output);
+			}
+			else
+			{
+				ffile = std::make_shared<JSONFile>(opts->output);
+			}
+
+			ffile->set_columns(
+				{
+				"Id",
+				"MFT Index",
+				"Type",
+				"Filename",
+				"Size",
+				"Deletion Date",
+				"% Recoverable"
+				}
+			);
+
+			ULONG n = 0;
+			for (auto& deleted_file : deleted_files)
+			{
+				ffile->add_item(std::to_string(n++));
+				ffile->add_item(utils::format::hex(std::get<0>(deleted_file)));
+				ffile->add_item((std::get<1>(deleted_file) ? "Dir" : "File"));
+				ffile->add_item(get_full_path(std::get<0>(deleted_file), index_to_name, index_to_parent));
+				ffile->add_item((std::get<1>(deleted_file) ? "" : std::to_string(std::get<2>(deleted_file))));
+				ffile->add_item(utils::times::display_systemtime(std::get<3>(deleted_file)));
+
+				std::ostringstream percent;
+				percent << std::fixed << std::setprecision(2) << std::get<4>(deleted_file);
+				ffile->add_item(percent.str());
+				ffile->new_line();
+			}
+
+			std::cout << "[+] Done" << std::endl;
+		}
+		else
+		{
+			std::cout << std::endl;
+
+			std::shared_ptr<utils::ui::Table> df_table = std::make_shared<utils::ui::Table>();
+			df_table->set_interline(true);
+
+			df_table->add_header_line("Id");
+			df_table->add_header_line("MFT Index");
+			df_table->add_header_line("Type");
+			df_table->add_header_line("Filename");
+			df_table->add_header_line("Size");
+			df_table->add_header_line("Deletion Date");
+			df_table->add_header_line("% Recoverable");
+
+			ULONG n = 0;
+			for (auto& deleted_file : deleted_files)
+			{
+				df_table->add_item_line(std::to_string(n++));
+				df_table->add_item_line(utils::format::hex(std::get<0>(deleted_file)));
+				df_table->add_item_line((std::get<1>(deleted_file) ? "Dir" : "File"));
+				df_table->add_item_line(get_full_path(std::get<0>(deleted_file), index_to_name, index_to_parent));
+				df_table->add_item_line((std::get<1>(deleted_file) ? " " : utils::format::size(std::get<2>(deleted_file))));
+				df_table->add_item_line(utils::times::display_systemtime(std::get<3>(deleted_file)));
+
+				std::ostringstream percent;
+				percent << std::fixed << std::setprecision(2) << std::get<4>(deleted_file);
+				df_table->add_item_line(percent.str());
+				df_table->new_line();
+			}
+
+			df_table->render(std::cout);
+			std::cout << std::endl;
 		}
 
-		df_table->render(std::cout);
-		std::cout << std::endl;
+	}
+	else
+	{
+		std::cout << "[!] No deleted files found" << deleted_files.size() << std::endl;
 	}
 	return 0;
 }
