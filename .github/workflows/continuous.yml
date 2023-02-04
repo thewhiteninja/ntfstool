@@ -1,0 +1,46 @@
+
+env:
+  NUKE_TELEMETRY_OPTOUT: 1
+name: continuous
+
+on: push
+
+jobs:
+  continuous:
+    name: Run
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        BaseImage: [windows-latest]
+        Configuration: [Debug, Release]
+        Arch: [x86, x64]
+
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          repository: microsoft/vcpkg
+          path: vcpkg
+      - name: Run VCPkg bootstrap
+        run:  .\vcpkg\bootstrap-vcpkg.bat
+      - name: Run VCPkg Integration
+        run:  .\vcpkg\vcpkg integrate install
+      - name: Set VS path
+        run: Split-Path (& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find MSBuild\Current\Bin\amd64\MSBuild.exe | Select-Object -First 1) -Parent | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Do Build
+        run: msbuild -v:m -m -restore -t:Build -p:Configuration=${{matrix.Configuration}} /p:Platform=${{matrix.Arch}}
+      - name: Copy Artifacts
+        run: |
+          mkdir final
+          copy D:\a\ntfstool\ntfstool\Builds\${{matrix.Configuration}}\${{matrix.Arch}}\ntfstool*.exe final
+      - uses: actions/upload-artifact@v1
+        with:
+          name: build-${{matrix.Configuration}}-${{matrix.Arch}}
+          path: final
