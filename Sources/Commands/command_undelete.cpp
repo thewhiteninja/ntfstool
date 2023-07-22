@@ -100,8 +100,8 @@ int print_deleted_files(std::shared_ptr<Disk> disk, std::shared_ptr<Volume> vol,
 
 	std::shared_ptr<NTFSExplorer> explorer = std::make_shared<NTFSExplorer>(vol);
 
-	DWORD cluster_size = ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->bytePerSector * ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->sectorPerCluster;
-	DWORD record_size = ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord >= 0 ? ((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord * cluster_size : 1 << -((PBOOT_SECTOR_NTFS)explorer->reader()->boot_record())->clusterPerRecord;
+	DWORD cluster_size = explorer->reader()->sizes.cluster_size;
+	DWORD record_size = explorer->reader()->sizes.record_size;
 
 	std::shared_ptr<MFTRecord> record = explorer->mft()->record_from_number(0);
 	ULONG64 total_size = record->datasize();
