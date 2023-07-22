@@ -129,7 +129,7 @@ void print_help_mft_dump(const char* name)
 	command_header("mft.dump");
 	command_description(name, "mft.dump [disk id] [volume id] [output] (format)", "Dump $MFT for selected disk, volume and inode/path");
 	command_examples(name, "Dump raw $MFT for disk 0, volume 2 to a file", "mft.dump disk=0 volume=2 output=myvolume.mft");
-	command_examples(name, "Parse $MFT for disk 0, volume 2 and output results in a CSV file", "mft.dump disk=0 volume=2 output=my_mft.json format=json");
+	command_examples(name, "Parse $MFT for disk 0, volume 2 and output results in a json file", "mft.dump disk=0 volume=2 output=my_mft.json format=json");
 }
 
 void print_help_bitlocker(const char* name)
