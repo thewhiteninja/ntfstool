@@ -14,7 +14,7 @@
 NTFSTool is a forensic tool focused on [NTFS][10] volumes.
 It supports reading partition info (MBR, partition table, VBR) but also information on Master File Table, Bitlocker encrypted volume, EFS encrypted files, USN journal and more.
 
-Download the latest binaries on [AppVeyor](https://ci.appveyor.com/project/thewhiteninja/ntfstool).
+Download the latest binaries on [AppVeyor](https://ci.appveyor.com/project/thewhiteninja/ntfstool) or by checking the last GitHub [artefacts](https://github.com/thewhiteninja/ntfstool/actions).
 
 See below for some [examples](#examples) of the features!
 
