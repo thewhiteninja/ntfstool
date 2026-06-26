@@ -8,11 +8,10 @@ on: push
 jobs:
   continuous:
     name: Run
-    runs-on: windows-latest
+    runs-on: windows-2022
     strategy:
       fail-fast: false
       matrix:
-        BaseImage: [windows-latest]
         Configuration: [Debug, Release]
         Arch: [x86, x64]
 
@@ -27,6 +26,7 @@ jobs:
           submodules: recursive
           fetch-depth: 0
           repository: microsoft/vcpkg
+          ref: 2026.04.27
           path: vcpkg
       - name: Run VCPkg bootstrap
         run:  .\vcpkg\bootstrap-vcpkg.bat
@@ -40,7 +40,7 @@ jobs:
         run: |
           mkdir final
           copy D:\a\ntfstool\ntfstool\Builds\${{matrix.Configuration}}\${{matrix.Arch}}\ntfstool*.exe final
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: build-${{matrix.Configuration}}-${{matrix.Arch}}
           path: final
